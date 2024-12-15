@@ -41,12 +41,12 @@ namespace Omnis
         }
 
         /// <summary>
-        /// It continuously lerps from 0 to 1 by <i>t</i>.
+        /// It continuously lerps from 0 to 1 with <i>speed</i>.
         /// </summary>
         public static IEnumerator Lerp(UnityAction<float> action, float speed = 1f)
         {
             var life = 0f;
-            while (1f - life > Mathf.Epsilon)
+            while (1f - life > 0.01f)
             {
                 action?.Invoke(life);
                 life = Mathf.Lerp(life, 1f, speed * Time.deltaTime);
@@ -56,12 +56,12 @@ namespace Omnis
         }
 
         /// <summary>
-        /// It continuously lerps from 0 to 1 by <i>t</i>.
+        /// It continuously lerps from 0 to 1 with <i>speed</i>.
         /// </summary>
         public static IEnumerator LerpFixed(UnityAction<float> action, float speed = 1f)
         {
             var life = 0f;
-            while (1f - life > Mathf.Epsilon)
+            while (1f - life > 0.01f)
             {
                 action?.Invoke(life);
                 life = Mathf.Lerp(life, 1f, speed * Time.fixedDeltaTime);
@@ -98,7 +98,7 @@ namespace Omnis
         }
 
         /// <summary>
-        /// It invokes <i>action</i> every fixed frame and won't stop by itself.
+        /// It invokes <i>action</i> every fixed update and won't stop by itself.
         /// </summary>
         public static IEnumerator InfiniteLoopFixed(UnityAction action)
         {
