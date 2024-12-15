@@ -1,3 +1,6 @@
+// author: Omnistudio
+// version: 2024.12.15
+
 using UnityEngine;
 
 namespace Omnis
@@ -16,7 +19,17 @@ namespace Omnis
             get => mute;
             set => mute = value;
         }
-        public void PlaySE(string seName) => PlaySE(System.Enum.Parse<SoundEffectName>(seName));
+        public void PlaySE(string seName)
+        {
+            try
+            {
+                PlaySE(System.Enum.Parse<SoundEffectName>(seName));
+            }
+            catch
+            {
+                Debug.LogWarning($"No sound effect named {seName}.");
+            }
+        }
         public void PlaySE(SoundEffectName seName)
         {
             if (!Mute)
