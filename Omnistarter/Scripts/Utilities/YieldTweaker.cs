@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2024.12.15
 
 using System.Collections;
 using UnityEngine;
@@ -22,8 +22,7 @@ namespace Omnis
                 life += Time.deltaTime / time;
                 yield return null;
             }
-            life = 1f;
-            action?.Invoke(life);
+            action?.Invoke(1f);
         }
 
         /// <summary>
@@ -38,8 +37,7 @@ namespace Omnis
                 life += Time.fixedDeltaTime / time;
                 yield return new WaitForFixedUpdate();
             }
-            life = 1f;
-            action?.Invoke(life);
+            action?.Invoke(1f);
         }
 
         /// <summary>
@@ -54,8 +52,7 @@ namespace Omnis
                 life = Mathf.Lerp(life, 1f, speed * Time.deltaTime);
                 yield return null;
             }
-            life = 1f;
-            action?.Invoke(life);
+            action?.Invoke(1f);
         }
 
         /// <summary>
@@ -70,8 +67,7 @@ namespace Omnis
                 life = Mathf.Lerp(life, 1f, speed * Time.fixedDeltaTime);
                 yield return new WaitForFixedUpdate();
             }
-            life = 1f;
-            action?.Invoke(life);
+            action?.Invoke(1f);
         }
 
         /// <summary>

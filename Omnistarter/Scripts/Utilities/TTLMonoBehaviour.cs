@@ -1,7 +1,6 @@
 // author: Omnistudio
-// version: 2024.11.01
+// version: 2024.12.15
 
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,57 +8,33 @@ namespace Omnis
 {
     /// <summary>
     /// After Start(), live <i>lifeTime</i> and then destroy gameObject.<br />
+    /// Use <i>OnStart</i> to initiate.<br />
     /// Use <i>OnLifeSpan</i> to set callbacks.
     /// </summary>
     public class TTLMonoBehaviour : MonoBehaviour
     {
-        #region Serialized Fields
-        [SerializeField] private float lifeTime = 1f;
-        #endregion
-
-        #region Fields
-        private float life;
-        private float Life
-        {
-            get => life;
-            set
-            {
-                life = Mathf.Clamp01(value);
-                OnLifeSpan.Invoke(value);
-            }
-        }
-        #endregion
-
-        #region Interfaces
+        public float lifeTime = 1f;
         public TTLMonoBehaviour SetLifeTime(float value)
         {
             lifeTime = value;
             return this;
         }
+
         /// <summary>
-        /// The float value would be 1 at the start, 0 at the end.
+        /// The float value would be 0 at the start, 1 at the end.
         /// </summary>
-        public UnityAction<float> OnLifeSpan {  private get; set; }
-        #endregion
+        public UnityAction<float> OnLifeSpan { private get; set; }
 
-        #region Life Span
+        #region Unity methods
         protected virtual void OnStart() { }
-        private void Start()
+        protected void Start()
         {
-            life = 1f;
             OnStart();
-            StartCoroutine(LifeSpan());
-        }
-
-        private IEnumerator LifeSpan()
-        {
-            var lifeTimeFixed = lifeTime;
-            while (Life > 0f)
+            StartCoroutine(YieldTweaker.Linear((value) =>
             {
-                Life -= Time.deltaTime / lifeTimeFixed;
-                yield return 0;
-            }
-            Destroy(gameObject);
+                OnLifeSpan?.Invoke(value);
+                if (value == 1f) Destroy(gameObject);
+            }, lifeTime));
         }
         #endregion
     }
