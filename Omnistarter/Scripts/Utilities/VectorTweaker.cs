@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.10.30
+// version: 2025.02.16
 
 using UnityEngine;
 
@@ -27,10 +27,18 @@ namespace Omnis
         #endregion
 
         #region Vector2 to Vector3
+        /// <returns>(x, y, n)</returns>
+        public static Vector3 V2ToV3xy(Vector2 v2, float n) => new(v2.x, v2.y, n);
+        /// <returns>(x, n, y)</returns>
+        public static Vector3 V2ToV3xz(Vector2 v2, float n) => new(v2.x, n, v2.y);
+        /// <returns>(n, x, y)</returns>
+        public static Vector3 V2ToV3yz(Vector2 v2, float n) => new(n, v2.x, v2.y);
         /// <returns>(x, y, 0)</returns>
         public static Vector3 V2ToV3xy(Vector2 v2) => new(v2.x, v2.y, 0f);
         /// <returns>(x, 0, y)</returns>
         public static Vector3 V2ToV3xz(Vector2 v2) => new(v2.x, 0f, v2.y);
+        /// <returns>(0, x, y)</returns>
+        public static Vector3 V2ToV3yz(Vector2 v2) => new(0f, v2.x, v2.y);
         #endregion
 
         #region Vector3 to Vector2
