@@ -1,7 +1,7 @@
 // author: Omnistudio
-// version: 2024.10.28
+// version: 2025.02.19
 
-#if UNITY_EDITOR
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,6 +12,7 @@ namespace Omnis
     /// </summary>
     public class EditorTweaker : Editor
     {
+        #region Inspector
         /// <summary>
         /// Add one line of self script in Inspector.
         /// </summary>
@@ -21,6 +22,7 @@ namespace Omnis
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)System.Convert.ChangeType(target, classType)), classType, false);
             GUI.enabled = true;
         }
+
         /// <summary>
         /// Add one line of Header and prior space.
         /// </summary>
@@ -29,6 +31,17 @@ namespace Omnis
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
         }
+        #endregion
+
+        #region Assets
+        public static string ExtractAssetNameFromObject(Object obj)
+            => ExtractAssetNameFromPath(AssetDatabase.GetAssetPath(obj));
+        public static string ExtractAssetNameFromPath(string path)
+            => string.Concat(path.Split('/').Last().Split('.')[0..^1]);
+        public static string ExtractAssetMainNameFromObject(Object obj)
+            => ExtractAssetMainNameFromPath(AssetDatabase.GetAssetPath(obj));
+        public static string ExtractAssetMainNameFromPath(string path)
+            => path.Split('/').Last().Split('.')[0];
+        #endregion
     }
 }
-#endif

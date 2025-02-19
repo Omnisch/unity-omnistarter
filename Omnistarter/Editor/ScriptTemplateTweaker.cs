@@ -1,3 +1,6 @@
+// author: Omnistudio
+// version: 2025.02.19
+
 using System;
 using System.IO;
 using UnityEditor;
@@ -21,7 +24,9 @@ namespace Omnis
                     {
                         string content = File.ReadAllText(fullPath);
 
-                        content = content.Replace("#DATE#", DateTime.Now.ToString("yyyy.MM.dd"));
+                        content = content
+                            .Replace("#DATE#", DateTime.Now.ToString("yyyy.MM.dd"))
+                            .Replace("#PARTIALSCRIPTNAME#", EditorTweaker.ExtractAssetMainNameFromPath(path));
 
                         File.WriteAllText(fullPath, content);
                         AssetDatabase.Refresh();

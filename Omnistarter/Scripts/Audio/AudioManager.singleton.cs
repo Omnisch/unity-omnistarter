@@ -5,8 +5,7 @@ namespace Omnis
 {
     public partial class AudioManager
     {
-        private static AudioManager instance;
-        public static AudioManager Instance => instance;
+        public static AudioManager Instance { get; private set; }
 
         private bool EnsureSingleton()
         {
@@ -17,7 +16,7 @@ namespace Omnis
             }
             else
             {
-                instance = this;
+                Instance = this;
                 StartCoroutine(YieldTweaker.DoAfter(
                     () => gameObject.scene.isLoaded,
                     () => DontDestroyOnLoad(gameObject)));
