@@ -1,19 +1,13 @@
-using System.Collections;
-using UnityEngine;
+// author: Omnistudio
+// version: 2025.02.19
 
 namespace Omnis
 {
     public partial class GameManager
     {
-        #region Fields
         private static GameManager instance;
-        #endregion
-
-        #region Interfaces
         public static GameManager Instance => instance;
-        #endregion
 
-        #region Functions
         private bool EnsureSingleton()
         {
             if (Instance != null && Instance != this)
@@ -24,24 +18,17 @@ namespace Omnis
             else
             {
                 instance = this;
-                StartCoroutine(DontDestroySelfOnLoadCoroutine());
+                StartCoroutine(YieldTweaker.DoAfter(
+                    () => gameObject.scene.isLoaded,
+                    () => DontDestroyOnLoad(gameObject)));
                 return true;
             }
         }
 
-        private IEnumerator DontDestroySelfOnLoadCoroutine()
-        {
-            yield return new WaitUntil(() => gameObject.scene.isLoaded);
-            DontDestroyOnLoad(gameObject);
-        }
-        #endregion
-
-        #region Unity Methods
         private void Awake()
         {
             if (!EnsureSingleton())
                 return;
         }
-        #endregion
     }
 }

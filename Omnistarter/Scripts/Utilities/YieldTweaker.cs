@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.15
+// version: 2025.02.19
 
 using System.Collections;
 using UnityEngine;
@@ -9,7 +9,7 @@ namespace Omnis
 {
     public class YieldTweaker
     {
-        #region Static Functions
+        #region Linear Accumulation
         /// <summary>
         /// It takes <i>time</i> seconds to accumulate from 0 to 1.
         /// </summary>
@@ -39,7 +39,9 @@ namespace Omnis
             }
             action?.Invoke(1f);
         }
+        #endregion
 
+        #region Lerp Accumulation
         /// <summary>
         /// It continuously lerps from 0 to 1 with <i>speed</i>.
         /// </summary>
@@ -69,7 +71,9 @@ namespace Omnis
             }
             action?.Invoke(1f);
         }
+        #endregion
 
+        #region Infinite Loop
         /// <summary>
         /// It invokes <i>action</i> every frame and won't stop by itself.
         /// </summary>
@@ -108,6 +112,17 @@ namespace Omnis
                 action.Invoke();
                 yield return new WaitForFixedUpdate();
             }
+        }
+        #endregion
+
+        #region Wait Until
+        /// <summary>
+        /// Do <i>action</i> until <i>condition</i> becomes true.
+        /// </summary>
+        public static IEnumerator DoAfter(System.Func<bool> condition, UnityAction action)
+        {
+            yield return new WaitUntil(condition);
+            action?.Invoke();
         }
         #endregion
     }
