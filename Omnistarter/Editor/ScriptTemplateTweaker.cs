@@ -1,12 +1,12 @@
 // author: Omnistudio
-// version: 2025.02.19
+// version: 2025.03.15
 
 using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Editor
 {
     public class ScriptTemplateTweaker : AssetModificationProcessor
     {

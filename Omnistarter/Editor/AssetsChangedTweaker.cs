@@ -7,39 +7,37 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Editor
 {
     public class AssetsChangedTweaker : AssetPostprocessor
     {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            //EditorApplication.delayCall += () =>
+            foreach (string path in importedAssets)
             {
-                foreach (string path in importedAssets)
+                if (path.EndsWith(".cs"))
                 {
-                    if (path.EndsWith(".cs"))
+                    string fullPath = Application.dataPath[..^"Assets".Length] + path;
+
+                    if (File.Exists(fullPath))
                     {
-                        string fullPath = Application.dataPath[..^"Assets".Length] + path;
+                        string content = File.ReadAllText(fullPath);
 
-                        if (File.Exists(fullPath))
-                        {
-                            string content = File.ReadAllText(fullPath);
-
-                            string toMatch = @"// version: (\d{4}\.\d{2}\.\d{2})";
-                            Match m = Regex.Match(content, toMatch);
-                            if (m.Success)
+                        string pattern = @"\d{4}\.\d{2}\.\d{2}";
+                        Regex rgx = new(pattern);
+                        Match m = rgx.Match(content);
+                        if (m.Success)
+                        {   
+                            if (DateTime.Parse(m.Groups[0].Value) != DateTime.Now.Date)
                             {
-                                if (DateTime.Parse(m.Groups[1].Captures[0].Value) != DateTime.Now.Date)
-                                {
-                                    content = Regex.Replace(content, toMatch, "// version: " + DateTime.Now.ToString("yyyy.MM.dd"));
-                                    File.WriteAllText(fullPath, content);
-                                    AssetDatabase.Refresh();
-                                }
+                                content = rgx.Replace(content, DateTime.Now.ToString("yyyy.MM.dd"), 1);
+                                File.WriteAllText(fullPath, content);
+                                AssetDatabase.Refresh();
                             }
                         }
                     }
                 }
-            };
+            }
         }
     }
 }

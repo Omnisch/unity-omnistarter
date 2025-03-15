@@ -1,9 +1,9 @@
 // author: Omnistudio
-// version: 2025.02.19
+// version: 2025.03.15
 
 using UnityEditor;
 
-namespace Omnis
+namespace Omnis.Editor
 {
     public static class CreateMenuItem
     {
