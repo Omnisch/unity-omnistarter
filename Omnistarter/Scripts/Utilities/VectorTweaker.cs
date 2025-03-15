@@ -1,9 +1,9 @@
 // author: Omnistudio
-// version: 2025.02.16
+// version: 2025.03.15
 
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Util
 {
     /// <summary>
     /// Auxiliary functions of UnityEngine.Vector2 and UnityEngine.Vector3.

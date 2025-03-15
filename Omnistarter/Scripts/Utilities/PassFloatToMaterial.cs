@@ -1,9 +1,9 @@
 // author: Omnistudio
-// version: 2024.12.15
+// version: 2025.03.15
 
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Util
 {
     /// <summary>
     /// Use <i>FloatToPass</i> or <i>LerpTo</i> to pass a float to <i>material</i>

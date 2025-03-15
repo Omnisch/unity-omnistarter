@@ -1,10 +1,10 @@
 // author: Omnistudio
-// version: 2024.12.15
+// version: 2025.03.15
 
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Omnis
+namespace Omnis.Util
 {
     /// <summary>
     /// After Start(), live <i>lifeTime</i> and then destroy gameObject.<br />

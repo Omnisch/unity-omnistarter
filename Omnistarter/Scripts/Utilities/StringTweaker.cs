@@ -1,16 +1,14 @@
 // author: Omnistudio
-// version: 2025.02.16
+// version: 2025.03.15
 
-using UnityEngine;
-
-namespace Omnis
+namespace Omnis.Util
 {
     public class StringTweaker
     {
-        public static readonly string[] hanNumbers = { "Áã", "Ò»", "¶ş", "Èı", "ËÄ", "Îå", "Áù", "Æß", "°Ë", "¾Å" };
-        public static readonly string[] hanNumbersFormal = { "Áã", "Ò¼", "·¡", "Èş", "ËÁ", "Îé", "Â½", "Æâ", "°Æ", "¾Á" };
-        private static readonly string[] unit = { "", "Ê®", "°Ù", "Ç§", "Íò", "Ê®", "°Ù", "Ç§", "ÒÚ" };
-        private static readonly string[] unitFormal = { "", "Ê°", "°Û", "Çª", "Íò", "Ê°", "°Û", "Çª", "ÒÚ" };
+        public static readonly string[] hanNumbers = { "é›¶", "ä¸€", "äºŒ", "ä¸‰", "å››", "äº”", "å…­", "ä¸ƒ", "å…«", "ä¹" };
+        public static readonly string[] hanNumbersFormal = { "é›¶", "å£¹", "è´°", "å", "è‚†", "ä¼", "é™†", "æŸ’", "æŒ", "ç–" };
+        private static readonly string[] unit = { "", "å", "ç™¾", "åƒ", "ä¸‡", "å", "ç™¾", "åƒ", "äº¿" };
+        private static readonly string[] unitFormal = { "", "æ‹¾", "ä½°", "ä»Ÿ", "ä¸‡", "æ‹¾", "ä½°", "ä»Ÿ", "äº¿" };
 
         public static string NumberToHanCardinal(string numStr, bool useFormal = false)
         {
@@ -60,13 +58,13 @@ namespace Omnis
 
             if (!useFormal)
             {
-                if (integerStr.StartsWith("Ò»Ê®"))
+                if (integerStr.StartsWith("ä¸€å"))
                     integerStr = integerStr[1..];
             }
 
             string decimalStr = NumeralToHanIndividual(splitted[1], useFormal);
 
-            return decimalStr == "" ? integerStr : integerStr + "µã" + decimalStr;
+            return decimalStr == "" ? integerStr : integerStr + "ç‚¹" + decimalStr;
         }
 
         public static string NumeralToHanIndividual(string no, bool useFormal = false)

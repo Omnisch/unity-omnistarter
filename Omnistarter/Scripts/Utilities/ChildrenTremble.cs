@@ -1,10 +1,10 @@
 // author: Omnistudio
-// version: 2024.10.28
+// version: 2025.03.15
 
 using System.Linq;
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Util
 {
     [RequireComponent(typeof(Rigidbody))]
     public class ChildrenTremble : MonoBehaviour

@@ -1,11 +1,11 @@
 // author: Omnistudio
-// version: 2025.02.19
+// version: 2025.03.15
 
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Omnis
+namespace Omnis.Util
 {
     public class YieldTweaker
     {

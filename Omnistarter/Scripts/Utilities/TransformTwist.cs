@@ -1,10 +1,10 @@
 // author: Omnistudio
-// version: 2024.10.28
+// version: 2025.03.15
 
 using System.Collections;
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Util
 {
     /// <summary>
     /// Slightly move the transform to imitate effects like trembling.

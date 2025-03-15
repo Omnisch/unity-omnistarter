@@ -1,9 +1,9 @@
 // author: Omnistudio
-// version: 2024.11.01
+// version: 2025.03.15
 
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Util
 {
     /// <summary>
     /// Auxiliary functions of UnityEngine.Color.
