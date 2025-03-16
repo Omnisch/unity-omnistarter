@@ -30,11 +30,11 @@ namespace Omnis
         protected void Start()
         {
             OnStart();
-            StartCoroutine(Utils.YieldTweaker.Linear((value) =>
+            StartCoroutine(Utils.YieldTweaker.Ease((value) =>
             {
                 OnLifeSpan?.Invoke(value);
                 if (value == 1f) Destroy(gameObject);
-            }, lifeTime));
+            }, Utils.Easing.Linear, lifeTime));
         }
         #endregion
     }

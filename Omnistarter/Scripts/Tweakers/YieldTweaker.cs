@@ -12,14 +12,16 @@ namespace Omnis.Utils
     {
         #region Accumulations
         /// <summary>
-        /// It takes <i>time</i> seconds to accumulate from 0 to 1.
+        /// It takes <i>time</i> seconds to ease from 0 to 1 using <i>easingFunc</i>.
         /// </summary>
-        public static IEnumerator Linear(UnityAction<float> action, float time = 1f, bool fixedUpdate = false)
+        public static IEnumerator Ease(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
         {
             var life = 0f;
+            var value = 0f;
             while (life < 1f)
             {
-                action?.Invoke(life);
+                action?.Invoke(value);
+                value = easingFunc(life);
                 life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
@@ -44,7 +46,7 @@ namespace Omnis.Utils
         /// <summary>
         /// It imitates an elastic motion from 0 to 1.
         /// </summary>
-        public static IEnumerator Elastic(UnityAction<float> action, float speed = 1f, float drag = 0.1f, bool fixedUpdate = false)
+        public static IEnumerator ElasticBounce(UnityAction<float> action, float speed = 1f, float drag = 0.1f, bool fixedUpdate = false)
         {
             var amp = 1f;
             var life = 0f;
@@ -58,7 +60,7 @@ namespace Omnis.Utils
                 life += fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
-            action?.Invoke(1f);
+            action?.Invoke(0f);
         }
 
         /// <summary>
@@ -104,6 +106,10 @@ namespace Omnis.Utils
                 }
         }
 
+        /// <summary>
+        /// It starts coroutine <i>action</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
+        /// If <i>i</i> less than 1, it won't stop.
+        /// </summary>
         public static IEnumerator Loop(Func<IEnumerator> action, float interval = 0f, int i = 0)
         {
             if (action == null) yield break;
@@ -128,10 +134,19 @@ namespace Omnis.Utils
         /// <summary>
         /// Do <i>action</i> when <i>condition</i> becomes true.
         /// </summary>
-        public static IEnumerator DoWhen(System.Func<bool> condition, UnityAction action)
+        public static IEnumerator DoWhen(Func<bool> condition, UnityAction action)
         {
             yield return new WaitUntil(condition);
             action?.Invoke();
+        }
+
+        /// <summary>
+        /// Do <i>former</i> and <i>latter</i> sequentially.
+        /// </summary>
+        public static IEnumerator DoAfter(Func<IEnumerator> former, Func<IEnumerator> latter)
+        {
+            yield return former();
+            yield return latter();
         }
         #endregion
     }
