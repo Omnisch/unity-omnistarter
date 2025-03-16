@@ -8,7 +8,7 @@ namespace Omnis.Utils
     /// <summary>
     /// Auxiliary methods of UnityEngine.Vector2 and UnityEngine.Vector3.
     /// </summary>
-    public static class VectorTweaker
+    public static class VectorHelper
     {
         #region Vector2 consts
         /// <summary>Shorthand for writing Vector2(-1, -1).</summary>

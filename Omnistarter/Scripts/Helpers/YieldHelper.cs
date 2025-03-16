@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace Omnis.Utils
 {
-    public static class YieldTweaker
+    public static class YieldHelper
     {
         #region Accumulations
         /// <summary>

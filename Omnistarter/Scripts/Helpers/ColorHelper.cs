@@ -8,7 +8,7 @@ namespace Omnis.Utils
     /// <summary>
     /// Auxiliary methods of UnityEngine.Color.
     /// </summary>
-    public static class ColorTweaker
+    public static class ColorHelper
     {
         #region Common colors
 

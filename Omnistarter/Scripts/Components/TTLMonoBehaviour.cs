@@ -30,7 +30,7 @@ namespace Omnis
         protected void Start()
         {
             OnStart();
-            StartCoroutine(Utils.YieldTweaker.Ease((value) =>
+            StartCoroutine(Utils.YieldHelper.Ease((value) =>
             {
                 OnLifeSpan?.Invoke(value);
                 if (value == 1f) Destroy(gameObject);

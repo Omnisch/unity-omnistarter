@@ -17,7 +17,7 @@ namespace Omnis
             else
             {
                 Instance = this;
-                StartCoroutine(Utils.YieldTweaker.DoWhen(
+                StartCoroutine(Utils.YieldHelper.DoWhen(
                     () => gameObject.scene.isLoaded,
                     () => DontDestroyOnLoad(gameObject)));
                 return true;

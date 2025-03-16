@@ -34,7 +34,7 @@ namespace Omnis
         {
             StopAllCoroutines();
             var startFloat = FloatToPass;
-            StartCoroutine(Utils.YieldTweaker.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
+            StartCoroutine(Utils.YieldHelper.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
         }
         #endregion
     }

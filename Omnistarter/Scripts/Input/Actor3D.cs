@@ -37,7 +37,7 @@ namespace Omnis
                 }
                 else if (value > 0f)
                 {
-                    jumpCoroutine = StartCoroutine(Utils.YieldTweaker.Lerp(jumpAction, jumpActionSpeed, true));
+                    jumpCoroutine = StartCoroutine(Utils.YieldHelper.Lerp(jumpAction, jumpActionSpeed, true));
                 }
             }
         }

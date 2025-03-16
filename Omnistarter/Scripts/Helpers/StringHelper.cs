@@ -6,7 +6,7 @@ namespace Omnis.Utils
     /// <summary>
     /// Auxiliary methods of System.String.
     /// </summary>
-    public static class StringTweaker
+    public static class StringHelper
     {
         public static readonly string[] hanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
         public static readonly string[] hanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
