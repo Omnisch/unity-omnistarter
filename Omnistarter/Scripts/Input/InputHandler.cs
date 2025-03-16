@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2025.03.15
 
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Omnis
         #region Fields
         private PlayerInput playerInput;
         private List<Collider> hits;
-        private List<ActorBase> listeners;
+        private List<GameObject> listeners;
         #endregion
 
         #region Properties
@@ -30,8 +30,8 @@ namespace Omnis
         #endregion
 
         #region Public Functions
-        public void AddListener(ActorBase listener) => listeners.Add(listener);
-        public bool RemoveListener(ActorBase listener) => listeners.Remove(listener);
+        public void AddListener(GameObject listener) => listeners.Add(listener);
+        public bool RemoveListener(GameObject listener) => listeners.Remove(listener);
         #endregion
 
         #region Functions

@@ -64,13 +64,13 @@ namespace Omnis
 
             handler = FindFirstObjectByType<InputHandler>();
             if (handler)
-                handler.AddListener(this);
+                handler.AddListener(gameObject);
             else
                 Destroy(gameObject);
         }
         private void OnDestroy()
         {
-            if (handler) handler.RemoveListener(this);
+            if (handler) handler.RemoveListener(gameObject);
         }
         #endregion
 
