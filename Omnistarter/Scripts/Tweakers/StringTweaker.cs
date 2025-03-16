@@ -3,14 +3,17 @@
 
 namespace Omnis.Utils
 {
-    public class StringTweaker
+    /// <summary>
+    /// Auxiliary methods of System.String.
+    /// </summary>
+    public static class StringTweaker
     {
         public static readonly string[] hanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
         public static readonly string[] hanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
         private static readonly string[] unit = { "", "十", "百", "千", "万", "十", "百", "千", "亿" };
         private static readonly string[] unitFormal = { "", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿" };
 
-        public static string NumberToHanCardinal(string numStr, bool useFormal = false)
+        public static string ParseToHanCardinal(this string numStr, bool useFormal = false)
         {
             // Not a number.
             if (!float.TryParse(numStr, out float num)) return "NAN";
@@ -62,17 +65,17 @@ namespace Omnis.Utils
                     integerStr = integerStr[1..];
             }
 
-            string decimalStr = NumeralToHanIndividual(splitted[1], useFormal);
+            string decimalStr = splitted[1].ParseToHanIndividual(useFormal);
 
             return decimalStr == "" ? integerStr : integerStr + "点" + decimalStr;
         }
 
-        public static string NumeralToHanIndividual(string no, bool useFormal = false)
+        public static string ParseToHanIndividual(this string numStr, bool useFormal = false)
         {
             string result = "";
             var numbers = useFormal ? hanNumbersFormal : hanNumbers;
 
-            foreach (char digit in no)
+            foreach (char digit in numStr)
             {
                 if (digit >= '0' && digit <= '9')
                     result += numbers[digit - '0'];

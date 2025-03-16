@@ -6,9 +6,9 @@ using UnityEngine;
 namespace Omnis.Utils
 {
     /// <summary>
-    /// Auxiliary functions of UnityEngine.Color.
+    /// Auxiliary methods of UnityEngine.Color.
     /// </summary>
-    public class ColorTweaker
+    public static class ColorTweaker
     {
         #region Common colors
 
@@ -62,7 +62,12 @@ namespace Omnis.Utils
 
         #endregion
 
-        #region Color Lerp
+        #region Change one value in Color
+        /// <returns>(r, g, b, n)</returns>
+        public static Color rgbn(this Color color, float n) => new(color.r, color.g, color.b, n);
+        #endregion
+
+        #region Color lerp
         public static Color LerpFromColorToColor(Color fromColor, Color toColor, float t) => new(
             Mathf.Lerp(fromColor.r, toColor.r, t),
             Mathf.Lerp(fromColor.g, toColor.g, t),

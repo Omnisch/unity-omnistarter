@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 namespace Omnis.Utils
 {
-    public class YieldTweaker
+    public static class YieldTweaker
     {
         #region Accumulation
         /// <summary>
@@ -124,7 +124,7 @@ namespace Omnis.Utils
         /// <summary>
         /// Do <i>action</i> until <i>condition</i> becomes true.
         /// </summary>
-        public static IEnumerator DoAfter(System.Func<bool> condition, UnityAction action)
+        public static IEnumerator DoWhen(System.Func<bool> condition, UnityAction action)
         {
             yield return new WaitUntil(condition);
             action?.Invoke();
