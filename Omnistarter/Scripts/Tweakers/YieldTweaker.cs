@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2025.03.16
 
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,7 +10,7 @@ namespace Omnis.Utils
 {
     public static class YieldTweaker
     {
-        #region Accumulation
+        #region Accumulations
         /// <summary>
         /// It takes <i>time</i> seconds to accumulate from 0 to 1.
         /// </summary>
@@ -78,51 +79,54 @@ namespace Omnis.Utils
         }
         #endregion
 
-        #region Infinite Loop
+        #region Loops
         /// <summary>
-        /// It invokes <i>action</i> every frame and won't stop by itself.
+        /// It invokes <i>action</i> every <i>interval</i> seconds for <i>i</i> times.<br/>
+        /// If <i>interval</i> leq to 0, it invokes <i>action</i> every frame.<br/>
+        /// If <i>i</i> less than 1, it won't stop.
         /// </summary>
-        public static IEnumerator InfiniteLoop(UnityAction action)
+        public static IEnumerator Loop(UnityAction action, float interval = 0f, int i = 0)
         {
             if (action == null) yield break;
-            while (true)
-            {
-                action.Invoke();
-                yield return null;
-            }
+            var waitForIntervalSeconds = new WaitForSeconds(interval);
+            if (i <= 0)
+                while (true)
+                {
+                    action.Invoke();
+                    yield return waitForIntervalSeconds;
+                }
+            else
+                while (i > 0)
+                {
+                    action.Invoke();
+                    i--;
+                    yield return waitForIntervalSeconds;
+                }
         }
 
-        /// <summary>
-        /// It invokes <i>action</i> every <i>interval</i> seconds and won't stop by itself.
-        /// </summary>
-        public static IEnumerator InfiniteLoop(UnityAction action, float interval)
+        public static IEnumerator Loop(Func<IEnumerator> action, float interval = 0f, int i = 0)
         {
             if (action == null) yield break;
-            var wfsInterval = new WaitForSeconds(interval);
-            while (true)
-            {
-                action.Invoke();
-                yield return wfsInterval;
-            }
-        }
-
-        /// <summary>
-        /// It invokes <i>action</i> every fixed update and won't stop by itself.
-        /// </summary>
-        public static IEnumerator InfiniteLoopFixed(UnityAction action)
-        {
-            if (action == null) yield break;
-            while (true)
-            {
-                action.Invoke();
-                yield return new WaitForFixedUpdate();
-            }
+            var waitForIntervalSeconds = new WaitForSeconds(interval);
+            if (i <= 0)
+                while (true)
+                {
+                    yield return action();
+                    yield return waitForIntervalSeconds;
+                }
+            else
+                while (i > 0)
+                {
+                    yield return action();
+                    i--;
+                    yield return waitForIntervalSeconds;
+                }
         }
         #endregion
 
-        #region Wait Until
+        #region Wait until
         /// <summary>
-        /// Do <i>action</i> until <i>condition</i> becomes true.
+        /// Do <i>action</i> when <i>condition</i> becomes true.
         /// </summary>
         public static IEnumerator DoWhen(System.Func<bool> condition, UnityAction action)
         {
