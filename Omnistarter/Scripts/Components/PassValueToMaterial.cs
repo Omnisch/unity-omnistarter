@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.15
+// version: 2025.03.16
 
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace Omnis
         {
             StopAllCoroutines();
             var startFloat = FloatToPass;
-            StartCoroutine(Util.YieldTweaker.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
+            StartCoroutine(Utils.YieldTweaker.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
         }
         #endregion
     }

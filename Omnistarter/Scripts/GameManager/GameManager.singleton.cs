@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.15
+// version: 2025.03.16
 
 namespace Omnis
 {
@@ -17,7 +17,7 @@ namespace Omnis
             else
             {
                 Instance = this;
-                StartCoroutine(Util.YieldTweaker.DoAfter(
+                StartCoroutine(Utils.YieldTweaker.DoAfter(
                     () => gameObject.scene.isLoaded,
                     () => DontDestroyOnLoad(gameObject)));
                 return true;

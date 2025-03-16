@@ -13,7 +13,7 @@ public partial class #PARTIALSCRIPTNAME#
         else
         {
             Instance = this;
-            StartCoroutine(Omnis.YieldTweaker.DoAfter(
+            StartCoroutine(Omnis.Utils.YieldTweaker.DoAfter(
                 () => gameObject.scene.isLoaded,
                 () => DontDestroyOnLoad(gameObject)));
             return true;

@@ -1,7 +1,7 @@
 // author: Omnistudio
-// version: 2025.03.15
+// version: 2025.03.16
 
-namespace Omnis.Util
+namespace Omnis.Utils
 {
     public class StringTweaker
     {

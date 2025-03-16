@@ -5,7 +5,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Omnis.Util
+namespace Omnis.Utils
 {
     public class YieldTweaker
     {
