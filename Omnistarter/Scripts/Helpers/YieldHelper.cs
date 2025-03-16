@@ -12,7 +12,7 @@ namespace Omnis.Utils
     {
         #region Accumulations
         /// <summary>
-        /// It takes <i>time</i> seconds to ease from 0 to 1 using <i>easingFunc</i>.
+        /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
         /// </summary>
         public static IEnumerator Ease(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
         {

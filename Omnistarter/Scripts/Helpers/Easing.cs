@@ -40,14 +40,12 @@ namespace Omnis.Utils
 
         public static float InBack(float x)
         {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1f;
+            const float c1 = 1.70158f, c3 = 2.70158f;
             return c3 * x * x * x - c1 * x * x;
         }
         public static float OutBack(float x)
         {
-            const float c1 = 1.70158f;
-            const float c3 = c1 + 1f;
+            const float c1 = 1.70158f, c3 = 2.70158f;
             return 1f + c3 * (x - 1f) * (x - 1f) * (x - 1f) + c1 * (x - 1f) * (x - 1f);
         }
 
