@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Omnis.Utils
 {
+    /// <summary>
+    /// All methods are directed at x belonging to [0, 1].
+    /// Being out of range may lead to unexpected effects.
+    /// </summary>
     public static class Easing
     {
         public static float Linear(float x) => x;
@@ -34,7 +38,11 @@ namespace Omnis.Utils
         public static float OutExpo(float x) => x == 1f ? 1f : 1f - Mathf.Pow(2f, -10f * x);
 
 
+        /// <remarks>
+        /// <para><strong>Note:</strong> It won't check if x is out of the domain and thus may return NAN.</para>
+        /// </remarks>
         public static float InCirc(float x) => 1f - Mathf.Sqrt(1f - x * x);
+        /// <inheritdoc cref="InCirc(float)"/>
         public static float OutCirc(float x) => Mathf.Sqrt(1f - (x - 1f) * (x - 1f));
 
 
@@ -76,5 +84,9 @@ namespace Omnis.Utils
             else if (x < 2.5f / d1) return n1 * (x -= 2.25f / d1) * x + 0.9375f;
             else return n1 * (x -= 2.625f / d1) * x + 0.984375f;
         }
+
+
+        public static float Smoothstep(float x) => Mathf.SmoothStep(0f, 1f, x);
+        public static float Smootherstep(float x) => x <= 0f ? 0f : (x >= 1f ? 1f : x * x * x * (6f * x * x - 15f * x + 10f));
     }
 }
