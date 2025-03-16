@@ -3,12 +3,12 @@
 
 using UnityEngine;
 
-namespace Omnis.Util
+namespace Omnis
 {
     /// <summary>
-    /// Use <i>FloatToPass</i> or <i>LerpTo</i> to pass a float to <i>material</i>
+    /// Use <i>FloatToPass</i> or <i>LerpTo</i> to pass a float to <i>material</i>.
     /// </summary>
-    public class PassFloatToMaterial : MonoBehaviour
+    public class PassValueToMaterial : MonoBehaviour
     {
         #region Serialized fields
         public Material material;
@@ -34,7 +34,7 @@ namespace Omnis.Util
         {
             StopAllCoroutines();
             var startFloat = FloatToPass;
-            StartCoroutine(YieldTweaker.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
+            StartCoroutine(Util.YieldTweaker.Lerp((x) => FloatToPass = Mathf.Lerp(startFloat, value, x), lerpSpeed));
         }
         #endregion
     }
