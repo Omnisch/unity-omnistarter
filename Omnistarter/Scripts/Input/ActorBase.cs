@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2025.03.17
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -53,7 +53,7 @@ namespace Omnis
         #endregion
 
         #region Functions
-        protected virtual void OnInteracted(List<ActorBase> siblings) {}
+        protected virtual void OnInteracted(List<GameObject> fellows) {}
         #endregion
 
         #region Unity methods
@@ -75,7 +75,7 @@ namespace Omnis
         #endregion
 
         #region Messages
-        protected void OnInteract(List<ActorBase> siblings) { if (Interactable) OnInteracted(siblings); }
+        protected void OnInteract(List<GameObject> fellows) { if (Interactable) OnInteracted(fellows); }
         private void OnMove(Vector2 value)
         {
             if (Interactable)

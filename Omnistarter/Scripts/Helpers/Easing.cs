@@ -1,12 +1,12 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.03.17
 
 using UnityEngine;
 
 namespace Omnis.Utils
 {
     /// <summary>
-    /// All methods are directed at x belonging to [0, 1].
+    /// All methods are directed at x starting with 0 and ending with 1.
     /// Being out of range may lead to unexpected effects.
     /// </summary>
     public static class Easing
@@ -16,6 +16,8 @@ namespace Omnis.Utils
 
         public static float InSine(float x) => 1f - Mathf.Cos(x * Mathf.PI / 2f);
         public static float OutSine(float x) => Mathf.Sin(x * Mathf.PI / 2f);
+        public static float InOutSine(float x) => -(Mathf.Cos(Mathf.PI * x) - 1f) / 2f;
+        public static float RawSine(float x) => Mathf.Sin(2f * Mathf.PI * x);
 
 
         public static float InQuad(float x) => x * x;

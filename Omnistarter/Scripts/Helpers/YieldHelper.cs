@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.03.17
 
 using System;
 using System.Collections;
@@ -16,8 +16,9 @@ namespace Omnis.Utils
         /// </summary>
         public static IEnumerator Ease(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
         {
-            var life = 0f;
-            var value = 0f;
+            time = Mathf.Max(time, float.Epsilon);
+            float life = 0f;
+            float value = 0f;
             while (life < 1f)
             {
                 action?.Invoke(value);
@@ -28,56 +29,36 @@ namespace Omnis.Utils
             action?.Invoke(1f);
         }
 
-        /// <summary>
-        /// It continuously lerps from 0 to 1 with <i>speed</i>.
-        /// </summary>
-        public static IEnumerator Lerp(UnityAction<float> action, float speed = 1f, bool fixedUpdate = false)
+        public static IEnumerator EaseRepeat(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
         {
-            var life = 0f;
-            while (1f - life > 0.01f)
+            time = Mathf.Max(time, float.Epsilon);
+            float life = 0f;
+            float value = 0f;
+            float scale = 1f;
+            while (life < cycleCount)
             {
-                action?.Invoke(life);
-                life = Mathf.Lerp(life, 1f, speed * (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime));
+                action?.Invoke(dampened ? scale * value : value);
+                value = easingFunc(pingPong ? life.PingPong(1f) : life.Repeat(1f));
+                if (dampened) scale = Mathf.Lerp(1f, 0f, life / cycleCount);
+                life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
+                yield return fixedUpdate ? new WaitForFixedUpdate() : null;
+            }
+            action?.Invoke(easingFunc(cycleCount.Repeat(1f)));
+        }
+
+        public static IEnumerator SmoothDamp(UnityAction<float> action, float time = 1f, bool fixedUpdate = false)
+        {
+            time = Mathf.Max(time, float.Epsilon);
+            float value = 0f;
+            float velocity = 0f;
+            float smoothTime = 0.3f * time;
+            while (!value.ApproxLoose(1f))
+            {
+                action?.Invoke(value);
+                value = Mathf.SmoothDamp(value, 1f, ref velocity, smoothTime);
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
             action?.Invoke(1f);
-        }
-
-        /// <summary>
-        /// It imitates an elastic motion from 0 to 1.
-        /// </summary>
-        public static IEnumerator ElasticBounce(UnityAction<float> action, float speed = 1f, float drag = 0.1f, bool fixedUpdate = false)
-        {
-            var amp = 1f;
-            var life = 0f;
-            var value = 0f;
-            while (amp > 0.01f)
-            {
-                action?.Invoke(value);
-                value = amp * Mathf.Sin(speed * life);
-                amp = Mathf.Exp(-drag * life);
-                Debug.Log(amp);
-                life += fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
-                yield return fixedUpdate ? new WaitForFixedUpdate() : null;
-            }
-            action?.Invoke(0f);
-        }
-
-        /// <summary>
-        /// It draws a sine wave from x=0.
-        /// </summary>
-        public static IEnumerator SineWave(UnityAction<float> action, float amplitude = 1f, float frequency = 1f, float cycleCount = 1f, bool fixedUpdate = false)
-        {
-            var life = 0f;
-            var value = 0f;
-            while (life < cycleCount / frequency)
-            {
-                action?.Invoke(value);
-                value = amplitude * Mathf.Sin(frequency * life * 2f * Mathf.PI);
-                life += fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime;
-                yield return fixedUpdate ? new WaitForFixedUpdate() : null;
-            }
-            action?.Invoke(amplitude * Mathf.Sin(cycleCount * 2f * Mathf.PI));
         }
         #endregion
 
@@ -141,12 +122,14 @@ namespace Omnis.Utils
         }
 
         /// <summary>
-        /// Do <i>former</i> and <i>latter</i> sequentially.
+        /// Do <i>coroutines</i> sequentially.
         /// </summary>
-        public static IEnumerator DoAfter(Func<IEnumerator> former, Func<IEnumerator> latter)
+        public static IEnumerator DoSequentially(params Func<IEnumerator>[] coroutines)
         {
-            yield return former();
-            yield return latter();
+            foreach (var coroutine in coroutines)
+            {
+                yield return coroutine();
+            }
         }
         #endregion
     }

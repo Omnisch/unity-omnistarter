@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.03.17
 
 using UnityEngine;
 
@@ -9,6 +9,7 @@ namespace Omnis.Utils
     {
         #region Extensions using Mathf
         public static float Abs(this float value) => Mathf.Abs(value);
+        public static bool Approximately(this float value, float target) => Mathf.Approximately(value, target);
         public static float Ceil(this float value) => Mathf.Ceil(value);
         public static int CeilToInt(this float value) => Mathf.CeilToInt(value);
         public static float Clamp(this float value, float min, float max) => Mathf.Clamp(value, min, max);
@@ -26,6 +27,10 @@ namespace Omnis.Utils
 
 
         #region Simple operations
+        /// <summary>
+        /// The loose version of Mathf.Approximately(), where Epsilon is 0.001.
+        /// </summary>
+        public static bool ApproxLoose(this float value, float target) => Mathf.Abs(target - value) < 0.001f;
         /// <returns>1 - value</returns>
         public static float Inv(this float value) => 1f - value;
         #endregion
