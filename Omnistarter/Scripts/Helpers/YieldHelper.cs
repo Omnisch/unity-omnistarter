@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.17
+// version: 2025.03.18
 
 using System;
 using System.Collections;
@@ -70,9 +70,9 @@ namespace Omnis.Utils
         }
         #endregion
 
-        #region Loops
+        #region Sequences
         /// <summary>
-        /// It invokes <i>actions</i> sequentially every <i>interval</i> seconds for <i>i</i> times.<br/>
+        /// It sequentially invokes <i>actions</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
         /// If <i>interval</i> &lt; 0, it invokes <i>action</i> every frame.<br/>
         /// If <i>i</i> less than 1, it won't stop.
         /// </summary>
@@ -80,66 +80,42 @@ namespace Omnis.Utils
         {
             var waitForIntervalSeconds = new WaitForSeconds(interval);
             int it = 0;
-            if (i <= 0)
-                while (true)
-                {
-                    actions[it]?.Invoke();
-                    it = (it + 1) % actions.Length;
-                    yield return waitForIntervalSeconds;
-                }
-            else
-                while (i > 0)
-                {
-                    actions[it]?.Invoke();
-                    it = (it + 1) % actions.Length;
-                    if (it == 0) i--;
-                    yield return waitForIntervalSeconds;
-                }
+            do {
+                actions[it]?.Invoke();
+                it = (it + 1) % actions.Length;
+                if (it == 0) i--;
+                yield return waitForIntervalSeconds;
+            } while (i != 0 || it != 0);
         }
 
         /// <summary>
-        /// It starts coroutine <i>action</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
+        /// It sequentially starts <i>iEnums</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
         /// If <i>i</i> less than 1, it won't stop.
         /// </summary>
-        public static IEnumerator Loop(Func<IEnumerator> action, float interval = 0f, int i = 0)
+        public static IEnumerator Loop(int i = 3, float interval = 1f, params Func<IEnumerator>[] iEnums)
         {
-            if (action == null) yield break;
             var waitForIntervalSeconds = new WaitForSeconds(interval);
-            if (i <= 0)
-                while (true)
-                {
-                    yield return action();
-                    yield return waitForIntervalSeconds;
-                }
-            else
-                while (i > 0)
-                {
-                    yield return action();
-                    i--;
-                    yield return waitForIntervalSeconds;
-                }
+            int it = 0;
+            do {
+                yield return iEnums[it]();
+                it = (it + 1) % iEnums.Length;
+                if (it == 0) i--;
+                yield return waitForIntervalSeconds;
+            } while (i != 0 || it != 0);
         }
-        #endregion
 
-        #region Wait until
         /// <summary>
-        /// Do <i>action</i> when <i>condition</i> becomes true.
+        /// It starts <i>iEnums</i> sequentially. It's the same with <i>Loop(1, 0, iEnums)</i>.
+        /// </summary>
+        public static IEnumerator DoSequence(params Func<IEnumerator>[] iEnums) => Loop(1, 0f, iEnums);
+
+        /// <summary>
+        /// It invokes <i>action</i> when <i>condition</i> becomes true.
         /// </summary>
         public static IEnumerator DoWhen(Func<bool> condition, UnityAction action)
         {
             yield return new WaitUntil(condition);
             action?.Invoke();
-        }
-
-        /// <summary>
-        /// Do <i>coroutines</i> sequentially.
-        /// </summary>
-        public static IEnumerator DoSequentially(params Func<IEnumerator>[] coroutines)
-        {
-            foreach (var coroutine in coroutines)
-            {
-                yield return coroutine();
-            }
         }
         #endregion
     }

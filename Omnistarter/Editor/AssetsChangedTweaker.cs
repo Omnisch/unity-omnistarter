@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.15
+// version: 2025.03.17
 
 using System;
 using System.IO;
@@ -27,7 +27,7 @@ namespace Omnis.Editor
                         Regex rgx = new(pattern);
                         Match m = rgx.Match(content);
                         if (m.Success)
-                        {   
+                        {
                             if (DateTime.Parse(m.Groups[0].Value) != DateTime.Now.Date)
                             {
                                 content = rgx.Replace(content, DateTime.Now.ToString("yyyy.MM.dd"), 1);
