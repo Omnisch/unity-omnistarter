@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.17
+// version: 2025.03.21
 
 using UnityEngine;
 
@@ -33,6 +33,16 @@ namespace Omnis.Utils
         public static bool ApproxLoose(this float value, float target) => Mathf.Abs(target - value) < 0.001f;
         /// <returns>1 - value</returns>
         public static float Inv(this float value) => 1f - value;
+        /// <summary>
+        /// Basically same with Mathf.Repeat(),
+        /// except when <i>value</i> % <i>length</i> = 0, it returns <i>length</i> instead of 0.
+        /// </summary>
+        public static float RepeatCeil(this float value, float length)
+        {
+            if (value == 0f) return 0f;
+            float commonRepeat = Mathf.Repeat(value, length);
+            return commonRepeat == 0f ? length : commonRepeat;
+        }
         #endregion
     }
 }

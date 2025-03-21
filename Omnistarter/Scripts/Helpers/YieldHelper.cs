@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.18
+// version: 2025.03.21
 
 using System;
 using System.Collections;
@@ -15,23 +15,12 @@ namespace Omnis.Utils
         /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
         /// </summary>
         public static IEnumerator Ease(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-        {
-            time = Mathf.Max(time, float.Epsilon);
-            float life = 0f;
-            float value = 0f;
-            while (life < 1f)
-            {
-                action?.Invoke(value);
-                value = easingFunc(life);
-                life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
-                yield return fixedUpdate ? new WaitForFixedUpdate() : null;
-            }
-            action?.Invoke(1f);
-        }
+            => EaseRepeat(action, easingFunc, time, 1f, false, false, fixedUpdate);
 
         /// <summary>
         /// It takes <i>time</i> seconds to ease from 0 to 1, repeat <i>cycleCount</i> times.
         /// </summary>
+        /// <param name="cycleCount">If less than 1, it won't stop.</param>
         /// <param name="pingPong">If true, it will use Mathf.PingPong() rather than Mathf.Repeat().</param>
         /// <param name="dampened">If true, it applys linear decay to the scale.</param>
         public static IEnumerator EaseRepeat(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
@@ -40,7 +29,7 @@ namespace Omnis.Utils
             float life = 0f;
             float value = 0f;
             float scale = 1f;
-            while (life < cycleCount)
+            while (life < cycleCount || cycleCount < 1)
             {
                 action?.Invoke(dampened ? scale * value : value);
                 value = easingFunc(pingPong ? life.PingPong(1f) : life.Repeat(1f));
@@ -48,7 +37,7 @@ namespace Omnis.Utils
                 life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
-            action?.Invoke(easingFunc(cycleCount.Repeat(1f)));
+            action?.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)));
         }
 
         /// <summary>
@@ -72,10 +61,10 @@ namespace Omnis.Utils
 
         #region Sequences
         /// <summary>
-        /// It sequentially invokes <i>actions</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
-        /// If <i>interval</i> &lt; 0, it invokes <i>action</i> every frame.<br/>
-        /// If <i>i</i> less than 1, it won't stop.
+        /// It sequentially invokes <i>actions</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.
         /// </summary>
+        /// <param name="i">If less than 1, it won't stop.</param>
+        /// <param name="interval">If <i>interval</i> &lt; 0, it invokes <i>action</i> every frame.</param>
         public static IEnumerator Loop(int i = 3, float interval = 1f, params UnityAction[] actions)
         {
             var waitForIntervalSeconds = new WaitForSeconds(interval);
@@ -89,9 +78,9 @@ namespace Omnis.Utils
         }
 
         /// <summary>
-        /// It sequentially starts <i>iEnums</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.<br/>
-        /// If <i>i</i> less than 1, it won't stop.
+        /// It sequentially starts <i>iEnums</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.
         /// </summary>
+        /// <param name="i">If less than 1, it won't stop.</param>
         public static IEnumerator Loop(int i = 3, float interval = 1f, params Func<IEnumerator>[] iEnums)
         {
             var waitForIntervalSeconds = new WaitForSeconds(interval);
