@@ -3,6 +3,14 @@
 
 #include "UnityCG.cginc"
 
+#define PI 3.1415926
+#define TAU 6.2831853
+
+bool ColorsAreSame(float4 c1, float4 c2)
+{
+    return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b && c1.a == c2.a;
+}
+
 float4 ApplyGaussianKernel(sampler2D tex, float2 uv, float depth)
 {
     float4 sum = float4(0, 0, 0, 0);
