@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.17
+// version: 2025.03.22
 
 using System.Collections.Generic;
 using System.Linq;
@@ -78,14 +78,14 @@ namespace Omnis
         #endregion
 
         #region Messages
-        protected virtual void OnLeftPress() => ForwardMessageToHits("OnLeftPress");
-        protected virtual void OnLeftRelease() => ForwardMessageToHits("OnLeftRelease");
-        protected virtual void OnRightPress() => ForwardMessageToHits("OnRightPress");
-        protected virtual void OnRightRelease() => ForwardMessageToHits("OnRightRelease");
-        protected virtual void OnMiddlePress() => ForwardMessageToHits("OnMiddlePress");
-        protected virtual void OnMiddleRelease() => ForwardMessageToHits("OnMiddleRelease");
-        protected virtual void OnScroll(InputValue value) => ForwardMessageToHits("OnScroll", value.Get<float>());
-        protected virtual void OnPointer(InputValue value)
+        private void OnLeftPress() => ForwardMessageToHits("OnLeftPress");
+        private void OnLeftRelease() => ForwardMessageToHits("OnLeftRelease");
+        private void OnRightPress() => ForwardMessageToHits("OnRightPress");
+        private void OnRightRelease() => ForwardMessageToHits("OnRightRelease");
+        private void OnMiddlePress() => ForwardMessageToHits("OnMiddlePress");
+        private void OnMiddleRelease() => ForwardMessageToHits("OnMiddleRelease");
+        private void OnScroll(InputValue value) => ForwardMessageToHits("OnScroll", value.Get<float>());
+        private void OnPointer(InputValue value)
         {
             PointerPosition = value.Get<Vector2>();
             Ray r = Camera.main.ScreenPointToRay(value.Get<Vector2>());
@@ -107,16 +107,17 @@ namespace Omnis
             hits = newHits;
         }
 
-        protected virtual void OnMove(InputValue value) => ForwardMessageToListeners("OnMove", value.Get<Vector2>());
-        protected virtual void OnAct() => ForwardMessageToListeners("OnAct");
-        protected virtual void OnCrouch() => ForwardMessageToListeners("OnCrouch");
-        protected virtual void OnJump(InputValue value) => ForwardMessageToListeners("OnJump", value.Get<float>());
-        protected virtual void OnRetry() => ForwardMessageToListeners("OnRetry");
+        private void OnMove(InputValue value) => ForwardMessageToListeners("OnMove", value.Get<Vector2>());
+        private void OnJump(InputValue value) => ForwardMessageToListeners("OnJump", value.Get<float>());
+        private void OnAct() => ForwardMessageToListeners("OnAct");
+        private void OnCrouch() => ForwardMessageToListeners("OnCrouch");
+        private void OnUndo() => ForwardMessageToListeners("OnUndo");
+        private void OnRetry() => ForwardMessageToListeners("OnRetry");
 
-        protected virtual void OnSave() => ForwardMessageToHits("OnSave");
-        protected virtual void OnLoad() => ForwardMessageToHits("OnLoad");
-        protected virtual void OnDebugTest() => debugLogic?.Invoke();
-        protected virtual void OnEscape()
+        private void OnSave() => ForwardMessageToHits("OnSave");
+        private void OnLoad() => ForwardMessageToHits("OnLoad");
+        private void OnDebugTest() => debugLogic?.Invoke();
+        private void OnEscape()
         {
 #if UNITY_STANDALONE
             Application.Quit();
