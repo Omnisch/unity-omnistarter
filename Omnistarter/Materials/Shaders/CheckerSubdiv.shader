@@ -2,8 +2,10 @@ Shader "Omnis/CheckerSubdiv"
 {
     Properties
     {
-        _KingTex ("King Texture", 2D) = "black" {}
+        _KingTex ("King Texture", 2D) = "white" {}
+        _KingTint ("King Tint", Color) = (0, 0, 0, 1)
         _QueenTex ("Queen Texture", 2D) = "white" {}
+        _QueenTint ("Queen Tint", Color) = (1, 1, 1, 1)
         _SubdivisionLevel ("Subdivision Level", Range(0, 12)) = 1
         _AspectRatio ("Aspect Ratio", Float) = 1
     }
@@ -24,6 +26,8 @@ Shader "Omnis/CheckerSubdiv"
 
             sampler2D _KingTex;
             sampler2D _QueenTex;
+            float4 _KingTint;
+            float4 _QueenTint;
 
             int _SubdivisionLevel;
             float _AspectRatio;
@@ -42,9 +46,9 @@ Shader "Omnis/CheckerSubdiv"
 
                 float mult = pow(2, _SubdivisionLevel);
                 if ((floor(scaledUv.x * mult) + floor(scaledUv.y * mult)) % 2 == 0)
-                    return cKing;
+                    return cKing * _KingTint;
                 else
-                    return cQueen;
+                    return cQueen * _QueenTint;
             }
             ENDCG
         }
