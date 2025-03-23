@@ -43,6 +43,7 @@ namespace Omnis.Utils
             float commonRepeat = Mathf.Repeat(value, length);
             return commonRepeat == 0f ? length : commonRepeat;
         }
+        public static float RoundDigits(this float value, int digits) => (float)System.Math.Round(value, digits);
         #endregion
 
         #region Float to Vector2 or Vector3

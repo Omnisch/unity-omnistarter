@@ -12,10 +12,22 @@ namespace Omnis.Utils
     {
         #region Accumulations
         /// <summary>
-        /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
+        /// <inheritdoc cref="Ease(UnityAction{float}, UnityAction, Func{float, float}, float, bool)"/>
         /// </summary>
         public static IEnumerator Ease(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-            => EaseRepeat(action, easingFunc, time, 1f, false, false, fixedUpdate);
+            => EaseRepeat(action, null, easingFunc, time, 1f, false, false, fixedUpdate);
+
+        /// <summary>
+        /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
+        /// </summary>
+        public static IEnumerator Ease(UnityAction<float> action, UnityAction final, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
+            => EaseRepeat(action, final, easingFunc, time, 1f, false, false, fixedUpdate);
+
+        /// <summary>
+        /// <inheritdoc cref="EaseRepeat(UnityAction{float}, UnityAction, Func{float, float}, float, float, bool, bool, bool)"/>
+        /// </summary>
+        public static IEnumerator EaseRepeat(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+            => EaseRepeat(action, null, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate);
 
         /// <summary>
         /// It takes <i>time</i> seconds to ease from 0 to 1, repeat <i>cycleCount</i> times.
@@ -23,7 +35,7 @@ namespace Omnis.Utils
         /// <param name="cycleCount">If less than 1, it won't stop.</param>
         /// <param name="pingPong">If true, it will use Mathf.PingPong() rather than Mathf.Repeat().</param>
         /// <param name="dampened">If true, it applys linear decay to the scale.</param>
-        public static IEnumerator EaseRepeat(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+        public static IEnumerator EaseRepeat(UnityAction<float> action, UnityAction final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
         {
             if (action == null) yield break;
 
@@ -40,6 +52,7 @@ namespace Omnis.Utils
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
             action.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)));
+            final?.Invoke();
         }
 
         /// <summary>
@@ -63,12 +76,18 @@ namespace Omnis.Utils
         }
         #endregion
 
-        #region Delta Time
+        #region Delta time
+        /// <summary>
+        /// <inheritdoc cref="GiveDeltaTime(UnityAction{float}, UnityAction, float, int, bool)"/>
+        /// </summary>
+        public static IEnumerator GiveDeltaTime(UnityAction<float> action, float time = 1f, int frameInterval = 1, bool fixedUpdate = false)
+            => GiveDeltaTime(action, null, time, frameInterval, fixedUpdate);
+
         /// <summary>
         /// It gives the delta time through <i>frameInterval</i> frames back to <i>action</i>.<br/>
         /// NOTE: Floating-point errors may occur.
         /// </summary>
-        public static IEnumerator GiveDeltaTime(UnityAction<float> action, float t = 1f, int frameInterval = 1, bool fixedUpdate = false)
+        public static IEnumerator GiveDeltaTime(UnityAction<float> action, UnityAction final = null, float time = 1f, int frameInterval = 1, bool fixedUpdate = false)
         {
             if (action == null) yield break;
 
@@ -77,7 +96,7 @@ namespace Omnis.Utils
             float period = 0f;
             int periodFrame = 0;
             if (fixedUpdate)
-                while (life < t)
+                while (life < time)
                 {
                     if (periodFrame == frameInterval)
                     {
@@ -91,7 +110,7 @@ namespace Omnis.Utils
                     yield return new WaitForFixedUpdate();
                 }
             else
-                while (life < t)
+                while (life < time)
                 {
                     if (periodFrame == frameInterval)
                     {
@@ -104,7 +123,8 @@ namespace Omnis.Utils
                     life += Time.deltaTime;
                     yield return null;
                 }
-            action.Invoke(t + period - life);
+            action.Invoke(time + period - life);
+            final?.Invoke();
         }
         #endregion
 
