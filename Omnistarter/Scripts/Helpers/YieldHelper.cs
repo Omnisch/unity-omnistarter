@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.21
+// version: 2025.03.23
 
 using System;
 using System.Collections;
@@ -25,19 +25,21 @@ namespace Omnis.Utils
         /// <param name="dampened">If true, it applys linear decay to the scale.</param>
         public static IEnumerator EaseRepeat(UnityAction<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
         {
+            if (action == null) yield break;
+
             time = Mathf.Max(time, float.Epsilon);
             float life = 0f;
             float value = 0f;
             float scale = 1f;
             while (life < cycleCount || cycleCount < 1)
             {
-                action?.Invoke(dampened ? scale * value : value);
+                action.Invoke(dampened ? scale * value : value);
                 value = easingFunc(pingPong ? life.PingPong(1f) : life.Repeat(1f));
                 if (dampened) scale = Mathf.Lerp(1f, 0f, life / cycleCount);
                 life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
-            action?.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)));
+            action.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)));
         }
 
         /// <summary>
@@ -45,17 +47,64 @@ namespace Omnis.Utils
         /// </summary>
         public static IEnumerator SmoothDamp(UnityAction<float> action, float time = 1f, bool fixedUpdate = false)
         {
+            if (action == null) yield break;
+
             time = Mathf.Max(time, float.Epsilon);
             float value = 0f;
             float velocity = 0f;
             float smoothTime = 0.3f * time;
             while (!value.ApproxLoose(1f))
             {
-                action?.Invoke(value);
+                action.Invoke(value);
                 value = Mathf.SmoothDamp(value, 1f, ref velocity, smoothTime);
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
-            action?.Invoke(1f);
+            action.Invoke(1f);
+        }
+        #endregion
+
+        #region Delta Time
+        /// <summary>
+        /// It gives the delta time through <i>frameInterval</i> frames back to <i>action</i>.<br/>
+        /// NOTE: Floating-point errors may occur.
+        /// </summary>
+        public static IEnumerator GiveDeltaTime(UnityAction<float> action, float t = 1f, int frameInterval = 1, bool fixedUpdate = false)
+        {
+            if (action == null) yield break;
+
+            frameInterval = Mathf.Max(frameInterval, 1);
+            float life = 0f;
+            float period = 0f;
+            int periodFrame = 0;
+            if (fixedUpdate)
+                while (life < t)
+                {
+                    if (periodFrame == frameInterval)
+                    {
+                        action.Invoke(period);
+                        period = 0f;
+                        periodFrame = 0;
+                    }
+                    periodFrame++;
+                    period += Time.fixedDeltaTime;
+                    life += Time.fixedDeltaTime;
+                    yield return new WaitForFixedUpdate();
+                }
+            else
+                while (life < t)
+                {
+                    if (periodFrame == frameInterval)
+                    {
+                        action.Invoke(period);
+                        period = 0f;
+                        periodFrame = 0;
+                    }
+                    periodFrame++;
+                    period += Time.deltaTime;
+                    life += Time.deltaTime;
+                    yield return null;
+                }
+            action.Invoke(t + period - life);
         }
         #endregion
 
