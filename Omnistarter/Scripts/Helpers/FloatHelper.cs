@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.21
+// version: 2025.03.23
 
 using UnityEngine;
 
@@ -43,6 +43,23 @@ namespace Omnis.Utils
             float commonRepeat = Mathf.Repeat(value, length);
             return commonRepeat == 0f ? length : commonRepeat;
         }
+        #endregion
+
+        #region Float to Vector2 or Vector3
+        /// <returns>(n, n)</returns>
+        public static Vector2 StickV2(this float value) => new(value, value);
+        /// <returns>(n, n, n)</returns>
+        public static Vector3 StickV3(this float value) => new(value, value, value);
+        /// <returns>(n, 0)</returns>
+        public static Vector2 no(this float value) => new(value, 0f);
+        /// <returns>(0, n)</returns>
+        public static Vector2 on(this float value) => new(0f, value);
+        /// <returns>(n, 0, 0)</returns>
+        public static Vector3 noo(this float value) => new(value, 0f, 0f);
+        /// <returns>(0, n, 0)</returns>
+        public static Vector3 ono(this float value) => new(0f, value, 0f);
+        /// <returns>(0, 0, n)</returns>
+        public static Vector3 oon(this float value) => new(0f, 0f, value);
         #endregion
     }
 }
