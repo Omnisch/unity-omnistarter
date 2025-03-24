@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.23
+// version: 2025.03.24
 
 using UnityEngine;
 
@@ -28,17 +28,17 @@ namespace Omnis.Utils
 
         #region Vector2 to Vector3
         /// <returns>(x, y, n)</returns>
-        public static Vector3 ToV3xy(this Vector2 v2, float n) => new(v2.x, v2.y, n);
+        public static Vector3 xyn(this Vector2 v2, float n) => new(v2.x, v2.y, n);
         /// <returns>(x, n, y)</returns>
-        public static Vector3 ToV3xz(this Vector2 v2, float n) => new(v2.x, n, v2.y);
+        public static Vector3 xny(this Vector2 v2, float n) => new(v2.x, n, v2.y);
         /// <returns>(n, x, y)</returns>
-        public static Vector3 ToV3yz(this Vector2 v2, float n) => new(n, v2.x, v2.y);
+        public static Vector3 nxy(this Vector2 v2, float n) => new(n, v2.x, v2.y);
         /// <returns>(x, y, 0)</returns>
-        public static Vector3 ToV3xy(this Vector2 v2) => new(v2.x, v2.y, 0f);
+        public static Vector3 xyo(this Vector2 v2) => new(v2.x, v2.y, 0f);
         /// <returns>(x, 0, y)</returns>
-        public static Vector3 ToV3xz(this Vector2 v2) => new(v2.x, 0f, v2.y);
+        public static Vector3 xoy(this Vector2 v2) => new(v2.x, 0f, v2.y);
         /// <returns>(0, x, y)</returns>
-        public static Vector3 ToV3yz(this Vector2 v2) => new(0f, v2.x, v2.y);
+        public static Vector3 oxy(this Vector2 v2) => new(0f, v2.x, v2.y);
         #endregion
 
         #region Vector3 to Vector2

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.22
+// version: 2025.03.24
 
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +39,7 @@ namespace Omnis
         {
             foreach (var hit in hits)
             {
+                if (!hit.GetComponent<PointerBase>()) continue;
                 hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
                 hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
                 if (hit.GetComponent<PointerBase>() && hit.GetComponent<PointerBase>().opaque) break;

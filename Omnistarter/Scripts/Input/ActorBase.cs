@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.17
+// version: 2025.03.23
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,11 +8,13 @@ namespace Omnis
 {
     public abstract class ActorBase : MonoBehaviour
     {
+        #region Serialized Fields
+        [SerializeField] private bool interactable = true;
+        [SerializeField] private bool jumpable = true;
+        #endregion
+
         #region Fields
         private InputHandler handler;
-        private bool interactable;
-
-        private bool jumpable;
         private float jumpAxis;
         private float horizontalAxis;
         private float verticalAxis;
@@ -59,9 +61,6 @@ namespace Omnis
         #region Unity methods
         protected virtual void Start()
         {
-            interactable = true;
-            jumpable = true;
-
             handler = FindFirstObjectByType<InputHandler>();
             if (handler)
                 handler.AddListener(gameObject);
