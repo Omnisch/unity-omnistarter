@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.23
+// version: 2025.03.25
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -67,7 +67,7 @@ namespace Omnis
             else
                 Destroy(gameObject);
         }
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (handler) handler.RemoveListener(gameObject);
         }
