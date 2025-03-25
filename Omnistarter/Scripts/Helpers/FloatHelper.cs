@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.03.23
+// version: 2025.03.25
 
+using System;
 using UnityEngine;
 
 namespace Omnis.Utils
@@ -25,7 +26,6 @@ namespace Omnis.Utils
         public static float Sqrt(this float value) => Mathf.Sqrt(value);
         #endregion
 
-
         #region Simple operations
         /// <summary>
         /// The loose version of Mathf.Approximately(), where Epsilon is 0.001.
@@ -34,7 +34,7 @@ namespace Omnis.Utils
         /// <returns>1 - value</returns>
         public static float Inv(this float value) => 1f - value;
         /// <summary>
-        /// Basically same with Mathf.Repeat(),
+        /// It's basically same with Mathf.Repeat(),
         /// except when <i>value</i> % <i>length</i> = 0, it returns <i>length</i> instead of 0.
         /// </summary>
         public static float RepeatCeil(this float value, float length)
@@ -43,24 +43,37 @@ namespace Omnis.Utils
             float commonRepeat = Mathf.Repeat(value, length);
             return commonRepeat == 0f ? length : commonRepeat;
         }
-        public static float RoundDigits(this float value, int digits) => (float)System.Math.Round(value, digits);
+        /// <summary>
+        /// A shorthand to System.Math.Round(value, digits).
+        /// </summary>
+        public static float Round(this float value, int digits) => (float)Math.Round(value, digits);
         #endregion
 
         #region Float to Vector2 or Vector3
-        /// <returns>(n, n)</returns>
+        /// <returns>(value, value)</returns>
         public static Vector2 StickV2(this float value) => new(value, value);
-        /// <returns>(n, n, n)</returns>
+        /// <returns>(value, value, value)</returns>
         public static Vector3 StickV3(this float value) => new(value, value, value);
-        /// <returns>(n, 0)</returns>
+        /// <returns>(value, 0)</returns>
         public static Vector2 no(this float value) => new(value, 0f);
-        /// <returns>(0, n)</returns>
+        /// <returns>(0, value)</returns>
         public static Vector2 on(this float value) => new(0f, value);
-        /// <returns>(n, 0, 0)</returns>
+        /// <returns>(value, 0, 0)</returns>
         public static Vector3 noo(this float value) => new(value, 0f, 0f);
-        /// <returns>(0, n, 0)</returns>
+        /// <returns>(0, value, 0)</returns>
         public static Vector3 ono(this float value) => new(0f, value, 0f);
-        /// <returns>(0, 0, n)</returns>
+        /// <returns>(0, 0, value)</returns>
         public static Vector3 oon(this float value) => new(0f, 0f, value);
+        /// <returns>(value, value, 0)</returns>
+        public static Vector3 nno(this float value) => new(value, value, 0f);
+        /// <returns>(value, 0, value)</returns>
+        public static Vector3 non(this float value) => new(value, 0f, value);
+        /// <returns>(0, value, value)</returns>
+        public static Vector3 onn(this float value) => new(0f, value, value);
+        /// <returns>(value, value)</returns>
+        [Obsolete("Please use StickV2() instead.")] public static Vector2 nn(this float value) => new(value, value);
+        /// <returns>(value, value, value)</returns>
+        [Obsolete("Please use StickV3() instead.")] public static Vector3 nnn(this float value) => new(value, value, value);
         #endregion
     }
 }
