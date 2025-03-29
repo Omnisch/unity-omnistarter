@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.24
+// version: 2025.03.29
 
 using UnityEngine;
 
@@ -69,6 +69,18 @@ namespace Omnis.Utils
         public static Vector3 xoz(this Vector3 v) => new(v.x, 0f, v.z);
         /// <returns>(0, y, z)</returns>
         public static Vector3 oyz(this Vector3 v) => new(0f, v.y, v.z);
+        #endregion
+
+        #region Abs
+        public static Vector2 Abs(this Vector2 v) => new(v.x.Abs(), v.y.Abs());
+        public static Vector3 Abs(this Vector3 v) => new(v.x.Abs(), v.y.Abs(), v.z.Abs());
+        #endregion
+
+        #region Flip
+        /// <summary>Lets x be y and y be x.</summary>
+        public static Vector2 Flip(this Vector2 v) => new(v.y, v.x);
+        /// <summary>Lets x be z and z be x.</summary>
+        public static Vector3 Flip(this Vector3 v) => new(v.z, v.y, v.x);
         #endregion
 
         #region Round
