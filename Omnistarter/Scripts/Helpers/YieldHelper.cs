@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.23
+// version: 2025.03.30
 
 using System;
 using System.Collections;
@@ -163,7 +163,13 @@ namespace Omnis.Utils
         }
 
         /// <summary>
-        /// It starts <i>iEnums</i> sequentially. It's the same with <i>Loop(1, 0, iEnums)</i>.
+        /// It sequentially invokes <i>actions</i>, waiting <i>interval</i> seconds in between.<br/>
+        /// It's the same with <i>Loop(1, interval, actions)</i>.
+        /// </summary>
+        public static IEnumerator DoSequence(float interval, params UnityAction[] actions) => Loop(1, interval, actions);
+        /// <summary>
+        /// It starts <i>iEnums</i> sequentially.<br/>
+        /// It's the same with <i>Loop(1, 0, iEnums)</i>.
         /// </summary>
         public static IEnumerator DoSequence(params Func<IEnumerator>[] iEnums) => Loop(1, 0f, iEnums);
 
