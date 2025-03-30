@@ -1,22 +1,22 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.03.30
 
-namespace Omnis
+namespace Omnis.Audio
 {
-    public partial class GameManager
+    public partial class AudioHandler
     {
-        public static GameManager Instance { get; private set; }
+        public static AudioHandler Agent { get; private set; }
 
         private bool EnsureSingleton()
         {
-            if (Instance != null && Instance != this)
+            if (Agent != null && Agent != this)
             {
                 Destroy(gameObject);
                 return false;
             }
             else
             {
-                Instance = this;
+                Agent = this;
                 StartCoroutine(Utils.YieldHelper.DoWhen(
                     () => gameObject.scene.isLoaded,
                     () => DontDestroyOnLoad(gameObject)));

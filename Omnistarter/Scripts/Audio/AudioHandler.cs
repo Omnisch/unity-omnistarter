@@ -1,13 +1,17 @@
 // author: Omnistudio
-// version: 2024.12.15
+// version: 2025.03.30
 
 using UnityEngine;
 
-namespace Omnis
+namespace Omnis.Audio
 {
     [RequireComponent(typeof(AudioSource))]
-    public partial class AudioManager : MonoBehaviour
+    public partial class AudioHandler : MonoBehaviour
     {
+        #region Serialized Fields
+        [SerializeField] private AudioSettings audioSettings;
+        #endregion
+
         #region Fields
         private AudioSource source;
         private bool mute;
@@ -17,23 +21,16 @@ namespace Omnis
         public bool Mute
         {
             get => mute;
-            set => mute = value;
+            set
+            {
+                mute = value;
+                if (value) source.Stop();
+            }
         }
         public void PlaySE(string seName)
         {
-            try
-            {
-                PlaySE(System.Enum.Parse<SoundEffectName>(seName));
-            }
-            catch
-            {
-                Debug.LogWarning($"No sound effect named {seName}.");
-            }
-        }
-        public void PlaySE(SoundEffectName seName)
-        {
             if (!Mute)
-                source.PlayOneShot(GameManager.Instance.SeSettings.soundEffects.Find(se => se.name == seName).se);
+                source.PlayOneShot(audioSettings.soundEffects.Find(se => se.name == seName).audio);
         }
         #endregion
 

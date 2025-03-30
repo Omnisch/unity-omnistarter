@@ -35,6 +35,16 @@ namespace Omnis.Editor
             GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
             Selection.activeObject = go;
         }
+
+        [MenuItem("GameObject/Omnis/Gizmo Handler", false, 242)]
+        private static void CreateGizmoHandler(MenuCommand menuCommand)
+        {
+            GameObject go = new("Gizmo Handler");
+            go.AddComponent<Gizmos.GizmoHandler>();
+            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Selection.activeObject = go;
+        }
         #endregion
     }
 }
