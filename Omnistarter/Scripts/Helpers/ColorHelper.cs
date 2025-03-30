@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.03.30
 
 using UnityEngine;
 
@@ -58,6 +58,12 @@ namespace Omnis.Utils
 
         /// <summary>Pink. RGBA is (1, 0.75, 0.8, 1).</summary>
         public static Color pink => new(1f, 0.75f, 0.8f, 1f);
+
+        /// <summary>Apple White, #F5F5F7. RGBA is (0.96, 0.96, 0.97).</summary>
+        public static Color appleWhite => new(0.96f, 0.96f, 0.97f, 1f);
+
+        /// <summary>Apple Black, #1D1D1F. RGBA is (0.11, 0.11, 0.12).</summary>
+        public static Color appleBlack => new(0.11f, 0.11f, 0.12f, 1f);
         #endregion
 
         #endregion
