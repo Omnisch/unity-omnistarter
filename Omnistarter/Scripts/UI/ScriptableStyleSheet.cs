@@ -1,19 +1,21 @@
 // author: Omnistudio
-// version: 2025.03.30
+// version: 2025.03.31
 
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Omnis.UI
 {
-    public struct RichTextLine
+    public abstract class ScriptableStyleSheet : ScriptableObject
     {
-        public string text;
-        public List<RichTextScriptableTag> tags;
+        public abstract List<RichTextScriptableTag> Tags { get; }
     }
 
     /// <summary>
-    /// Stores a scriptable TMP tag, used in <i>RichTextLine</i>, <i>TextActor</i> and <i>TextManager</i>.
+    /// Stores a scriptable TMP tag, used in <i>ScriptableStyleSheet</i>, <i>TextActor</i> and <i>TextManager</i>.
     /// </summary>
+    [Serializable]
     public struct RichTextScriptableTag
     {
         /// <summary>
@@ -25,7 +27,7 @@ namespace Omnis.UI
         public string OpeningTag { private get; set; }
         public string ClosingTag { get; set; }
         /// <summary>The function to tune the raw tags.</summary>
-        public System.Func<string, float, string> tuneFunc;
+        public Func<string, float, string> tuneFunc;
         public readonly string TunedOpeningTag(float phase) => tuneFunc(OpeningTag, phase);
     }
 }

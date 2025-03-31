@@ -19,15 +19,15 @@ namespace Omnis.UI
 
         #region Fields
         private TextMeshProUGUI tmpro;
-        public RichTextLine line;
+        private string line;
         #endregion
 
         #region Properties
-        public string RawText
+        public string RawLine
         {
             set => tmpro.text = value;
         }
-        public RichTextLine Line
+        public string Line
         {
             set
             {
@@ -43,8 +43,8 @@ namespace Omnis.UI
         {
             while (true)
             {
-                string text = line.text;
-                foreach (var tag in line.tags)
+                string text = line;
+                foreach (var tag in TextManager.Instance.StyleSheet.Tags)
                 {
                     if (tag.applyToCharWithPhase)
                     {
