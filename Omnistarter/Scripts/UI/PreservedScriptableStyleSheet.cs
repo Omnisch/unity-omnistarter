@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.04.01
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -10,38 +10,49 @@ namespace Omnis.UI
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
     public class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
-        [Omnis.Editor.InspectorReadOnly]
-        [SerializeField] private List<RichTextScriptableTag> tags = new()
+        private readonly List<RichTextScriptableTag> tags = new()
         {
             new() {
-                id = "elastic",
-                applyToCharWithPhase = true,
+                name = "elastic",
                 OpeningTag = "<voffset=?em>",
                 ClosingTag = "</voffset>",
-                tuneFunc = (raw, phase) => raw.Replace("?", (0.4f * Easing.InBounce((Time.timeSinceLevelLoad + phase).PingPong(1f))).ToString("F2"))
+                paramType = ScriptableTagParamType.TimeWithDelta,
+                delta = -0.133f,
+                tuneFunc = (raw, param) => raw.Replace("?", (0.4f * Easing.InBounce(param.PingPong(1f))).ToString("F2"))
             },
             new() {
-                id = "float",
-                applyToCharWithPhase = false,
+                name = "float",
                 OpeningTag = "<voffset=?em>",
                 ClosingTag = "</voffset>",
-                tuneFunc = (raw, phase) => raw.Replace("?", (0.2f * Easing.RawSine((Time.timeSinceLevelLoad + phase).Repeat(1f))).ToString("F2"))
+                paramType = ScriptableTagParamType.TimeWithSpectrum,
+                spectrumLength = -1f,
+                tuneFunc = (raw, param) => raw.Replace("?", (0.1f * Easing.RawSine(param.Repeat(1f))).ToString("F2"))
             },
             new() {
-                id = "gold",
-                applyToCharWithPhase = false,
+                name = "colorful",
                 OpeningTag = "<color=#?>",
                 ClosingTag = "</color>",
-                tuneFunc = (raw, phase) => raw.Replace("?", ColorUtility.ToHtmlStringRGB(
-                    ColorHelper.LerpFromColorToColor(ColorHelper.appleBlack, ColorHelper.gold, Easing.InOutSine(Time.timeSinceLevelLoad + phase).PingPong(1f)))
+                paramType = ScriptableTagParamType.Spectrum,
+                spectrumLength = 1f,
+                tuneFunc = (raw, param) => raw.Replace("?", ColorUtility.ToHtmlStringRGB(
+                    ColorHelper.LerpFromColorToColor(ColorHelper.skyBlue, ColorHelper.gold, param))
                 )
             },
             new() {
-                id = "reveal",
-                applyToCharWithPhase = true,
+                name = "reveallinear",
                 OpeningTag = "<alpha=#?>",
-                ClosingTag = "<alpha=#00>",
-                tuneFunc = (raw, phase) => raw.Replace("?", (255f * Easing.Smoothstep((Time.timeSinceLevelLoad + phase).PingPong(1f))).RoundToInt().ToString("X2"))
+                ClosingTag = "<alpha=#FF>",
+                paramType = ScriptableTagParamType.TimeWithDelta,
+                delta = -0.1f,
+                tuneFunc = (raw, param) => raw.Replace("?", (255f * param.Clamp01()).RoundToInt().ToString("X2"))
+            },
+            new() {
+                name = "revealstep",
+                OpeningTag = "<alpha=#?>",
+                ClosingTag = "<alpha=#FF>",
+                paramType = ScriptableTagParamType.TimeWithDelta,
+                delta = -0.05f,
+                tuneFunc = (raw, param) => raw.Replace("?", (255f * param.Step01(0.5f)).RoundToInt().ToString("X2"))
             },
         };
         public override List<RichTextScriptableTag> Tags => tags;

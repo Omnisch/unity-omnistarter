@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.04.01
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace Omnis.UI
         [SerializeField] private ScriptableStyleSheet styleSheet;
         #endregion
 
-        #region Fields
+        #region Properties
         public ScriptableStyleSheet StyleSheet => styleSheet;
         #endregion
 
@@ -22,8 +22,8 @@ namespace Omnis.UI
         public void Invoke()
         {
             actors.Find(actor => actor.actorName == "Test").Line =
-                "<line-height=1.2em><elastic>俱往矣，数<gold>风流人物</gold>，</elastic>还看今朝。\n" +
-                "The quick brown fox <reveal>jumps over the lazy dog.</reveal>";
+                "<revealstep><elastic>俱往矣，数<colorful>风流人物</colorful>，</elastic>还看今朝。\n" +
+                "The quick brown fox jumps over the lazy dog.</revealstep>";
         }
         #endregion
 

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.25
+// version: 2025.03.31
 
 using System;
 using UnityEngine;
@@ -47,6 +47,10 @@ namespace Omnis.Utils
         /// A shorthand to System.Math.Round(value, digits).
         /// </summary>
         public static float Round(this float value, int digits) => (float)Math.Round(value, digits);
+        /// <summary>
+        /// If the value is greater than or equal to <i>par</i> it returns 1, else returns 0.
+        /// </summary>
+        public static float Step01(this float value, float par) => value >= par ? 1f : 0f;
         #endregion
 
         #region Float to Vector2 or Vector3

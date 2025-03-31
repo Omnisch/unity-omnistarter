@@ -14,12 +14,13 @@ namespace Omnis.UI
     {
         #region Serialized Fields
         public string actorName;
-        [Range(-1f, 1f)] public float phaseDelta = -0.03f;
+        public string staticOpeningTags;
         #endregion
 
         #region Fields
         private TextMeshProUGUI tmpro;
         private string line;
+        private float lineStartTime;
         #endregion
 
         #region Properties
@@ -33,6 +34,7 @@ namespace Omnis.UI
             {
                 StopAllCoroutines();
                 line = value;
+                lineStartTime = Time.time;
                 StartCoroutine(ShowLine());
             }
         }
@@ -46,35 +48,65 @@ namespace Omnis.UI
                 string text = line;
                 foreach (var tag in TextManager.Instance.StyleSheet.Tags)
                 {
-                    if (tag.applyToCharWithPhase)
+                    float param = tag.paramType == ScriptableTagParamType.One ? 1f : 0f;
+
+                    if ((tag.paramType & ScriptableTagParamType.Time) != 0)
+                        param = Time.time - lineStartTime;
+
+                    if ((tag.paramType & ScriptableTagParamType.Spectrum) != 0f)
                     {
-                        Regex reg = new($@"<{tag.id}>(.*?)</{tag.id}>", RegexOptions.Singleline);
+                        Regex reg = new($@"<{tag.name}>(.*?)</{tag.name}>", RegexOptions.Singleline);
                         text = reg.Replace(text, (match) =>
                         {
-                            string result = "";
+                            string result = staticOpeningTags;
+                            string capture = match.Groups[1].Value;
+                            bool skipOtherTags = false;
+                            for (int i = 0; i < capture.Length; i++)
+                            {
+                                if (capture[i] == '<') skipOtherTags = true;
+                                if (skipOtherTags)
+                                {
+                                    if (capture[i] == '>') skipOtherTags = false;
+                                    result += capture[i];
+                                    continue;
+                                }
+                                result += string.Join("",
+                                    tag.TunedOpeningTag(param + Mathf.Lerp(0f, tag.spectrumLength, i / (float)(capture.Length - 1))), capture[i], tag.ClosingTag
+                                );
+                            }
+                            return result;
+                        });
+                    }
+                    else if ((tag.paramType & ScriptableTagParamType.Delta) != 0f)
+                    {
+                        Regex reg = new($@"<{tag.name}>(.*?)</{tag.name}>", RegexOptions.Singleline);
+                        text = reg.Replace(text, (match) =>
+                        {
+                            string result = staticOpeningTags;
                             string capture = match.Groups[1].Value;
                             bool skipOtherTags = false;
                             float phase = 0f;
-                            foreach (char c in capture)
+                            for (int i = 0; i < capture.Length; i++)
                             {
-                                if (c == '<') skipOtherTags = true;
+                                if (capture[i] == '<') skipOtherTags = true;
                                 if (skipOtherTags)
                                 {
-                                    if (c == '>') skipOtherTags = false;
-                                    result += c;
+                                    if (capture[i] == '>') skipOtherTags = false;
+                                    result += capture[i];
                                     continue;
                                 }
-
-                                result += string.Join("", tag.TunedOpeningTag(phase), c, tag.ClosingTag);
-                                phase += phaseDelta;
+                                result += string.Join("",
+                                    tag.TunedOpeningTag(param + phase), capture[i], tag.ClosingTag
+                                );
+                                phase += tag.delta;
                             }
                             return result;
                         });
                     }
                     else
                     {
-                        text = text.Replace($"<{tag.id}>", tag.TunedOpeningTag(0f))
-                                   .Replace($"</{tag.id}>", tag.ClosingTag);
+                        text = text.Replace($"<{tag.name}>", tag.TunedOpeningTag(param))
+                                   .Replace($"</{tag.name}>", tag.ClosingTag);
                     }
                 }
                 tmpro.text = text;
