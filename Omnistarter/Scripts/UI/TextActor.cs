@@ -65,7 +65,7 @@ namespace Omnis.UI
                                     continue;
                                 }
 
-                                result += tag.TunedOpeningTag(phase) + c + tag.ClosingTag;
+                                result += string.Join("", tag.TunedOpeningTag(phase), c, tag.ClosingTag);
                                 phase += phaseDelta;
                             }
                             return result;
