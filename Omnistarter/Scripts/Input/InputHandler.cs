@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.24
+// version: 2025.04.21
 
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +17,11 @@ namespace Omnis
     {
         #region Serialized Fields
         [SerializeField] protected UnityEvent debugLogic;
+
+        [Header("Cursor Settings")]
+        [SerializeField] private Texture2D iconCursor;
+        [SerializeField] private Texture2D iconCursorPressed;
+        [SerializeField] private Vector2 cursorHotspot = new(16f, 16f);
         #endregion
 
         #region Fields
@@ -26,7 +31,11 @@ namespace Omnis
         #endregion
 
         #region Properties
-        public static Vector2 PointerPosition {  get; private set; }
+        public static Vector2 PointerPosition { get; private set; }
+        private Texture2D CursorIcon
+        {
+            set => Cursor.SetCursor(value, cursorHotspot, CursorMode.Auto);
+        }
         #endregion
 
         #region Public Functions
@@ -79,8 +88,16 @@ namespace Omnis
         #endregion
 
         #region Messages
-        private void OnLeftPress() => ForwardMessageToHits("OnLeftPress");
-        private void OnLeftRelease() => ForwardMessageToHits("OnLeftRelease");
+        private void OnLeftPress()
+        {
+            ForwardMessageToHits("OnLeftPress");
+            CursorIcon = iconCursorPressed;
+        }
+        private void OnLeftRelease()
+        {
+            ForwardMessageToHits("OnLeftRelease");
+            CursorIcon = iconCursor;
+        }
         private void OnRightPress() => ForwardMessageToHits("OnRightPress");
         private void OnRightRelease() => ForwardMessageToHits("OnRightRelease");
         private void OnMiddlePress() => ForwardMessageToHits("OnMiddlePress");
