@@ -1,6 +1,23 @@
-LICENSE.meta
-README.md.meta
+# Unity
+/[Ll]ibrary
+/[Ll]ogs
+/[Oo]bj
+/[Tt]emp
+/[Uu]serSettings
 
-/Plugins/
+# Project
+/[Ss]creenshots
 
-/Omnistarter/Fonts/
+# Visual Studio
+/.vs
+/.vsconfig
+/*.sln
+/*.csproj
+
+# Rider
+/**/.idea
+
+# Custom
+/Assets/Omnistarter/Fonts
+/Assets/Plugins
+/Assets/TextMesh Pro
