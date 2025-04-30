@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.04.30
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,6 +11,7 @@ namespace Omnis
     /// Override <i>OnStart()</i> to initiate.<br />
     /// Use <i>OnLifeSpan</i> to set callbacks.
     /// </summary>
+    [DisallowMultipleComponent]
     public class TTLMonoBehaviour : MonoBehaviour
     {
         public float lifeTime = 1f;
@@ -26,10 +27,8 @@ namespace Omnis
         public UnityAction<float> OnLifeSpan { private get; set; }
 
         #region Unity methods
-        protected virtual void OnStart() { }
         protected void Start()
         {
-            OnStart();
             StartCoroutine(Utils.YieldHelper.Ease((value) =>
             {
                 OnLifeSpan?.Invoke(value);

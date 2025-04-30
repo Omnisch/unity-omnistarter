@@ -1,8 +1,8 @@
 // author: Omnistudio
-// version: 2025.03.17
+// version: 2025.04.30
 
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Omnis
 {
@@ -19,7 +19,7 @@ namespace Omnis
         #region Fields
         private Rigidbody rb;
         private Coroutine jumpCoroutine;
-        private UnityAction<float> jumpAction;
+        private Action<float> jumpAction;
         #endregion
 
         #region Properties
