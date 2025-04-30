@@ -1,10 +1,10 @@
 # Omnistarter Unity Toolkit
 
-OUT for short, is a Unity toolkit containing
+OUT for short, is a Unity 2022.3.16f1 toolkit, including
 
-- basic scripts, e.g. simple logics, input, file IO, utilities
+- handy scripts, e.g. simple logics, input, file IO, utilities
 - editor tweakers, e.g. auto updating modified date in scripts
-- useful shaders
+- useful image shaders
 - etc.
 
 It was made by myself and for myself, so it may be difficult to use for others.

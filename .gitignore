@@ -18,9 +18,9 @@
 /**/.idea
 
 # Custom
-/Assets/Omnistarter/Fonts
+/Assets/Omnistarter/Fonts/
 /Assets/Omnistarter/Fonts.meta
-/Assets/Plugins
+/Assets/Plugins/
 /Assets/Plugins.meta
-/Assets/TextMesh Pro
+/Assets/TextMesh Pro/
 /Assets/TextMesh Pro.meta
