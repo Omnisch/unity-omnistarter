@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.04
+// version: 2025.05.05
 
 using System;
 using System.Collections;
@@ -27,20 +27,40 @@ namespace Omnis.UI
         /// It should not be the same with tags preserved by Unity.
         /// </summary>
         public string name;
-        public float delta;
         /// <summary>
         /// TMP_Text: The TMPro to be tagged.<br/>
         /// TagInfo: The info of the active tag.<br/>
         /// float: Time after the text been displayed.
         /// </summary>
-        public Action<TMP_Text, TagInfo, float> Tune;
+        public Action<CharInfo> Tune;
+
+        public RichTextScriptableTag(string name, Action<CharInfo> tune)
+        {
+            this.name = name;
+            Tune = tune;
+        }
     }
 
     public struct TagInfo
     {
         public string name;
-        public string attr;
         public int startIndex;
         public int endIndex;
+    }
+
+    public readonly struct CharInfo
+    {
+        public readonly TMP_Text tmpro;
+        public readonly TagInfo tagInfo;
+        public readonly int index;
+        public readonly float time;
+
+        public CharInfo(TMP_Text tmpro, TagInfo tagInfo, int index, float time)
+        {
+            this.tmpro = tmpro;
+            this.tagInfo = tagInfo;
+            this.index = index;
+            this.time = time;
+        }
     }
 }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.04
+// version: 2025.05.05
 
 using System.Collections;
 using System.Collections.Generic;
@@ -42,20 +42,23 @@ namespace Omnis.UI
             var tagInfoList = ParseRichText(line, out string textVisible);
             tmpro.SetText(textVisible);
 
+            if (tagInfoList.Count == 0) yield break;
+
             while (true)
             {
                 // Refresh all infos.
                 tmpro.ForceMeshUpdate();
+                var textInfo = tmpro.textInfo;
 
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList)
                 {
                     var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
-                    tag?.Tune(tmpro, tagInfo, Time.time - lineStartTime);
+                    for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
+                        tag?.Tune(new(tmpro, tagInfo, i, Time.time - lineStartTime));
                 }
 
                 // Update geometry.
-                var textInfo = tmpro.textInfo;
                 for (int i = 0; i < textInfo.meshInfo.Length; i++)
                 {
                     var meshInfo = textInfo.meshInfo[i];
@@ -73,7 +76,7 @@ namespace Omnis.UI
         private static List<TagInfo> ParseRichText(string src, out string srcVisible)
         {
             var infos = new List<TagInfo>();
-            var stack = new Stack<(string tag, string attr, int start)>();
+            var stack = new Stack<(string tag, int start)>();
             srcVisible = "";
 
             int visibleIndex = 0;
@@ -83,9 +86,9 @@ namespace Omnis.UI
                 if (mClose.Success && mClose.Index == i)
                 {
                     string n = mClose.Groups["name"].Value;
-                    var (openTag, a, s) = stack.Pop();
+                    var (openTag, s) = stack.Pop();
                     if (openTag == n)
-                        infos.Add(new TagInfo { name = n, attr = a, startIndex = s, endIndex = visibleIndex });
+                        infos.Add(new TagInfo { name = n, startIndex = s, endIndex = visibleIndex });
 
                     i += mClose.Length;
                     continue;
@@ -95,8 +98,7 @@ namespace Omnis.UI
                 if (mOpen.Success && mOpen.Index == i)
                 {
                     string n = mOpen.Groups["name"].Value;
-                    var a = mOpen.Groups["a"].Value.Trim();
-                    stack.Push((n, a, visibleIndex));
+                    stack.Push((n, visibleIndex));
 
                     i += mOpen.Length;
                     continue;
@@ -106,6 +108,13 @@ namespace Omnis.UI
                 visibleIndex++;
                 i++;
             }
+
+            while (stack.Count > 0)
+            {
+                var (openTag, s) = stack.Pop();
+                infos.Add(new TagInfo { name = openTag, startIndex = s, endIndex = visibleIndex });
+            }
+
             return infos;
         }
         #endregion
@@ -116,6 +125,7 @@ namespace Omnis.UI
             tmpro = GetComponent<TextMeshProUGUI>();
             if (TextManager.Instance != null)
                 TextManager.Instance.actors.Add(this);
+            Line = tmpro.text;
         }
 
         private void OnDestroy()
