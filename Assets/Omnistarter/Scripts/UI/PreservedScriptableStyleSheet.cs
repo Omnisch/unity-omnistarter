@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.04.01
+// version: 2025.05.04
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -8,53 +8,63 @@ using UnityEngine;
 namespace Omnis.UI
 {
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
-    public class PreservedScriptableStyleSheet : ScriptableStyleSheet
+    public sealed class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
         private readonly List<RichTextScriptableTag> tags = new()
         {
+            #region Offset
             new() {
                 name = "elastic",
-                OpeningTag = "<voffset=?em>",
-                ClosingTag = "</voffset>",
-                paramType = ScriptableTagParamType.TimeWithDelta,
-                delta = -0.133f,
-                tuneFunc = (raw, param) => raw.Replace("?", (0.4f * Easing.InBounce(param.PingPong(1f))).ToString("F2"))
+                Tune = (tmpro, info, time) =>
+                    tmpro.MoveChar(
+                        (index) => 10f * Easing.InBounce((time - index * 0.133f).PingPong(1f)).ono(),
+                        info.startIndex, info.endIndex
+                    )
             },
             new() {
                 name = "float",
-                OpeningTag = "<voffset=?em>",
-                ClosingTag = "</voffset>",
-                paramType = ScriptableTagParamType.TimeWithSpectrum,
-                spectrumLength = -1f,
-                tuneFunc = (raw, param) => raw.Replace("?", (0.1f * Easing.RawSine(param.Repeat(1f))).ToString("F2"))
+                Tune = (tmpro, info, time) =>
+                    tmpro.MoveChar(
+                        (index) => 10f * Easing.RawSine((time - Spectrum(info, index)).Repeat(1f)).ono(),
+                        info.startIndex, info.endIndex
+                    )
+            },
+            #endregion
+
+            #region Emphasis
+            new() {
+                name = "highlight",
+                Tune = (tmpro, info, time) =>
+                    tmpro.PaintChar(
+                        (index) => ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, Spectrum(info, index)),
+                        info.startIndex, info.endIndex
+                    )
             },
             new() {
-                name = "colorful",
-                OpeningTag = "<color=#?>",
-                ClosingTag = "</color>",
-                paramType = ScriptableTagParamType.Spectrum,
-                spectrumLength = 1f,
-                tuneFunc = (raw, param) => raw.Replace("?", ColorUtility.ToHtmlStringRGB(
-                    ColorHelper.LerpFromColorToColor(ColorHelper.skyBlue, ColorHelper.gold, param))
-                )
+                name = "rgb",
+                Tune = (tmpro, info, time) =>
+                    tmpro.PaintChar(
+                        (index) => Color.HSVToRGB((time - Spectrum(info, index)).Repeat(1f), 1f, 1f),
+                        info.startIndex, info.endIndex
+                    )
+            },
+            #endregion
+
+            #region Reveal
+            new() {
+                name = "reveallinear", delta = -0.05f,
+                //Tune = (tmpro, info, time) =>
+                //    (255f * time.Clamp01()).RoundToInt()
             },
             new() {
-                name = "reveallinear",
-                OpeningTag = "<alpha=#?>",
-                ClosingTag = "<alpha=#FF>",
-                paramType = ScriptableTagParamType.TimeWithDelta,
-                delta = -0.1f,
-                tuneFunc = (raw, param) => raw.Replace("?", (255f * param.Clamp01()).RoundToInt().ToString("X2"))
+                name = "revealstep", delta = -0.05f,
+                //tuneFunc = (raw, time) => raw.Replace("?", (255f * time.Step01(0.1f)).RoundToInt().ToString("X2"))
             },
-            new() {
-                name = "revealstep",
-                OpeningTag = "<alpha=#?>",
-                ClosingTag = "<alpha=#FF>",
-                paramType = ScriptableTagParamType.TimeWithDelta,
-                delta = -0.05f,
-                tuneFunc = (raw, param) => raw.Replace("?", (255f * param.Step01(0.5f)).RoundToInt().ToString("X2"))
-            },
+            #endregion
         };
         public override List<RichTextScriptableTag> Tags => tags;
+
+        private static float Spectrum(TagInfo tagInfo, int index)
+            => tagInfo.endIndex == tagInfo.startIndex ? 0f : index / (float)(tagInfo.endIndex - tagInfo.startIndex);
     }
 }

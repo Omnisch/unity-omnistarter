@@ -1,117 +1,112 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.05.04
 
-using Omnis.Utils;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
 namespace Omnis.UI
 {
-    [RequireComponent(typeof(TextMeshProUGUI))]
+    [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
     public class TextActor : MonoBehaviour
     {
         #region Serialized Fields
-        public string actorName;
+        public string actorId;
         public string staticOpeningTags;
         #endregion
 
         #region Fields
         private TextMeshProUGUI tmpro;
-        private string line;
         private float lineStartTime;
         #endregion
 
         #region Properties
-        public string RawLine
-        {
-            set => tmpro.text = value;
-        }
+        /// <summary>Set TMPro text directly.</summary>
+        public string RawLine { set => tmpro.text = value; }
         public string Line
         {
             set
             {
                 StopAllCoroutines();
-                line = value;
                 lineStartTime = Time.time;
-                StartCoroutine(ShowLine());
+                StartCoroutine(ShowLine(value));
             }
         }
         #endregion
 
         #region Methods
-        private IEnumerator ShowLine()
+        private IEnumerator ShowLine(string line)
         {
+            var tagInfoList = ParseRichText(line, out string textVisible);
+            tmpro.SetText(textVisible);
+
             while (true)
             {
-                string text = line;
-                foreach (var tag in TextManager.Instance.StyleSheet.Tags)
+                // Refresh all infos.
+                tmpro.ForceMeshUpdate();
+
+                // Perform rich text effects.
+                foreach (var tagInfo in tagInfoList)
                 {
-                    float param = tag.paramType == ScriptableTagParamType.One ? 1f : 0f;
-
-                    if ((tag.paramType & ScriptableTagParamType.Time) != 0)
-                        param = Time.time - lineStartTime;
-
-                    if ((tag.paramType & ScriptableTagParamType.Spectrum) != 0f)
-                    {
-                        Regex reg = new($@"<{tag.name}>(.*?)</{tag.name}>", RegexOptions.Singleline);
-                        text = reg.Replace(text, (match) =>
-                        {
-                            string result = staticOpeningTags;
-                            string capture = match.Groups[1].Value;
-                            bool skipOtherTags = false;
-                            for (int i = 0; i < capture.Length; i++)
-                            {
-                                if (capture[i] == '<') skipOtherTags = true;
-                                if (skipOtherTags)
-                                {
-                                    if (capture[i] == '>') skipOtherTags = false;
-                                    result += capture[i];
-                                    continue;
-                                }
-                                result += string.Join("",
-                                    tag.TunedOpeningTag(param + Mathf.Lerp(0f, tag.spectrumLength, i / (float)(capture.Length - 1))), capture[i], tag.ClosingTag
-                                );
-                            }
-                            return result;
-                        });
-                    }
-                    else if ((tag.paramType & ScriptableTagParamType.Delta) != 0f)
-                    {
-                        Regex reg = new($@"<{tag.name}>(.*?)</{tag.name}>", RegexOptions.Singleline);
-                        text = reg.Replace(text, (match) =>
-                        {
-                            string result = staticOpeningTags;
-                            string capture = match.Groups[1].Value;
-                            bool skipOtherTags = false;
-                            float phase = 0f;
-                            for (int i = 0; i < capture.Length; i++)
-                            {
-                                if (capture[i] == '<') skipOtherTags = true;
-                                if (skipOtherTags)
-                                {
-                                    if (capture[i] == '>') skipOtherTags = false;
-                                    result += capture[i];
-                                    continue;
-                                }
-                                result += string.Join("",
-                                    tag.TunedOpeningTag(param + phase), capture[i], tag.ClosingTag
-                                );
-                                phase += tag.delta;
-                            }
-                            return result;
-                        });
-                    }
-                    else
-                    {
-                        text = text.Replace($"<{tag.name}>", tag.TunedOpeningTag(param))
-                                   .Replace($"</{tag.name}>", tag.ClosingTag);
-                    }
+                    var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
+                    tag?.Tune(tmpro, tagInfo, Time.time - lineStartTime);
                 }
-                tmpro.text = text;
+
+                // Update geometry.
+                var textInfo = tmpro.textInfo;
+                for (int i = 0; i < textInfo.meshInfo.Length; i++)
+                {
+                    var meshInfo = textInfo.meshInfo[i];
+                    meshInfo.mesh.vertices = meshInfo.vertices;
+                    meshInfo.mesh.colors32 = meshInfo.colors32;
+                    tmpro.UpdateGeometry(meshInfo.mesh, i);
+                }
+
                 yield return null;
             }
+        }
+
+        private static readonly Regex openTag = new(@"<(?<name>\w+)(?<a>[^>]*?)>", RegexOptions.Compiled);
+        private static readonly Regex closeTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
+        private static List<TagInfo> ParseRichText(string src, out string srcVisible)
+        {
+            var infos = new List<TagInfo>();
+            var stack = new Stack<(string tag, string attr, int start)>();
+            srcVisible = "";
+
+            int visibleIndex = 0;
+            for (int i = 0; i < src.Length;)
+            {
+                var mClose = closeTag.Match(src, i);
+                if (mClose.Success && mClose.Index == i)
+                {
+                    string n = mClose.Groups["name"].Value;
+                    var (openTag, a, s) = stack.Pop();
+                    if (openTag == n)
+                        infos.Add(new TagInfo { name = n, attr = a, startIndex = s, endIndex = visibleIndex });
+
+                    i += mClose.Length;
+                    continue;
+                }
+
+                var mOpen = openTag.Match(src, i);
+                if (mOpen.Success && mOpen.Index == i)
+                {
+                    string n = mOpen.Groups["name"].Value;
+                    var a = mOpen.Groups["a"].Value.Trim();
+                    stack.Push((n, a, visibleIndex));
+
+                    i += mOpen.Length;
+                    continue;
+                }
+
+                srcVisible += src[i];
+                visibleIndex++;
+                i++;
+            }
+            return infos;
         }
         #endregion
 
@@ -119,20 +114,14 @@ namespace Omnis.UI
         private void Start()
         {
             tmpro = GetComponent<TextMeshProUGUI>();
-            var manager = FindFirstObjectByType<TextManager>();
-            if (manager != null)
-            {
-                manager.actors.Add(this);
-            }
+            if (TextManager.Instance != null)
+                TextManager.Instance.actors.Add(this);
         }
 
         private void OnDestroy()
         {
-            var manager = FindFirstObjectByType<TextManager>();
-            if (manager != null)
-            {
-                manager.actors.Remove(this);
-            }
+            if (TextManager.Instance != null)
+                TextManager.Instance.actors.Remove(this);
         }
         #endregion
     }

@@ -1,47 +1,46 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.05.04
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Omnis.UI
 {
-    public abstract class ScriptableStyleSheet : ScriptableObject
+    public abstract class ScriptableStyleSheet : ScriptableObject, IEnumerable<RichTextScriptableTag>
     {
         public abstract List<RichTextScriptableTag> Tags { get; }
+        public static implicit operator List<RichTextScriptableTag>(ScriptableStyleSheet sss) => sss.Tags;
+        public IEnumerator<RichTextScriptableTag> GetEnumerator() => Tags.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     /// <summary>
-    /// Stores a scriptable TMP tag, used in <i>ScriptableStyleSheet</i>, <i>TextActor</i> and <i>TextManager</i>.
+    /// Stores a scriptable TMPro tag, used in <i>ScriptableStyleSheet</i> and <i>TextActor</i>.
     /// </summary>
-    public struct RichTextScriptableTag
+    public class RichTextScriptableTag
     {
         /// <summary>
         /// The reference used in tags, e.g. &lt;name&gt;&lt;/name&gt;<br/>
         /// It should not be the same with tags preserved by Unity.
         /// </summary>
         public string name;
-        public string OpeningTag { private get; set; }
-        public string ClosingTag { get; set; }
-        /// <summary>The type of param which <i>TextActor</i> will pass.</summary>
-        public ScriptableTagParamType paramType;
-        /// <summary>The length of spectrum, only available when <i>paramType</i> contains Spectrum.</summary>
-        public float spectrumLength;
-        /// <summary>The delta value, only available when <i>paramType</i> contains Delta.</summary>
         public float delta;
-        /// <summary>The function to tune the raw tags.</summary>
-        public Func<string, float, string> tuneFunc;
-        public readonly string TunedOpeningTag(float param) => tuneFunc(OpeningTag, param);
+        /// <summary>
+        /// TMP_Text: The TMPro to be tagged.<br/>
+        /// TagInfo: The info of the active tag.<br/>
+        /// float: Time after the text been displayed.
+        /// </summary>
+        public Action<TMP_Text, TagInfo, float> Tune;
     }
 
-    public enum ScriptableTagParamType
+    public struct TagInfo
     {
-        One = 1,
-        Time = 2,
-        Spectrum = 4,
-        Delta = 8,
-        TimeWithSpectrum = Time | Spectrum,
-        TimeWithDelta = Time | Delta,
+        public string name;
+        public string attr;
+        public int startIndex;
+        public int endIndex;
     }
 }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.05.02
 
 using System;
 using UnityEngine;
@@ -78,6 +78,9 @@ namespace Omnis.Utils
         [Obsolete("Please use StickV2() instead.")] public static Vector2 nn(this float value) => new(value, value);
         /// <returns>(value, value, value)</returns>
         [Obsolete("Please use StickV3() instead.")] public static Vector3 nnn(this float value) => new(value, value, value);
+
+        public static Vector2 RadiansToVector2(this float value) => new(Mathf.Cos(value), Mathf.Sin(value));
+        public static Vector2 DegreesToVector2(this float value) => RadiansToVector2(Mathf.Deg2Rad * value);
         #endregion
     }
 }
