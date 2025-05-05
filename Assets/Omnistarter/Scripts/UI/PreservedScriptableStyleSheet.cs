@@ -17,6 +17,12 @@ namespace Omnis.UI
                 (c) => SimpleEditVertices(c, 10f * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
             new("float",
                 (c) => SimpleEditVertices(c, 10f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f)).ono())),
+            new("pacing",
+                (c) => {
+                    float x = 10f * Easing.RawSine((c.time - Spectrum(c) - 0.25f).Repeat(1f));
+                    float y = 10f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f));
+                    SimpleEditVertices(c, new Vector3(x, y, 0f));
+                }),
             #endregion
 
             #region Emphasis
@@ -34,6 +40,29 @@ namespace Omnis.UI
                 }),
             new("revealstep",
                 (c) => SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Step01(0.1f)))),
+            #endregion
+
+            #region Interact
+            new("cursorpush",
+                (c) => {
+                    var charInfo = c.tmpro.textInfo.characterInfo[c.index];
+                    if (!charInfo.isVisible) return;
+                    int matIndex = charInfo.materialReferenceIndex;
+                    int vertexIndex = charInfo.vertexIndex;
+                    Vector3[] vertices = c.tmpro.textInfo.meshInfo[matIndex].vertices;
+
+                    Vector3 charCenter = new();
+                    for (int i = 0; i < 4; i++)
+                        charCenter += vertices[vertexIndex + i];
+                    charCenter /= 4f;
+
+                    Vector3 v =  (c.tmpro.transform.position + charCenter) - c.mousePosition;
+                    float dst = v.magnitude;
+                    if (dst > 100f) return;
+                    v = v.normalized;
+                    for (int i = 0; i < 4; i++)
+                        vertices[vertexIndex + i] += 2f * (10f - dst.Sqrt()) * v;
+                })
             #endregion
         };
         public override List<RichTextScriptableTag> Tags => tags;

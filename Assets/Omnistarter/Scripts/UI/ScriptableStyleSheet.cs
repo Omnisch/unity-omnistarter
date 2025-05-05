@@ -53,14 +53,18 @@ namespace Omnis.UI
         public readonly TMP_Text tmpro;
         public readonly TagInfo tagInfo;
         public readonly int index;
-        public readonly float time;
 
-        public CharInfo(TMP_Text tmpro, TagInfo tagInfo, int index, float time)
+        // Game params.
+        public readonly float time;
+        public readonly Vector3 mousePosition;
+
+        public CharInfo(TMP_Text tmpro, TagInfo tagInfo, int index, float time, Vector3 mousePosition)
         {
             this.tmpro = tmpro;
             this.tagInfo = tagInfo;
             this.index = index;
             this.time = time;
+            this.mousePosition = mousePosition;
         }
     }
 }

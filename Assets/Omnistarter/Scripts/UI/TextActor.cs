@@ -55,7 +55,7 @@ namespace Omnis.UI
                 {
                     var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
-                        tag?.Tune(new(tmpro, tagInfo, i, Time.time - lineStartTime));
+                        tag?.Tune(new(tmpro, tagInfo, i, Time.time - lineStartTime, Input.mousePosition));
                 }
 
                 // Update geometry.
