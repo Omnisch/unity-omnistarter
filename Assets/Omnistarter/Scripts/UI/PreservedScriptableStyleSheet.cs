@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.05
+// version: 2025.05.14
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Omnis.UI
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
     public sealed class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
-        private readonly List<RichTextScriptableTag> tags = new()
+        private readonly List<ScriptableRichTextTag> tags = new()
         {
             #region Offset
             new("elastic",
@@ -19,31 +19,38 @@ namespace Omnis.UI
                 (c) => SimpleEditVertices(c, 10f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f)).ono())),
             new("pacing",
                 (c) => {
-                    float x = 10f * Easing.RawSine((c.time - Spectrum(c) - 0.25f).Repeat(1f));
-                    float y = 10f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f));
+                    float x = 5f * Easing.RawSine((c.time - Spectrum(c) - 0.25f).Repeat(1f));
+                    float y = 5f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f));
                     SimpleEditVertices(c, new Vector3(x, y, 0f));
                 }),
             #endregion
 
             #region Emphasis
-            new("highlight",
+            new("hili",
                 (c) => SimpleEditColor(c, ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, Spectrum(c)))),
             new("rgb",
                 (c) => SimpleEditColor(c, Color.HSVToRGB((c.time - Spectrum(c)).Repeat(1f), 1f, 1f))),
             #endregion
 
             #region Reveal
-            new("reveallinear",
+            new("showlnr",
                 (c) => {
-                    if (c.tmpro.textInfo.characterInfo[c.index].character == '¾ã') Debug.Log((byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
-                    SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
+                    if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
+                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f / speed).Clamp01()));
+                    else
+                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
                 }),
-            new("revealstep",
-                (c) => SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Step01(0.1f)))),
+            new("showstp",
+                (c) => {
+                    if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
+                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f / speed).Step01(0.1f)));
+                    else
+                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
+                }),
             #endregion
 
             #region Interact
-            new("cursorpush",
+            new("curpush",
                 (c) => {
                     var charInfo = c.tmpro.textInfo.characterInfo[c.index];
                     if (!charInfo.isVisible) return;
@@ -65,7 +72,7 @@ namespace Omnis.UI
                 })
             #endregion
         };
-        public override List<RichTextScriptableTag> Tags => tags;
+        public override List<ScriptableRichTextTag> Tags => tags;
 
         #region Methods
         private static float Spectrum(CharInfo c)

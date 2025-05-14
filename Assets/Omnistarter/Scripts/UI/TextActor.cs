@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.05
+// version: 2025.05.14
 
 using System.Collections;
 using System.Collections.Generic;
@@ -76,7 +76,7 @@ namespace Omnis.UI
         private static List<TagInfo> ParseRichText(string src, out string srcVisible)
         {
             var infos = new List<TagInfo>();
-            var stack = new Stack<(string tag, int start)>();
+            var stack = new Stack<(string tag, Dictionary<string, string> attr, int start)>();
             srcVisible = "";
 
             int visibleIndex = 0;
@@ -86,9 +86,9 @@ namespace Omnis.UI
                 if (mClose.Success && mClose.Index == i)
                 {
                     string n = mClose.Groups["name"].Value;
-                    var (openTag, s) = stack.Pop();
+                    var (openTag, a, s) = stack.Pop();
                     if (openTag == n)
-                        infos.Add(new TagInfo { name = n, startIndex = s, endIndex = visibleIndex });
+                        infos.Add(new TagInfo { name = n, attrs = a, startIndex = s, endIndex = visibleIndex });
 
                     i += mClose.Length;
                     continue;
@@ -98,7 +98,20 @@ namespace Omnis.UI
                 if (mOpen.Success && mOpen.Index == i)
                 {
                     string n = mOpen.Groups["name"].Value;
-                    stack.Push((n, visibleIndex));
+                    // parse attributes
+                    string a = mOpen.Groups["a"].Value.Trim(' ');
+                    var la = a.Split(" ");
+                    var da = new Dictionary<string, string>();
+                    foreach (string entry in la)
+                    {
+                        var p = entry.Split('=');
+                        if (p.Length > 1)
+                            da.Add(p[0], p[1]);
+                        else
+                            da.Add(entry, "");
+                    }
+                    // end parse
+                    stack.Push((n, da, visibleIndex));
 
                     i += mOpen.Length;
                     continue;
@@ -111,8 +124,8 @@ namespace Omnis.UI
 
             while (stack.Count > 0)
             {
-                var (openTag, s) = stack.Pop();
-                infos.Add(new TagInfo { name = openTag, startIndex = s, endIndex = visibleIndex });
+                var (openTag, a, s) = stack.Pop();
+                infos.Add(new TagInfo { name = openTag, attrs = a, startIndex = s, endIndex = visibleIndex });
             }
 
             return infos;

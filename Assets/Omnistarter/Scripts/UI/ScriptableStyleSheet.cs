@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.05
+// version: 2025.05.14
 
 using System;
 using System.Collections;
@@ -9,18 +9,18 @@ using UnityEngine;
 
 namespace Omnis.UI
 {
-    public abstract class ScriptableStyleSheet : ScriptableObject, IEnumerable<RichTextScriptableTag>
+    public abstract class ScriptableStyleSheet : ScriptableObject, IEnumerable<ScriptableRichTextTag>
     {
-        public abstract List<RichTextScriptableTag> Tags { get; }
-        public static implicit operator List<RichTextScriptableTag>(ScriptableStyleSheet sss) => sss.Tags;
-        public IEnumerator<RichTextScriptableTag> GetEnumerator() => Tags.GetEnumerator();
+        public abstract List<ScriptableRichTextTag> Tags { get; }
+        public static implicit operator List<ScriptableRichTextTag>(ScriptableStyleSheet sss) => sss.Tags;
+        public IEnumerator<ScriptableRichTextTag> GetEnumerator() => Tags.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     /// <summary>
     /// Stores a scriptable TMPro tag, used in <i>ScriptableStyleSheet</i> and <i>TextActor</i>.
     /// </summary>
-    public class RichTextScriptableTag
+    public class ScriptableRichTextTag
     {
         /// <summary>
         /// The reference used in tags, e.g. &lt;name&gt;&lt;/name&gt;<br/>
@@ -34,16 +34,20 @@ namespace Omnis.UI
         /// </summary>
         public Action<CharInfo> Tune;
 
-        public RichTextScriptableTag(string name, Action<CharInfo> tune)
+        public ScriptableRichTextTag(string name, Action<CharInfo> tune)
         {
             this.name = name;
             Tune = tune;
         }
     }
 
+    /// <summary>
+    /// Stores the info of a scriptable tag instance, will be created in <i>TextActor</i> and used in <i>CharInfo</i>.
+    /// </summary>
     public struct TagInfo
     {
         public string name;
+        public Dictionary<string, string> attrs;
         public int startIndex;
         public int endIndex;
     }
