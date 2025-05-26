@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.03
+// version: 2025.05.26
 
 using System;
 using System.IO;
@@ -11,8 +11,12 @@ namespace Omnis.Editor
 {
     public class AssetsChangedTweaker : AssetPostprocessor
     {
+        private static readonly bool bUpdateDate = true;
+
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
+            if (!bUpdateDate) return;
+
             foreach (string path in importedAssets)
             {
                 if (path.EndsWith(".cs"))
