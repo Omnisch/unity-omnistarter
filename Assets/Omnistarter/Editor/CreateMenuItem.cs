@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.30
+// version: 2025.06.10
 
 using UnityEditor;
 using UnityEngine;
@@ -20,9 +20,21 @@ namespace Omnis.Editor
         [MenuItem("Assets/Create/Omnis/Singleton", true, 241)]
         // Validate only when the selected asset is a csharp script.
         private static bool ValidateCreateSingletonInstance()
+            => Selection.activeObject != null && AssetDatabase.GetAssetPath(Selection.activeObject).EndsWith(".cs");
+
+
+
+        [MenuItem("Assets/Create/Omnis/Class Editor", false, 241)]
+        private static void CreateClassEditor()
         {
-            return Selection.activeObject != null && AssetDatabase.GetAssetPath(Selection.activeObject).EndsWith(".cs");
+            string templatePath = "Assets/Omnistarter/Editor/ClassEditorTemplate.cs.txt";
+            string selectedObjectName = EditorTweaker.ExtractAssetMainNameFromObject(Selection.activeObject);
+            ProjectWindowUtil.CreateScriptAssetFromTemplateFile(templatePath, $"{selectedObjectName}Editor.cs");
         }
+
+        [MenuItem("Assets/Create/Omnis/Class Editor", true, 241)]
+        private static bool ValidateCreateClassEditor()
+            => Selection.activeObject != null && AssetDatabase.GetAssetPath(Selection.activeObject).EndsWith(".cs");
         #endregion
 
         #region GameObjects

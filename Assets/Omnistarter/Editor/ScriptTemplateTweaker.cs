@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.15
+// version: 2025.06.10
 
 using System;
 using System.IO;
@@ -26,7 +26,8 @@ namespace Omnis.Editor
 
                         content = content
                             .Replace("#DATE#", DateTime.Now.ToString("yyyy.MM.dd"))
-                            .Replace("#PARTIALSCRIPTNAME#", EditorTweaker.ExtractAssetMainNameFromPath(path));
+                            .Replace("#PARTIALSCRIPTNAME#", EditorTweaker.ExtractAssetMainNameFromPath(path))
+                            .Replace("#CLASSNAME#", EditorTweaker.ExtractAssetClassNameFromPath(path));
 
                         File.WriteAllText(fullPath, content);
                         AssetDatabase.Refresh();

@@ -1,0 +1,29 @@
+// author: Omnistudio
+// version: #DATE#
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+
+    #ROOTNAMESPACEBEGIN#
+[CustomEditor(typeof(#CLASSNAME#)), CanEditMultipleObjects]
+public class #SCRIPTNAME# : UnityEditor.Editor
+{
+    private SerializedProperty _sample;
+
+    private void OnEnable()
+    {
+        _sample = serializedObject.FindProperty("sample");
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+
+        // TODO: Add your codes here.
+
+        serializedObject.ApplyModifiedProperties();
+    }
+}
+#ROOTNAMESPACEEND#
+#endif

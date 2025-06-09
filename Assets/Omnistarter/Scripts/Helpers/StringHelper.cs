@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.16
+// version: 2025.06.10
 
 namespace Omnis.Utils
 {
@@ -8,6 +8,7 @@ namespace Omnis.Utils
     /// </summary>
     public static class StringHelper
     {
+        #region Han Characters
         public static readonly string[] hanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
         public static readonly string[] hanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
         private static readonly string[] unit = { "", "十", "百", "千", "万", "十", "百", "千", "亿" };
@@ -69,7 +70,6 @@ namespace Omnis.Utils
 
             return decimalStr == "" ? integerStr : integerStr + "点" + decimalStr;
         }
-
         public static string ParseToHanIndividual(this string numStr, bool useFormal = false)
         {
             string result = "";
@@ -85,5 +85,11 @@ namespace Omnis.Utils
 
             return result;
         }
+        #endregion
+
+        #region Extensions
+        public static string TrimEnd(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
+            => str != null && trimString != null && str.EndsWith(trimString, cmp) ? str[..^trimString.Length] : str;
+        #endregion
     }
 }

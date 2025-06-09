@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.06.09
+// version: 2025.06.10
 
+using Omnis.Utils;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -80,6 +81,10 @@ namespace Omnis.Editor
             => ExtractAssetMainNameFromPath(AssetDatabase.GetAssetPath(obj));
         public static string ExtractAssetMainNameFromPath(string path)
             => path.Split('/').Last().Split('.')[0];
+        public static string ExtractAssetClassNameFromObject(Object obj)
+            => ExtractAssetClassNameFromPath(AssetDatabase.GetAssetPath(obj));
+        public static string ExtractAssetClassNameFromPath(string path)
+            => ExtractAssetMainNameFromPath(path).TrimEnd("Editor");
         #endregion
     }
 }
