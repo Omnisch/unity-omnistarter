@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.04.30
+// version: 2025.05.26
 
 using System;
 using System.Collections;
@@ -178,6 +178,14 @@ namespace Omnis.Utils
         public static IEnumerator DoWhen(Func<bool> condition, Action action)
         {
             yield return new WaitUntil(condition);
+            action?.Invoke();
+        }
+        /// <summary>
+        /// It invokes <i>action</i> after <i>waitSeconds</i> seconds.
+        /// </summary>
+        public static IEnumerator DoAfterSeconds(float waitSeconds, Action action)
+        {
+            yield return new WaitForSeconds(waitSeconds);
             action?.Invoke();
         }
         #endregion
