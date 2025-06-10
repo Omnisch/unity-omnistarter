@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.14
+// version: 2025.06.10
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -10,60 +10,60 @@ namespace Omnis.UI
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
     public sealed class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
+        public override List<ScriptableRichTextTag> Tags => tags;
         private readonly List<ScriptableRichTextTag> tags = new()
         {
             #region Offset
-            new("elastic",
-                (c) => SimpleEditVertices(c, 10f * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
-            new("float",
-                (c) => SimpleEditVertices(c, 10f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f)).ono())),
-            new("pacing",
-                (c) => {
-                    float x = 5f * Easing.RawSine((c.time - Spectrum(c) - 0.25f).Repeat(1f));
-                    float y = 5f * Easing.RawSine((c.time - Spectrum(c)).Repeat(1f));
-                    SimpleEditVertices(c, new Vector3(x, y, 0f));
+            new(name: "elastic",
+                tune: (c) => c.SimpleEditVertices(10f * Easing.InBounce((c.actor.LineTimePast - c.index * 0.133f).PingPong(1f)).ono())),
+            new(name: "float",
+                tune: (c) => c.SimpleEditVertices(10f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum()).Repeat(1f)).ono())),
+            new(name: "pacing",
+                tune: (c) => {
+                    float x = 5f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum() - 0.25f).Repeat(1f));
+                    float y = 5f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum()).Repeat(1f));
+                    c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
             #endregion
 
             #region Emphasis
-            new("hili",
-                (c) => SimpleEditColor(c, ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, Spectrum(c)))),
-            new("rgb",
-                (c) => SimpleEditColor(c, Color.HSVToRGB((c.time - Spectrum(c)).Repeat(1f), 1f, 1f))),
+            new(name: "hili",
+                tune: (c) => c.SimpleEditColor(ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, c.Spectrum()))),
+            new(name: "rgb",
+                tune: (c) => c.SimpleEditColor(Color.HSVToRGB((c.actor.LineTimePast - c.Spectrum()).Repeat(1f), 1f, 1f))),
             #endregion
 
             #region Reveal
-            new("showlnr",
-                (c) => {
-                    if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
-                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f / speed).Clamp01()));
-                    else
-                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
+            new(name: "showlnr",
+                tune: (c) => {
+                    c.SimpleEditAlpha((byte)(255 * (c.actor.LineTimePast - c.index * 0.05f).Clamp01()));
                 }),
-            new("showstp",
-                (c) => {
-                    if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
-                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f / speed).Step01(0.1f)));
-                    else
-                        SimpleEditAlpha(c, (byte)(255 * (c.time - c.index * 0.05f).Clamp01()));
+            new(name: "showstp",
+                tune: (c) => {
+                    if (c.actor.LineTimePast > (c.tagInfo.endIndex + 1) * 0.05f)
+                            c.tagInfo.finished = true;
+                    else if (c.actor.LineTimePast >= c.tagInfo.startIndex * 0.05f && c.tagInfo.startIndex == c.index)
+                        if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
+                            c.actor.LineTimeScale = speed;
+                    c.SimpleEditAlpha((byte)(255 * (c.actor.LineTimePast - c.index * 0.05f).Step01(0.1f)));
                 }),
             #endregion
 
             #region Interact
-            new("curpush",
-                (c) => {
-                    var charInfo = c.tmpro.textInfo.characterInfo[c.index];
+            new(name: "curpush",
+                tune: (c) => {
+                    var charInfo = c.actor.TMPro.textInfo.characterInfo[c.index];
                     if (!charInfo.isVisible) return;
                     int matIndex = charInfo.materialReferenceIndex;
                     int vertexIndex = charInfo.vertexIndex;
-                    Vector3[] vertices = c.tmpro.textInfo.meshInfo[matIndex].vertices;
+                    Vector3[] vertices = c.actor.TMPro.textInfo.meshInfo[matIndex].vertices;
 
                     Vector3 charCenter = new();
                     for (int i = 0; i < 4; i++)
                         charCenter += vertices[vertexIndex + i];
                     charCenter /= 4f;
 
-                    Vector3 v =  (c.tmpro.transform.position + charCenter) - c.mousePosition;
+                    Vector3 v =  (c.actor.TMPro.transform.position + charCenter) - c.mousePosition;
                     float dst = v.magnitude;
                     if (dst > 100f) return;
                     v = v.normalized;
@@ -72,41 +72,5 @@ namespace Omnis.UI
                 })
             #endregion
         };
-        public override List<ScriptableRichTextTag> Tags => tags;
-
-        #region Methods
-        private static float Spectrum(CharInfo c)
-            => c.tagInfo.endIndex <= c.tagInfo.startIndex + 1 ? 0f : (c.index - c.tagInfo.startIndex) / (float)(c.tagInfo.endIndex - c.tagInfo.startIndex - 1);
-        private static void SimpleEditVertices(CharInfo c, Vector3 value)
-        {
-            var charInfo = c.tmpro.textInfo.characterInfo[c.index];
-            if (!charInfo.isVisible) return;
-            int matIndex = charInfo.materialReferenceIndex;
-            int vertexIndex = charInfo.vertexIndex;
-            Vector3[] vertices = c.tmpro.textInfo.meshInfo[matIndex].vertices;
-            for (int i = 0; i < 4; i++)
-                vertices[vertexIndex + i] += value;
-        }
-        private static void SimpleEditColor(CharInfo c, Color32 value)
-        {
-            var charInfo = c.tmpro.textInfo.characterInfo[c.index];
-            if (!charInfo.isVisible) return;
-            int matIndex = charInfo.materialReferenceIndex;
-            Color32[] colors32 = c.tmpro.textInfo.meshInfo[matIndex].colors32;
-            int vertexIndex = charInfo.vertexIndex;
-            for (int i = 0; i < 4; i++)
-                colors32[vertexIndex + i] = value;
-        }
-        private static void SimpleEditAlpha(CharInfo c, byte value)
-        {
-            var charInfo = c.tmpro.textInfo.characterInfo[c.index];
-            if (!charInfo.isVisible) return;
-            int matIndex = charInfo.materialReferenceIndex;
-            Color32[] colors32 = c.tmpro.textInfo.meshInfo[matIndex].colors32;
-            int vertexIndex = charInfo.vertexIndex;
-            for (int i = 0; i < 4; i++)
-                colors32[vertexIndex + i].a = value;
-        }
-        #endregion
     }
 }

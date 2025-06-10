@@ -1,8 +1,9 @@
 // author: Omnistudio
-// version: 2025.05.14
+// version: 2025.06.10
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
@@ -19,18 +20,22 @@ namespace Omnis.UI
 
         #region Fields
         private TextMeshProUGUI tmpro;
-        private float lineStartTime;
+        private float lineTimePast;
         #endregion
 
         #region Properties
         /// <summary>Set TMPro text directly.</summary>
+        public TextMeshProUGUI TMPro => tmpro;
+        public float LineTimePast => lineTimePast;
+        public float LineTimeScale { get; set; }
         public string RawLine { set => tmpro.text = value; }
         public string Line
         {
             set
             {
                 StopAllCoroutines();
-                lineStartTime = Time.time;
+                lineTimePast = 0f;
+                LineTimeScale = 1f;
                 StartCoroutine(ShowLine(value));
             }
         }
@@ -46,6 +51,9 @@ namespace Omnis.UI
 
             while (true)
             {
+                if (tagInfoList.All(tagInfo => tagInfo.finished))
+                    yield break;
+
                 // Refresh all infos.
                 tmpro.ForceMeshUpdate();
                 var textInfo = tmpro.textInfo;
@@ -53,9 +61,10 @@ namespace Omnis.UI
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList)
                 {
+                    if (tagInfo.finished) continue;
                     var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
-                        tag?.Tune(new(tmpro, tagInfo, i, Time.time - lineStartTime, Input.mousePosition));
+                        tag?.Tune(new(this, tagInfo, i, Input.mousePosition));
                 }
 
                 // Update geometry.
@@ -67,6 +76,7 @@ namespace Omnis.UI
                     tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
+                lineTimePast += LineTimeScale * Time.deltaTime;
                 yield return null;
             }
         }
@@ -139,6 +149,7 @@ namespace Omnis.UI
             if (TextManager.Instance != null)
                 TextManager.Instance.actors.Add(this);
             Line = tmpro.text;
+            LineTimeScale = 1f;
         }
 
         private void OnDestroy()
