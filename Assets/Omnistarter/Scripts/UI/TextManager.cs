@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.05
+// version: 2025.06.11
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +11,8 @@ namespace Omnis.UI
         #region Serialized Fields
         public List<TextActor> actors = new();
         [SerializeField] private ScriptableStyleSheet styleSheet;
+
+        [HideInInspector] public static readonly float DefaultPrintSpeed = 20f;
         #endregion
 
         #region Properties
@@ -18,6 +20,11 @@ namespace Omnis.UI
         #endregion
 
         #region Methods
+        public void Invoke()
+        {
+            actors.Find(actor => actor.actorId == "Test").Line =
+                "<print>望长城内外，惟余莽莽；</print><break wait=1><print>大河上下，顿失滔滔。</print>";
+        }
         #endregion
 
         #region Unity Methods

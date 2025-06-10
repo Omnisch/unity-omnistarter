@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.06.11
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -15,13 +15,13 @@ namespace Omnis.UI
         {
             #region Offset
             new(name: "elastic",
-                tune: (c) => c.SimpleEditVertices(10f * Easing.InBounce((c.actor.LineTimePast - c.index * 0.133f).PingPong(1f)).ono())),
+                tune: (c) => c.SimpleEditVertices(10f * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
             new(name: "float",
-                tune: (c) => c.SimpleEditVertices(10f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum()).Repeat(1f)).ono())),
+                tune: (c) => c.SimpleEditVertices(10f * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f)).ono())),
             new(name: "pacing",
                 tune: (c) => {
-                    float x = 5f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum() - 0.25f).Repeat(1f));
-                    float y = 5f * Easing.RawSine((c.actor.LineTimePast - c.Spectrum()).Repeat(1f));
+                    float x = 5f * Easing.RawSine((c.time - c.Spectrum() - 0.25f).Repeat(1f));
+                    float y = 5f * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
             #endregion
@@ -30,22 +30,51 @@ namespace Omnis.UI
             new(name: "hili",
                 tune: (c) => c.SimpleEditColor(ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, c.Spectrum()))),
             new(name: "rgb",
-                tune: (c) => c.SimpleEditColor(Color.HSVToRGB((c.actor.LineTimePast - c.Spectrum()).Repeat(1f), 1f, 1f))),
+                tune: (c) => c.SimpleEditColor(Color.HSVToRGB((c.time - c.Spectrum()).Repeat(1f), 1f, 1f))),
             #endregion
 
-            #region Reveal
-            new(name: "showlnr",
+            #region Print
+            new(name: "break",
                 tune: (c) => {
-                    c.SimpleEditAlpha((byte)(255 * (c.actor.LineTimePast - c.index * 0.05f).Clamp01()));
+                    void Escape()
+                    {
+                        c.actor.PrintSpeed = TextManager.DefaultPrintSpeed;
+                        c.tagInfo.finished = true;
+                    }
+                    if ((int)c.actor.PrintPast == c.tagInfo.startIndex)
+                    {
+                        if (c.tagInfo.attrs.TryGetValue("wait", out string o) && float.TryParse(o, out float wait))
+                            c.actor.PrintSpeed = 1f / wait;
+                        else
+                            c.actor.PrintSpeed = 0f;
+                        if (c.actor.LeftPressed) Escape();
+                    }
+                    else if ((int)c.actor.PrintPast > c.tagInfo.startIndex) Escape();
                 }),
-            new(name: "showstp",
+            new(name: "reveal",
                 tune: (c) => {
-                    if (c.actor.LineTimePast > (c.tagInfo.endIndex + 1) * 0.05f)
-                            c.tagInfo.finished = true;
-                    else if (c.actor.LineTimePast >= c.tagInfo.startIndex * 0.05f && c.tagInfo.startIndex == c.index)
-                        if (c.tagInfo.attrs.TryGetValue("speed", out string a) && float.TryParse(a, out float speed))
-                            c.actor.LineTimeScale = speed;
-                    c.SimpleEditAlpha((byte)(255 * (c.actor.LineTimePast - c.index * 0.05f).Step01(0.1f)));
+                    // TODO
+                    c.SimpleEditAlpha((c.actor.PrintPast - c.index).Clamp01());
+                }),
+            new(name: "print",
+                tune: (c) => {
+                    // All shown, stop calculations.
+                    if ((int)c.actor.PrintPast >= c.tagInfo.endIndex)
+                        c.tagInfo.finished = true;
+
+                    // Start printing.
+                    else if ((int)c.actor.PrintPast == c.tagInfo.startIndex)
+                    {
+                        if (c.tagInfo.attrs.TryGetValue("speed", out string o) && float.TryParse(o, out float speed))
+                            c.actor.PrintSpeed = speed;
+                    }
+
+                    // Click to skip printing.
+                    else if ((int)c.actor.PrintPast > c.tagInfo.startIndex)
+                        if (c.actor.LeftPressed)
+                            c.actor.PrintPast = c.tagInfo.endIndex;
+
+                    c.SimpleEditAlpha(Mathf.Clamp01((int)c.actor.PrintPast - c.index));
                 }),
             #endregion
 

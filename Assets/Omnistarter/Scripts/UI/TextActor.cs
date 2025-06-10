@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.06.11
 
 using System.Collections;
 using System.Collections.Generic;
@@ -11,31 +11,30 @@ using UnityEngine;
 namespace Omnis.UI
 {
     [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
-    public class TextActor : MonoBehaviour
+    public class TextActor : PointerBase
     {
         #region Serialized Fields
         public string actorId;
-        public string staticOpeningTags;
+        [SerializeField] private string staticOpeningTags;
         #endregion
 
         #region Fields
         private TextMeshProUGUI tmpro;
-        private float lineTimePast;
         #endregion
 
         #region Properties
-        /// <summary>Set TMPro text directly.</summary>
         public TextMeshProUGUI TMPro => tmpro;
-        public float LineTimePast => lineTimePast;
-        public float LineTimeScale { get; set; }
+        public float PrintPast { get; set; }
+        public float PrintSpeed { get; set; }
+        /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
         public string RawLine { set => tmpro.text = value; }
         public string Line
         {
             set
             {
                 StopAllCoroutines();
-                lineTimePast = 0f;
-                LineTimeScale = 1f;
+                PrintPast = 0f;
+                PrintSpeed = TextManager.DefaultPrintSpeed;
                 StartCoroutine(ShowLine(value));
             }
         }
@@ -64,7 +63,7 @@ namespace Omnis.UI
                     if (tagInfo.finished) continue;
                     var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
-                        tag?.Tune(new(this, tagInfo, i, Input.mousePosition));
+                        tag?.Tune(new(this, tagInfo, i, Time.time, Input.mousePosition));
                 }
 
                 // Update geometry.
@@ -76,7 +75,7 @@ namespace Omnis.UI
                     tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
-                lineTimePast += LineTimeScale * Time.deltaTime;
+                PrintPast += PrintSpeed * Time.deltaTime;
                 yield return null;
             }
         }
@@ -143,13 +142,14 @@ namespace Omnis.UI
         #endregion
 
         #region Unity Methods
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             tmpro = GetComponent<TextMeshProUGUI>();
             if (TextManager.Instance != null)
                 TextManager.Instance.actors.Add(this);
             Line = tmpro.text;
-            LineTimeScale = 1f;
         }
 
         private void OnDestroy()

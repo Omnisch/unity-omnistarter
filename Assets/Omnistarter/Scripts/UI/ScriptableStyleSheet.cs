@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.06.11
 
 using System;
 using System.Collections.Generic;
@@ -57,13 +57,15 @@ namespace Omnis.UI
         public readonly int index;
 
         // Runtime params.
+        public readonly float time;
         public readonly Vector3 mousePosition;
 
-        public CharInfo(TextActor actor, TagInfo tagInfo, int index, Vector3 mousePosition)
+        public CharInfo(TextActor actor, TagInfo tagInfo, int index, float time, Vector3 mousePosition)
         {
             this.actor = actor;
             this.tagInfo = tagInfo;
             this.index = index;
+            this.time = time;
             this.mousePosition = mousePosition;
         }
     }
@@ -94,7 +96,8 @@ namespace Omnis.UI
                 colors32[vertexIndex + i] = value;
             return c;
         }
-        public static CharInfo SimpleEditAlpha(this CharInfo c, byte value)
+        /// <summary>Alpha is float 0 ~ 1.</summary>
+        public static CharInfo SimpleEditAlpha(this CharInfo c, float value)
         {
             var charInfo = c.actor.TMPro.textInfo.characterInfo[c.index];
             if (!charInfo.isVisible) return c;
@@ -102,7 +105,7 @@ namespace Omnis.UI
             Color32[] colors32 = c.actor.TMPro.textInfo.meshInfo[matIndex].colors32;
             int vertexIndex = charInfo.vertexIndex;
             for (int i = 0; i < 4; i++)
-                colors32[vertexIndex + i].a = value;
+                colors32[vertexIndex + i].a = (byte)(255 * value);
             return c;
         }
     }
