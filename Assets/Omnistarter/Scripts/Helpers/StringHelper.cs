@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.06.11
 
 namespace Omnis.Utils
 {
@@ -88,6 +88,8 @@ namespace Omnis.Utils
         #endregion
 
         #region Extensions
+        public static string TrimStart(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
+            => str != null && trimString != null && str.StartsWith(trimString, cmp) ? str[trimString.Length..] : str;
         public static string TrimEnd(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
             => str != null && trimString != null && str.EndsWith(trimString, cmp) ? str[..^trimString.Length] : str;
         #endregion

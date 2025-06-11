@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.06.11
 
 using Omnis.Utils;
 using System.Linq;
@@ -38,14 +38,18 @@ namespace Omnis.Editor
         /// </summary>
         public static void MinMaxFloat(string label, SerializedProperty minProp, SerializedProperty maxProp)
         {
-            EditorGUILayout.BeginHorizontal();
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(label, GUILayout.MaxWidth(100));
 
-            EditorGUILayout.LabelField(label, GUILayout.MaxWidth(100));
-            EditorGUIUtility.labelWidth = 30;
-            EditorGUILayout.PropertyField(minProp, new GUIContent("Min"));
-            EditorGUILayout.PropertyField(maxProp, new GUIContent("Max"));
+                float old = EditorGUIUtility.labelWidth;
+                EditorGUIUtility.labelWidth = 30;
 
-            EditorGUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(minProp, new GUIContent("Min"));
+                EditorGUILayout.PropertyField(maxProp, new GUIContent("Max"));
+
+                EditorGUIUtility.labelWidth = old;
+            }
         }
 
         /// <summary>

@@ -1,12 +1,12 @@
 // author: Omnistudio
-// version: 2025.03.31
+// version: 2025.06.11
 
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
 namespace Omnis.Editor
 {
-#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(InspectorReadOnlyAttribute))]
     public class InspectorReadOnlyDrawer : PropertyDrawer
     {
@@ -17,5 +17,5 @@ namespace Omnis.Editor
             GUI.enabled = true;
         }
     }
-#endif
 }
+#endif
