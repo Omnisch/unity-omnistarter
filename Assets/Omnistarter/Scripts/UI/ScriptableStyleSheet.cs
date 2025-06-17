@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.11
+// version: 2025.06.17
 
 using System;
 using System.Collections.Generic;
@@ -47,6 +47,7 @@ namespace Omnis.UI
         public Dictionary<string, string> attrs = null;
         public int startIndex = 0;
         public int endIndex = 0;
+        public bool active = false;
         public bool finished = false;
     }
 

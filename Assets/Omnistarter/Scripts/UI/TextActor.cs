@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.11
+// version: 2025.06.17
 
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +16,9 @@ namespace Omnis.UI
         #region Serialized Fields
         public string actorId;
         [SerializeField] private string staticOpeningTags;
+        [Editor.InspectorReadOnly] public float printPast;
+        [Editor.InspectorReadOnly] public float printSpeed;
+        [Editor.InspectorReadOnly] public static readonly float DefaultPrintSpeed = 20f;
         #endregion
 
         #region Fields
@@ -24,8 +27,6 @@ namespace Omnis.UI
 
         #region Properties
         public TextMeshProUGUI TMPro => tmpro;
-        public float PrintPast { get; set; }
-        public float PrintSpeed { get; set; }
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
         public string RawLine { set => tmpro.text = value; }
         public string Line
@@ -33,9 +34,20 @@ namespace Omnis.UI
             set
             {
                 StopAllCoroutines();
-                PrintPast = 0f;
-                PrintSpeed = TextManager.DefaultPrintSpeed;
+                printPast = 0f;
+                printSpeed = DefaultPrintSpeed;
                 StartCoroutine(ShowLine(value));
+            }
+        }
+        public bool Next { get; set; }
+        public override bool LeftPressed
+        {
+            get => base.LeftPressed;
+            set
+            {
+                base.LeftPressed = value;
+                if (value)
+                    StartCoroutine(Utils.YieldHelper.DoSequence(0f, () => Next = true, () => Next = false));
             }
         }
         #endregion
@@ -63,7 +75,7 @@ namespace Omnis.UI
                     if (tagInfo.finished) continue;
                     var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
-                        tag?.Tune(new(this, tagInfo, i, Time.time, Input.mousePosition));
+                        tag?.Tune(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
                 }
 
                 // Update geometry.
@@ -75,7 +87,7 @@ namespace Omnis.UI
                     tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
-                PrintPast += PrintSpeed * Time.deltaTime;
+                printPast += printSpeed * Time.deltaTime;
                 yield return null;
             }
         }
@@ -95,9 +107,9 @@ namespace Omnis.UI
                 if (mClose.Success && mClose.Index == i)
                 {
                     string n = mClose.Groups["name"].Value;
-                    var (openTag, a, s) = stack.Pop();
+                    var (openTag, da, s) = stack.Pop();
                     if (openTag == n)
-                        infos.Add(new TagInfo { name = n, attrs = a, startIndex = s, endIndex = visibleIndex });
+                        infos.Add(new TagInfo { name = n, attrs = da, startIndex = s, endIndex = visibleIndex });
 
                     i += mClose.Length;
                     continue;
@@ -107,20 +119,37 @@ namespace Omnis.UI
                 if (mOpen.Success && mOpen.Index == i)
                 {
                     string n = mOpen.Groups["name"].Value;
-                    // parse attributes
+
+                    // Parse attributes
                     string a = mOpen.Groups["a"].Value.Trim(' ');
                     var la = a.Split(" ");
                     var da = new Dictionary<string, string>();
+                    bool iso = false;
                     foreach (string entry in la)
                     {
+                        if (entry == "/")
+                        {
+                            iso = true;
+                            continue;
+                        }
+
                         var p = entry.Split('=');
                         if (p.Length > 1)
                             da.Add(p[0], p[1]);
                         else
                             da.Add(entry, "");
                     }
-                    // end parse
-                    stack.Push((n, da, visibleIndex));
+
+                    // Isolated tags, such as "<br />"
+                    if (iso)
+                    {
+                        infos.Add(new TagInfo { name = n, attrs = da, startIndex = visibleIndex, endIndex = visibleIndex + 1 });
+                        // Add a zero width space for any iso tags, so that it won't affect other characters
+                        srcVisible += '\u200B';
+                        visibleIndex++;
+                    }
+                    else
+                        stack.Push((n, da, visibleIndex));
 
                     i += mOpen.Length;
                     continue;
