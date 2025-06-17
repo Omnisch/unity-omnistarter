@@ -24,8 +24,5 @@ namespace Omnis.UI
                 "<mousepush><reveal>望长城内外，惟余<float>莽莽</float>；</reveal><break>\n<reveal>大河上下，顿失滔滔。</reveal>";
         }
         #endregion
-
-        #region Unity Methods
-        #endregion
     }
 }

@@ -39,8 +39,10 @@ namespace Omnis.UI
                     if (c.actor.printPast >= c.tagInfo.startIndex + 1) EscapePausing(c);
                     if (c.actor.printPast >= c.tagInfo.startIndex)
                     {
+                        // Click to skip the break.
                         if (c.actor.Next)
                         {
+                            c.actor.Next = false;
                             EscapePausing(c);
                             return;
                         }
@@ -113,7 +115,10 @@ namespace Omnis.UI
             else if (c.actor.printPast > c.tagInfo.startIndex)
             {
                 if (c.actor.Next)
+                {
+                    c.actor.Next = false;
                     c.actor.printPast = c.tagInfo.endIndex;
+                }
             }
         }
     }

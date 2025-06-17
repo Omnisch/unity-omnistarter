@@ -45,9 +45,7 @@ namespace Omnis.UI
             get => base.LeftPressed;
             set
             {
-                base.LeftPressed = value;
-                if (value)
-                    StartCoroutine(Utils.YieldHelper.DoSequence(0f, () => Next = true, () => Next = false));
+                base.LeftPressed = Next = value;
             }
         }
         #endregion
@@ -120,7 +118,7 @@ namespace Omnis.UI
                 {
                     string n = mOpen.Groups["name"].Value;
 
-                    // Parse attributes
+                    // Parse attributes.
                     string a = mOpen.Groups["a"].Value.Trim(' ');
                     var la = a.Split(" ");
                     var da = new Dictionary<string, string>();
@@ -140,11 +138,11 @@ namespace Omnis.UI
                             da.Add(entry, "");
                     }
 
-                    // Isolated tags, such as "<br />"
+                    // Isolated tags, such as "<br />".
                     if (iso)
                     {
                         infos.Add(new TagInfo { name = n, attrs = da, startIndex = visibleIndex, endIndex = visibleIndex + 1 });
-                        // Add a zero width space for any iso tags, so that it won't affect other characters
+                        // Add a zero width space for any iso tags, so that it won't affect other characters.
                         srcVisible += '\u200B';
                         visibleIndex++;
                     }
@@ -160,6 +158,7 @@ namespace Omnis.UI
                 i++;
             }
 
+            // Pop all the orphan tags.
             while (stack.Count > 0)
             {
                 var (openTag, a, s) = stack.Pop();
