@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.26
+// version: 2025.06.19
 
 using System;
 using System.Collections;
@@ -11,22 +11,47 @@ namespace Omnis.Utils
     {
         #region Accumulations
         /// <summary>
-        /// <inheritdoc cref="Ease(Action{float}, UnityAction, Func{float, float}, float, bool)"/>
+        /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
         /// </summary>
         public static IEnumerator Ease(Action<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
             => EaseRepeat(action, null, easingFunc, time, 1f, false, false, fixedUpdate);
 
+
         /// <summary>
-        /// It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.
+        /// <inheritdoc cref="Ease(Action{float}, Func{float, float}, float, bool)"/>
+        /// </summary>
+        /// <param name="action">Action&lt;value, delta&gt;: The second param is delta value of easingFunc.</param>
+        public static IEnumerator Ease(Action<float, float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
+            => EaseRepeat(action, null, easingFunc, time, 1f, false, false, fixedUpdate);
+
+
+        /// <summary>
+        /// <inheritdoc cref="Ease(Action{float}, Func{float, float}, float, bool)"/>
         /// </summary>
         public static IEnumerator Ease(Action<float> action, Action final, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
             => EaseRepeat(action, final, easingFunc, time, 1f, false, false, fixedUpdate);
+
+
+        /// <summary>
+        /// <inheritdoc cref="Ease(Action{float, float}, Func{float, float}, float, bool)"/>
+        /// </summary>
+        public static IEnumerator Ease(Action<float, float> action, Action final, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
+            => EaseRepeat(action, final, easingFunc, time, 1f, false, false, fixedUpdate);
+
 
         /// <summary>
         /// <inheritdoc cref="EaseRepeat(Action{float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
         /// </summary>
         public static IEnumerator EaseRepeat(Action<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
             => EaseRepeat(action, null, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate);
+
+
+        /// <summary>
+        /// <inheritdoc cref="EaseRepeat(Action{float, float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
+        /// </summary>
+        public static IEnumerator EaseRepeat(Action<float, float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+            => EaseRepeat(action, null, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate);
+
 
         /// <summary>
         /// It takes <i>time</i> seconds to ease from 0 to 1, repeat <i>cycleCount</i> times.
@@ -54,6 +79,34 @@ namespace Omnis.Utils
             final?.Invoke();
         }
 
+
+        /// <summary>
+        /// <inheritdoc cref="EaseRepeat(Action{float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
+        /// </summary>
+        /// <param name="action">Action&lt;value, delta&gt;: The second param is delta value of easingFunc.</param>
+        public static IEnumerator EaseRepeat(Action<float, float> action, Action final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+        {
+            if (action == null) yield break;
+
+            time = Mathf.Max(time, float.Epsilon);
+            float life = 0f;
+            float value = 0f;
+            float lastValue = 0f;
+            float scale = 1f;
+            while (life < cycleCount || cycleCount < 1)
+            {
+                action.Invoke(dampened ? scale * value : value, value - lastValue);
+                value = easingFunc(pingPong ? life.PingPong(1f) : life.Repeat(1f));
+                if (dampened) scale = Mathf.Lerp(1f, 0f, life / cycleCount);
+                life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
+                lastValue = value;
+                yield return fixedUpdate ? new WaitForFixedUpdate() : null;
+            }
+            action.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)), 1f - lastValue);
+            final?.Invoke();
+        }
+
+
         /// <summary>
         /// It performs Mathf.SmoothDamp().
         /// </summary>
@@ -75,12 +128,16 @@ namespace Omnis.Utils
         }
         #endregion
 
+
+
+
         #region Delta time
         /// <summary>
         /// <inheritdoc cref="GiveDeltaTime(UnityAction{float}, UnityAction, float, int, bool)"/>
         /// </summary>
         public static IEnumerator GiveDeltaTime(Action<float> action, float time = 1f, int frameInterval = 1, bool fixedUpdate = false)
             => GiveDeltaTime(action, null, time, frameInterval, fixedUpdate);
+
 
         /// <summary>
         /// It gives the delta time through <i>frameInterval</i> frames back to <i>action</i>.<br/>
@@ -127,6 +184,9 @@ namespace Omnis.Utils
         }
         #endregion
 
+
+
+
         #region Sequences
         /// <summary>
         /// It sequentially invokes <i>actions</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.
@@ -145,6 +205,7 @@ namespace Omnis.Utils
             } while (i != 0 || it != 0);
         }
 
+
         /// <summary>
         /// It sequentially starts <i>iEnums</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.
         /// </summary>
@@ -161,6 +222,7 @@ namespace Omnis.Utils
             } while (i != 0 || it != 0);
         }
 
+
         /// <summary>
         /// It sequentially invokes <i>actions</i>, waiting <i>interval</i> seconds in between.<br/>
         /// It's the same with <i>Loop(1, interval, actions)</i>.
@@ -172,6 +234,7 @@ namespace Omnis.Utils
         /// </summary>
         public static IEnumerator DoSequence(params Func<IEnumerator>[] iEnums) => Loop(1, 0f, iEnums);
 
+
         /// <summary>
         /// It invokes <i>action</i> when <i>condition</i> becomes true.
         /// </summary>
@@ -180,6 +243,8 @@ namespace Omnis.Utils
             yield return new WaitUntil(condition);
             action?.Invoke();
         }
+
+
         /// <summary>
         /// It invokes <i>action</i> after <i>waitSeconds</i> seconds.
         /// </summary>
