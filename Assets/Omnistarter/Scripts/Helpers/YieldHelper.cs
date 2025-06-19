@@ -96,10 +96,10 @@ namespace Omnis.Utils
             while (life < cycleCount || cycleCount < 1)
             {
                 action.Invoke(dampened ? scale * value : value, value - lastValue);
+                lastValue = value;
                 value = easingFunc(pingPong ? life.PingPong(1f) : life.Repeat(1f));
                 if (dampened) scale = Mathf.Lerp(1f, 0f, life / cycleCount);
                 life += (fixedUpdate ? Time.fixedDeltaTime : Time.deltaTime) / time;
-                lastValue = value;
                 yield return fixedUpdate ? new WaitForFixedUpdate() : null;
             }
             action.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)), 1f - lastValue);
