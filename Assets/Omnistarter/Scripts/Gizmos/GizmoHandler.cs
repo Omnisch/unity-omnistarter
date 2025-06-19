@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.04.30
+// version: 2025.06.19
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,10 @@ namespace Omnis.Gizmos
 {
     public partial class GizmoHandler : MonoBehaviour
     {
+        #region Serialized Fields
+        [SerializeField] private bool drawGizmos = true;
+        #endregion
+
         #region Fields
         private List<KeyValuePair<GameObject, Action>> requests = new();
         #endregion
@@ -25,6 +29,8 @@ namespace Omnis.Gizmos
         #region Unity Methods
         private void OnDrawGizmos()
         {
+            if (!drawGizmos) return;
+
             requests.RemoveAll(request =>
             {
                 if (request.Key == null)
