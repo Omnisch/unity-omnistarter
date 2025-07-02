@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.17
+// version: 2025.07.03
 
 using System.Collections;
 using System.Collections.Generic;
@@ -16,13 +16,12 @@ namespace Omnis.UI
         #region Serialized Fields
         public string actorId;
         [SerializeField] private string staticOpeningTags;
-        [Editor.InspectorReadOnly] public float printPast;
-        [Editor.InspectorReadOnly] public float printSpeed;
-        [Editor.InspectorReadOnly] public static readonly float DefaultPrintSpeed = 20f;
+        public static readonly float DefaultPrintSpeed = 20f;
         #endregion
 
         #region Fields
         private TextMeshProUGUI tmpro;
+        public PrintInfo pi;
         #endregion
 
         #region Properties
@@ -34,8 +33,7 @@ namespace Omnis.UI
             set
             {
                 StopAllCoroutines();
-                printPast = 0f;
-                printSpeed = DefaultPrintSpeed;
+                pi = new();
                 StartCoroutine(ShowLine(value));
             }
         }
@@ -58,11 +56,8 @@ namespace Omnis.UI
 
             if (tagInfoList.Count == 0) yield break;
 
-            while (true)
+            while (!tagInfoList.All(tagInfo => tagInfo.finished))
             {
-                if (tagInfoList.All(tagInfo => tagInfo.finished))
-                    yield break;
-
                 // Refresh all infos.
                 tmpro.ForceMeshUpdate();
                 var textInfo = tmpro.textInfo;
@@ -85,7 +80,9 @@ namespace Omnis.UI
                     tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
-                printPast += printSpeed * Time.deltaTime;
+                if (!pi.pause)
+                    pi.past += pi.speed * Time.deltaTime;
+
                 yield return null;
             }
         }
@@ -184,6 +181,21 @@ namespace Omnis.UI
         {
             if (TextManager.Instance != null)
                 TextManager.Instance.actors.Remove(this);
+        }
+        #endregion
+
+        #region Structs
+        public class PrintInfo
+        {
+            public float past;
+            public float speed;
+            public bool pause;
+            public PrintInfo()
+            {
+                past = 0;
+                speed = DefaultPrintSpeed;
+                pause = false;
+            }
         }
         #endregion
     }

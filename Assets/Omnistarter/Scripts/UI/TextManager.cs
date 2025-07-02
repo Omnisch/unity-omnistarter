@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.17
+// version: 2025.07.03
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +21,7 @@ namespace Omnis.UI
         public void Invoke()
         {
             actors.Find(actor => actor.actorId == "Test").Line =
-                "<mousepush><reveal>望长城内外，惟余<float>莽莽</float>；</reveal><break>\n<reveal>大河上下，顿失滔滔。</reveal>";
+                "<mousepush><print>望长城内外，惟余莽莽；<break time=.5>大河上下，顿失滔滔。";
         }
         #endregion
     }

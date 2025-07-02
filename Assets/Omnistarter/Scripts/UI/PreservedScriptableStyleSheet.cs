@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.17
+// version: 2025.07.03
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -36,8 +36,7 @@ namespace Omnis.UI
             #region Print
             new(name: "break",
                 tune: (c) => {
-                    if (c.actor.printPast >= c.tagInfo.startIndex + 1) EscapePausing(c);
-                    if (c.actor.printPast >= c.tagInfo.startIndex)
+                    if (c.actor.pi.past >= c.tagInfo.startIndex)
                     {
                         // Click to skip the break.
                         if (c.actor.Next)
@@ -50,21 +49,24 @@ namespace Omnis.UI
                         {
                             c.tagInfo.active = true;
                             if (c.tagInfo.attrs.TryGetValue("time", out string o) && float.TryParse(o, out float wait))
-                                c.actor.printSpeed = 1f / wait;
+                            {
+                                c.actor.pi.pause = true;
+                                c.actor.StartCoroutine(YieldHelper.DoAfterSeconds(wait, () => c.actor.pi.pause = false));
+                            }
                             else
-                                c.actor.printSpeed = 0f;
+                                c.actor.pi.pause = true;
                         }
                     }
                 }),
             new(name: "reveal",
                 tune: (c) => {
                     PrintingPresets(c);
-                    c.SimpleEditAlpha(Mathf.Clamp01(c.actor.printPast - c.index));
+                    c.SimpleEditAlpha(Mathf.Clamp01(c.actor.pi.past - c.index));
                 }),
             new(name: "print",
                 tune: (c) => {
                     PrintingPresets(c);
-                    c.SimpleEditAlpha(Mathf.Clamp01((int)c.actor.printPast - c.index));
+                    c.SimpleEditAlpha(Mathf.Clamp01((int)c.actor.pi.past - c.index));
                 }),
             #endregion
 
@@ -94,30 +96,30 @@ namespace Omnis.UI
 
         private static void EscapePausing(CharInfo c)
         {
-            c.actor.printSpeed = TextActor.DefaultPrintSpeed;
+            c.actor.pi.pause = false;
             c.tagInfo.finished = true;
         }
         private static void PrintingPresets(CharInfo c)
         {
             // All shown, stop calculations.
-            if (c.actor.printPast >= c.tagInfo.endIndex)
+            if (c.actor.pi.past >= c.tagInfo.endIndex)
                 c.tagInfo.finished = true;
 
             // Start printing.
-            else if (c.actor.printPast >= c.tagInfo.startIndex && !c.tagInfo.active)
+            else if (c.actor.pi.past >= c.tagInfo.startIndex && !c.tagInfo.active)
             {
                 c.tagInfo.active = true;
                 if (c.tagInfo.attrs.TryGetValue("speed", out string o) && float.TryParse(o, out float speed))
-                    c.actor.printSpeed = speed;
+                    c.actor.pi.speed = speed;
             }
 
             // Click to skip printing.
-            else if (c.actor.printPast > c.tagInfo.startIndex)
+            else if (c.actor.pi.past > c.tagInfo.startIndex)
             {
                 if (c.actor.Next)
                 {
                     c.actor.Next = false;
-                    c.actor.printPast = c.tagInfo.endIndex;
+                    c.actor.pi.past = c.tagInfo.endIndex;
                 }
             }
         }
