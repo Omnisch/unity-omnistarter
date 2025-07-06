@@ -1,10 +1,10 @@
 // author: Omnistudio
-// version: 2025.07.03
+// version: 2025.07.06
 
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Omnis.UI
+namespace Omnis.Text
 {
     public partial class TextManager : MonoBehaviour
     {

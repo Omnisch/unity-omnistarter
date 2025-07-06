@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.03
+// version: 2025.07.06
 
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
-namespace Omnis.UI
+namespace Omnis.Text
 {
     [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
     public class TextActor : PointerBase

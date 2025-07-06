@@ -1,11 +1,11 @@
 // author: Omnistudio
-// version: 2025.06.17
+// version: 2025.07.06
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Omnis.UI
+namespace Omnis.Text
 {
     public abstract class ScriptableStyleSheet : ScriptableObject
     {

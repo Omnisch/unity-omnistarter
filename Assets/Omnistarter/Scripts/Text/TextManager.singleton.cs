@@ -1,4 +1,4 @@
-namespace Omnis.UI
+namespace Omnis.Text
 {
     public partial class TextManager
     {

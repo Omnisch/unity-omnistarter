@@ -1,11 +1,11 @@
 // author: Omnistudio
-// version: 2025.07.03
+// version: 2025.07.06
 
 using Omnis.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Omnis.UI
+namespace Omnis.Text
 {
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
     public class PreservedScriptableStyleSheet : ScriptableStyleSheet
