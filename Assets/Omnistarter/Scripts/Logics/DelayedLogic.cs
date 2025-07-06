@@ -1,5 +1,5 @@
-// author: Omnistudio
-// version: 2024.10.28
+// author: WangNianyi2001
+// version: 2025.07.06
 
 using UnityEngine;
 
@@ -11,13 +11,13 @@ namespace Omnis
     public class DelayedLogic : Logic
     {
         [Tooltip("In seconds.")]
-        [UnityEngine.Min(0)] public float delayTime;
+        [Min(0)] public float delayTime;
 
         public override void Invoke() => StartCoroutine(InvokingCoroutine());
 
         private System.Collections.IEnumerator InvokingCoroutine()
         {
-            yield return new UnityEngine.WaitForSecondsRealtime(delayTime);
+            yield return new WaitForSecondsRealtime(delayTime);
             callback.Invoke();
         }
     }
