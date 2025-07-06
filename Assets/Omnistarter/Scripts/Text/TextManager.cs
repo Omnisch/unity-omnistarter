@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.06
+// version: 2025.07.07
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,7 +27,6 @@ namespace Omnis.Text
             get => currLineIndex;
             set
             {
-                Debug.Log(value);
                 if (currBranch == null)
                 {
                     currLineIndex = -1;
@@ -74,18 +73,17 @@ namespace Omnis.Text
                 if (found)
                 {
                     currBranch = branch;
-                    NextLine(true);
+                    CurrLineIndex = 0;
                     return true;
                 }
             }
 
             return false;
         }
-        public void NextLine(bool fromStart = false)
+        public void NextLine(string callFromActor)
         {
-            if (fromStart)
-                CurrLineIndex = 0;
-            else
+            // If not from the active actor, then ignore it.
+            if (currBranch != null && currBranch.actorLines[CurrLineIndex].actorId == callFromActor)
                 CurrLineIndex++;
         }
         public void FinishEntry()

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.06
+// version: 2025.07.07
 
 using System.Collections;
 using System.Collections.Generic;
@@ -56,10 +56,19 @@ namespace Omnis.Text
             {
                 next = value;
                 if (value)
-                    StartCoroutine(Utils.YieldHelper.DoAfterSeconds(0f, () =>
+                {
+                    IEnumerator ResetNextTrigger()
                     {
-                        if (next) TextManager.Instance.NextLine();
-                    }));
+                        yield return 0;
+                        yield return new WaitForEndOfFrame();
+                        if (next)
+                        {
+                            TextManager.Instance.NextLine(callFromActor: actorId);
+                            next = false;
+                        }
+                    }
+                    StartCoroutine(ResetNextTrigger());
+                }
             }
         }
         public override bool LeftPressed

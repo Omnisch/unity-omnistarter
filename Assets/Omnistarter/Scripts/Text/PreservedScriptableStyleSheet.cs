@@ -36,7 +36,11 @@ namespace Omnis.Text
             #region Print
             new(name: "break",
                 render: (c) => {
-                    if (c.actor.pi.past >= c.tagInfo.startIndex)
+                    if (c.actor.pi.past >= c.tagInfo.endIndex)
+                    {
+                        c.tagInfo.finished = true;
+                    }
+                    else if (c.actor.pi.past >= c.tagInfo.startIndex)
                     {
                         // Click to skip the break.
                         if (c.actor.Next)
