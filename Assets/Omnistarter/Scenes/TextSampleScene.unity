@@ -365,7 +365,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1920, y: 1080, z: 1}
+  m_Size: {x: 800, y: 800, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &251080621
 MonoBehaviour:
@@ -387,8 +387,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u671B\u957F\u57CE\u5185\u5916\uFF0C\u60DF\u4F59\u83BD\u83BD\uFF1B<break
-    time=.5>\u5927\u6CB3\u4E0A\u4E0B\uFF0C\u987F\u5931\u6ED4\u6ED4\u3002"
+  m_text: "\u671B\u957F\u57CE\u5185\u5916\uFF0C\u60DF\u4F59\u83BD\u83BD\uFF1B<break>\u5927\u6CB3\u4E0A\u4E0B\uFF0C\u987F\u5931\u6ED4\u6ED4\u3002"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: de0acc273b26ccc4b8470f354a59c8e5, type: 2}
   m_sharedMaterial: {fileID: 3720252586385276779, guid: de0acc273b26ccc4b8470f354a59c8e5, type: 2}
@@ -630,7 +629,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1920, y: 1080, z: 1}
+  m_Size: {x: 800, y: 800, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &318936161
 MonoBehaviour:
@@ -652,8 +651,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u671B\u957F\u57CE\u5185\u5916\uFF0C\u60DF\u4F59\u83BD\u83BD\uFF1B<break
-    time=.5>\u5927\u6CB3\u4E0A\u4E0B\uFF0C\u987F\u5931\u6ED4\u6ED4\u3002"
+  m_text: "\u671B\u957F\u57CE\u5185\u5916\uFF0C\u60DF\u4F59\u83BD\u83BD\uFF1B<break>\u5927\u6CB3\u4E0A\u4E0B\uFF0C\u987F\u5931\u6ED4\u6ED4\u3002"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: de0acc273b26ccc4b8470f354a59c8e5, type: 2}
   m_sharedMaterial: {fileID: 3720252586385276779, guid: de0acc273b26ccc4b8470f354a59c8e5, type: 2}
@@ -943,7 +941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5148949439c77946838c39a75847635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actors: []
   styleSheet: {fileID: 11400000, guid: 17ed4ff1972e5b94e8a242d2474c83f8, type: 2}
 --- !u!114 &1533390368
 MonoBehaviour:

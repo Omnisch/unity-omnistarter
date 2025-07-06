@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2025.07.06
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using UnityEngine;
 namespace Omnis.Text
 {
     [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
-    public partial class TextActor : PointerBase
+    public class TextActor : PointerBase
     {
         #region Serialized Fields
         public string actorId;
@@ -54,7 +55,7 @@ namespace Omnis.Text
                 if (value)
                     StartCoroutine(Utils.YieldHelper.DoAfterSeconds(0f, () =>
                     {
-                        if (next) FinishEntry();
+                        if (next) TextManager.Instance.NextLine();
                     }));
             }
         }
@@ -103,6 +104,7 @@ namespace Omnis.Text
                 yield return null;
             }
         }
+
 
         private static readonly Regex openTag = new(@"<(?<name>\w+)(?<a>[^>]*?)>", RegexOptions.Compiled);
         private static readonly Regex closeTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
@@ -189,16 +191,22 @@ namespace Omnis.Text
             base.Start();
 
             tmpro = GetComponent<TextMeshProUGUI>();
-            if (TextManager.Instance != null)
-                TextManager.Instance.actors.Add(this);
-            script = new();
-            Line = tmpro.text;
+            try
+            {
+                TextManager.Instance.AddActor(this);
+                Line = tmpro.text;
+            }
+            catch (NullReferenceException)
+            {
+                Debug.LogError("There MUST be a TextManager to apply TextActor.");
+                gameObject.SetActive(false);
+            }
         }
 
         private void OnDestroy()
         {
             if (TextManager.Instance != null)
-                TextManager.Instance.actors.Remove(this);
+                TextManager.Instance.RemoveActor(this);
         }
         #endregion
 
