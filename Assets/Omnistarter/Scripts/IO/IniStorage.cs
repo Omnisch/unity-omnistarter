@@ -11,7 +11,7 @@ namespace Omnis
     public class IniStorage
     {
         public string Path;
-        private readonly List<Pair> pairs = new();
+        public readonly List<Pair> pairs = new();
         private readonly List<Group> groups = new();
         private readonly List<string> endComments = new();
 
@@ -466,10 +466,10 @@ namespace Omnis
 
                             if (line.Contains('='))
                             {
-                                string n = line[..line.IndexOf('=')];
+                                string n = line[..line.IndexOf('=')].Trim();
                                 if (n.Length == 0)
                                     continue;
-                                Pair p = new(n, line[(line.IndexOf('=') + 1)..], comments);
+                                Pair p = new(n, line[(line.IndexOf('=') + 1)..].Trim(), comments);
                                 comments.Clear();
                                 if (g != null)
                                     g.Set(p);

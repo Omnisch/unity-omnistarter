@@ -42,7 +42,8 @@ namespace Omnis.Text
                         if (c.actor.Next)
                         {
                             c.actor.Next = false;
-                            EscapePausing(c);
+                            c.actor.pi.pause = false;
+                            c.tagInfo.finished = true;
                             return;
                         }
                         if (!c.tagInfo.active)
@@ -94,11 +95,6 @@ namespace Omnis.Text
             #endregion
         };
 
-        private static void EscapePausing(CharInfo c)
-        {
-            c.actor.pi.pause = false;
-            c.tagInfo.finished = true;
-        }
         private static void PrintingPresets(CharInfo c)
         {
             // All shown, stop calculations.

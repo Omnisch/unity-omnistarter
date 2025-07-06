@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.10.28
+// version: 2025.07.06
 
 using AnotherFileBrowser.Windows;
 using OdinSerializer;
@@ -28,6 +28,13 @@ namespace Omnis
             T returnValue = default;
             new FileBrowser().OpenFileBrowser(bp, path => returnValue = LoadFile<T>(path));
             return returnValue;
+        }
+        /// <param name="extensionFilter">Format: "description (*.ext1, *.ext2) | *.ext1; *.ext2"</param>
+        public static void OpenBrowserAndDo(string extensionFilter, System.Action<string> filepath)
+        {
+            BrowserProperties bp = new() { filter = extensionFilter, filterIndex = 0 };
+
+            new FileBrowser().OpenFileBrowser(bp, filepath);
         }
         #endregion
 

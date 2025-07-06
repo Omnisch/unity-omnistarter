@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Omnis.Text
 {
     [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
-    public class TextActor : PointerBase
+    public partial class TextActor : PointerBase
     {
         #region Serialized Fields
         public string actorId;
@@ -27,24 +27,41 @@ namespace Omnis.Text
         #region Properties
         public TextMeshProUGUI TMPro => tmpro;
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
-        public string RawLine { set => tmpro.text = value; }
+        public string RawLine
+        {
+            set
+            {
+                StopAllCoroutines();
+                tmpro.text = value;
+            }
+        }
         public string Line
         {
             set
             {
                 StopAllCoroutines();
                 pi = new();
-                StartCoroutine(ShowLine(value));
+                StartCoroutine(ShowLine(staticOpeningTags + value));
             }
         }
-        public bool Next { get; set; }
+        private bool next;
+        public bool Next
+        {
+            get => next;
+            set
+            {
+                next = value;
+                if (value)
+                    StartCoroutine(Utils.YieldHelper.DoAfterSeconds(0f, () =>
+                    {
+                        if (next) FinishEntry();
+                    }));
+            }
+        }
         public override bool LeftPressed
         {
             get => base.LeftPressed;
-            set
-            {
-                base.LeftPressed = Next = value;
-            }
+            set => base.LeftPressed = Next = value;
         }
         #endregion
 
@@ -174,6 +191,7 @@ namespace Omnis.Text
             tmpro = GetComponent<TextMeshProUGUI>();
             if (TextManager.Instance != null)
                 TextManager.Instance.actors.Add(this);
+            script = new();
             Line = tmpro.text;
         }
 

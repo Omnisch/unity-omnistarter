@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2025.07.06
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,15 +14,32 @@ namespace Omnis.Text
         [SerializeField] private ScriptableStyleSheet styleSheet;
         #endregion
 
+        #region Fields
+        public Dictionary<string, string> dialogStateDict;
+        public Dictionary<string, Action> dialogEntries;
+        #endregion
+
         #region Properties
         public ScriptableStyleSheet StyleSheet => styleSheet;
         #endregion
 
         #region Methods
+        public void CallEntry(string entryName)
+        {
+            if (dialogEntries.TryGetValue(entryName, out var entryAction))
+                entryAction.Invoke();
+        }
         public void Invoke()
         {
-            actors.Find(actor => actor.actorId == "Test").Line =
-                "<mousepush><print>望长城内外，惟余莽莽；<break time=.5>大河上下，顿失滔滔。";
+            IO.OpenBrowserAndDo("*.ini | *.ini", path => ReadDialogIni(path));
+            IO.OpenBrowserAndDo("*.txt | *.txt", path => ReadDialog(path));
+        }
+        #endregion
+
+        #region Unity Methods
+        private void Start()
+        {
+            dialogStateDict = new();
         }
         #endregion
     }
