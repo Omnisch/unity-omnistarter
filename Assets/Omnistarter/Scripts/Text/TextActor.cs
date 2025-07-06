@@ -66,9 +66,9 @@ namespace Omnis.Text
                 foreach (var tagInfo in tagInfoList)
                 {
                     if (tagInfo.finished) continue;
-                    var tag = TextManager.Instance.StyleSheet.Tags.Find((tag) => tag.name == tagInfo.name);
+                    var tag = TextManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
-                        tag?.Tune(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
+                        tag?.render(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
                 }
 
                 // Update geometry.
