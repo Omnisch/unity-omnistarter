@@ -1,7 +1,6 @@
 // author: Omnistudio
 // version: 2025.07.06
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,22 +10,26 @@ using UnityEngine;
 
 namespace Omnis.Text
 {
-    [RequireComponent(typeof(TextMeshProUGUI))][DisallowMultipleComponent]
+    [RequireComponent(typeof(TMP_Text))][DisallowMultipleComponent]
     public class TextActor : PointerBase
     {
         #region Serialized Fields
         public string actorId;
-        [SerializeField] private string staticOpeningTags;
+        [SerializeField] private string staticHead;
         public static readonly float DefaultPrintSpeed = 20f;
+        [Header("Animation Scale")]
+        [SerializeField][Range(-1, 1)] private float animScale = 1f;
+        [SerializeField] private bool isWorldPos;
         #endregion
 
         #region Fields
-        private TextMeshProUGUI tmpro;
+        private TMP_Text tmpro;
         public PrintInfo pi;
+        public float AnimFactor => isWorldPos ? animScale : animScale * 50f;
         #endregion
 
         #region Properties
-        public TextMeshProUGUI TMPro => tmpro;
+        public TMP_Text TMPro => tmpro;
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
         public string RawLine
         {
@@ -42,7 +45,7 @@ namespace Omnis.Text
             {
                 StopAllCoroutines();
                 pi = new();
-                StartCoroutine(ShowLine(staticOpeningTags + value));
+                StartCoroutine(ShowLine(staticHead + value));
             }
         }
         private bool next;
@@ -190,17 +193,9 @@ namespace Omnis.Text
         {
             base.Start();
 
-            tmpro = GetComponent<TextMeshProUGUI>();
-            try
-            {
-                TextManager.Instance.AddActor(this);
-                Line = tmpro.text;
-            }
-            catch (NullReferenceException)
-            {
-                Debug.LogError("There MUST be a TextManager to apply TextActor.");
-                gameObject.SetActive(false);
-            }
+            tmpro = GetComponent<TMP_Text>();
+            TextManager.Instance.AddActor(this);
+            Line = tmpro.text;
         }
 
         private void OnDestroy()

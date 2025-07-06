@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.06
+// version: 2025.07.07
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -15,13 +15,13 @@ namespace Omnis.Text
         {
             #region Offset
             new(name: "elastic",
-                render: (c) => c.SimpleEditVertices(10f * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
+                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
             new(name: "float",
-                render: (c) => c.SimpleEditVertices(10f * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f)).ono())),
+                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f)).ono())),
             new(name: "pacing",
                 render: (c) => {
-                    float x = 5f * Easing.RawSine((c.time - c.Spectrum() - 0.25f).Repeat(1f));
-                    float y = 5f * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f));
+                    float x = c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum() - 0.25f).Repeat(1f));
+                    float y = c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
             #endregion
@@ -72,7 +72,7 @@ namespace Omnis.Text
             #endregion
 
             #region Interact
-            new(name: "mousepush",
+            new(name: "pushingui",
                 render: (c) => {
                     var charInfo = c.actor.TMPro.textInfo.characterInfo[c.index];
                     if (!charInfo.isVisible) return;
@@ -90,7 +90,7 @@ namespace Omnis.Text
                     if (dst > 100f) return;
                     v = v.normalized;
                     for (int i = 0; i < 4; i++)
-                        vertices[vertexIndex + i] += 2f * (10f - dst.Sqrt()) * v;
+                        vertices[vertexIndex + i] += 0.1f * c.actor.AnimFactor * (10f - dst.Sqrt()) * v;
                 })
             #endregion
         };
