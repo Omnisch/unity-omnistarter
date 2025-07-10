@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.04.30
+// version: 2025.07.10
 
 using System;
 using UnityEngine;
@@ -11,9 +11,9 @@ namespace Omnis
     {
         #region Serialized fields
         [SerializeField] private MovingType movingType;
-        [SerializeField] private float moveScale;
-        [SerializeField] private float initJumpForce;
-        [SerializeField] private float jumpActionSpeed;
+        [SerializeField] private float moveScale = 1f;
+        [SerializeField] private float initJumpForce = 1f;
+        [SerializeField] private float jumpActionSpeed = 1f;
         #endregion
 
         #region Fields
