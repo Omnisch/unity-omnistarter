@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.07
+// version: 2025.07.11
 
 using System.Collections;
 using System.Collections.Generic;
@@ -135,10 +135,12 @@ namespace Omnis.Text
                     string n = mClose.Groups["name"].Value;
                     var (openTag, da, s) = stack.Pop();
                     if (openTag == n)
+                    {
                         infos.Add(new TagInfo { name = n, attrs = da, startIndex = s, endIndex = visibleIndex });
 
-                    i += mClose.Length;
-                    continue;
+                        i += mClose.Length;
+                        continue;
+                    }
                 }
 
                 var mOpen = openTag.Match(src, i);
@@ -146,39 +148,42 @@ namespace Omnis.Text
                 {
                     string n = mOpen.Groups["name"].Value;
 
-                    // Parse attributes.
-                    string a = mOpen.Groups["a"].Value.Trim(' ');
-                    var la = a.Split(" ");
-                    var da = new Dictionary<string, string>();
-                    bool iso = false;
-                    foreach (string entry in la)
+                    if (TextManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n))
                     {
-                        if (entry == "/")
+                        // Parse attributes.
+                        string a = mOpen.Groups["a"].Value.Trim(' ');
+                        var la = a.Split(" ");
+                        var da = new Dictionary<string, string>();
+                        bool iso = false;
+                        foreach (string entry in la)
                         {
-                            iso = true;
-                            continue;
+                            if (entry == "/")
+                            {
+                                iso = true;
+                                continue;
+                            }
+
+                            var p = entry.Split('=');
+                            if (p.Length > 1)
+                                da.Add(p[0], p[1]);
+                            else
+                                da.Add(entry, "");
                         }
 
-                        var p = entry.Split('=');
-                        if (p.Length > 1)
-                            da.Add(p[0], p[1]);
+                        // Isolated tags, such as "<br />".
+                        if (iso)
+                        {
+                            infos.Add(new TagInfo { name = n, attrs = da, startIndex = visibleIndex, endIndex = visibleIndex + 1 });
+                            // Add a zero width space for any iso tags, so that it won't affect other characters.
+                            srcVisible += '\u200B';
+                            visibleIndex++;
+                        }
                         else
-                            da.Add(entry, "");
-                    }
+                            stack.Push((n, da, visibleIndex));
 
-                    // Isolated tags, such as "<br />".
-                    if (iso)
-                    {
-                        infos.Add(new TagInfo { name = n, attrs = da, startIndex = visibleIndex, endIndex = visibleIndex + 1 });
-                        // Add a zero width space for any iso tags, so that it won't affect other characters.
-                        srcVisible += '\u200B';
-                        visibleIndex++;
+                        i += mOpen.Length;
+                        continue;
                     }
-                    else
-                        stack.Push((n, da, visibleIndex));
-
-                    i += mOpen.Length;
-                    continue;
                 }
 
                 srcVisible += src[i];
