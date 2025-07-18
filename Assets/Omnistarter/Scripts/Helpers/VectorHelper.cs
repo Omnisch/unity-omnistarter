@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.29
+// version: 2025.07.18
 
 using UnityEngine;
 
@@ -76,6 +76,27 @@ namespace Omnis.Utils
         public static Vector3 Abs(this Vector3 v) => new(v.x.Abs(), v.y.Abs(), v.z.Abs());
         #endregion
 
+        #region Clamp
+        public static Vector3 Clamp(this Vector3 v, Vector3 min, Vector3 max)
+        {
+            float x = v.x.Clamp(min.x, max.x);
+            float y = v.y.Clamp(min.y, max.y);
+            float z = v.z.Clamp(min.z, max.z);
+            return new Vector3(x, y, z);
+        }
+        #endregion
+
+        #region Comparison
+        public static bool AllLessThan(this Vector3 v, Vector3 other)
+            => v.x < other.x && v.y < other.y && v.z < other.z;
+        public static bool AllLessThanOrEqualsTo(this Vector3 v, Vector3 other)
+            => v.x <= other.x && v.y <= other.y && v.z <= other.z;
+        public static bool AllGreaterThan(this Vector3 v, Vector3 other)
+            => v.x > other.x && v.y > other.y && v.z > other.z;
+        public static bool AllGreaterThanOrEqualsTo(this Vector3 v, Vector3 other)
+            => v.x >= other.x && v.y >= other.y && v.z >= other.z;
+        #endregion
+
         #region Flip
         /// <summary>Lets x be y and y be x.</summary>
         public static Vector2 Flip(this Vector2 v) => new(v.y, v.x);
@@ -89,5 +110,6 @@ namespace Omnis.Utils
         public static Vector3 RoundDigits(this Vector3 v, int digits)
             => new((float)System.Math.Round(v.x, digits), (float)System.Math.Round(v.y, digits), (float)System.Math.Round(v.z, digits));
         #endregion
+
     }
 }
