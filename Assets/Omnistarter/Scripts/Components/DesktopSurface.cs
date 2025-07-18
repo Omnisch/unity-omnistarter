@@ -38,7 +38,7 @@ namespace Omnis
         #region Unity Methods
         private void Start()
         {
-            plane = new(inNormal, localInPoint);
+            plane = new(inNormal, transform.position + localInPoint);
         }
         #endregion
     }
