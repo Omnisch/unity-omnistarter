@@ -11,7 +11,7 @@ namespace Omnis
     {
         #region Serialized Fields
         [SerializeField] private Vector3 localSlotPoint = Vector3.zero;
-        [SerializeField] private UnityAction callback;
+        [SerializeField] private UnityEvent callback;
         #endregion
 
         #region Fields

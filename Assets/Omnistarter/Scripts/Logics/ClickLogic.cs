@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2025.07.21
 
 using UnityEngine.Events;
 
@@ -18,7 +18,7 @@ namespace Omnis
         public override bool Pointed
         {
             get => base.Pointed;
-            set
+            protected set
             {
                 base.Pointed = value;
                 if (value) enterCallback?.Invoke();
@@ -28,7 +28,7 @@ namespace Omnis
         public override bool LeftPressed
         {
             get => base.LeftPressed;
-            set
+            protected set
             {
                 base.LeftPressed = value;
                 if (value) pressCallback?.Invoke();

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.11
+// version: 2025.07.21
 
 using System.Collections;
 using System.Collections.Generic;
@@ -74,7 +74,7 @@ namespace Omnis.Text
         public override bool LeftPressed
         {
             get => base.LeftPressed;
-            set => base.LeftPressed = Next = value;
+            protected set => base.LeftPressed = Next = value;
         }
         #endregion
 

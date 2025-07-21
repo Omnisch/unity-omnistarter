@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.18
+// version: 2025.07.21
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -20,7 +20,7 @@ namespace Omnis
         public override bool LeftPressed
         {
             get => base.LeftPressed;
-            set
+            protected set
             {
                 base.LeftPressed = value;
                 Vector3 mousePoint;

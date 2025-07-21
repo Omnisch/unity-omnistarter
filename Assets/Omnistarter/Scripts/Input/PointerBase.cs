@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2025.07.21
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,27 +25,35 @@ namespace Omnis
         public virtual bool Interactable
         {
             get => interactable;
-            set => interactable = value;
+            protected set => interactable = value;
         }
         public virtual bool LeftPressed
         {
             get => leftPressed;
-            set => leftPressed = value;
+            protected set => leftPressed = value;
         }
         public virtual bool RightPressed
         {
             get => rightPressed;
-            set => rightPressed = value;
+            protected set => rightPressed = value;
         }
         public virtual bool MiddlePressed
         {
             get => middlePressed;
-            set => middlePressed = value;
+            protected set => middlePressed = value;
         }
         public virtual bool Pointed
         {
             get => pointed;
-            set => pointed = value;
+            protected set
+            {
+                pointed = value;
+
+                if (!value)
+                {
+                    LeftPressed = RightPressed = MiddlePressed = false;
+                }
+            }
         }
         #endregion
 
