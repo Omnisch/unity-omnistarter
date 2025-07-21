@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.18
+// version: 2025.07.21
 
 using Omnis.Utils;
 using UnityEngine;
@@ -13,6 +13,7 @@ namespace Omnis
         [SerializeField] private Vector3 inNormal = Vector3.up;
         [SerializeField] private Transform lb;
         [SerializeField] private Transform rt;
+        [SerializeField] private float liftUpHeight = 0.2f;
         #endregion
 
         #region Fields
@@ -20,9 +21,14 @@ namespace Omnis
         #endregion
 
         #region Methods
-        public bool Raycast(Ray ray, out Vector3 point, bool doClamp)
+        public bool Raycast(Ray ray, out Vector3 point, bool doClamp, bool liftUp)
         {
-            if (plane.Raycast(ray, out float dist))
+            Plane calcPlane = plane;
+
+            if (liftUp)
+                calcPlane.Translate(-liftUpHeight * inNormal);
+
+            if (calcPlane.Raycast(ray, out float dist))
             {
                 if (doClamp)
                     point = ray.GetPoint(dist).Clamp(lb.position, rt.position);
@@ -33,10 +39,12 @@ namespace Omnis
             point = Vector3.zero;
             return false;
         }
+
+        public Vector3 AdsordToSurface(Vector3 position) => plane.ClosestPointOnPlane(position);
         #endregion
 
         #region Unity Methods
-        private void Start()
+        private void Awake()
         {
             plane = new(inNormal, transform.position + localInPoint);
         }

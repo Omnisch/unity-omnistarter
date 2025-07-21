@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace Omnis
 {
+    /// <summary>
+    /// The base class of mouse-interactive 3D GameObjects.<br/>
+    /// Needs an Omnis.InputHandler in the scene.
+    /// </summary>
     [RequireComponent(typeof(Collider))]
     public abstract class PointerBase : MonoBehaviour
     {
@@ -45,15 +49,7 @@ namespace Omnis
         public virtual bool Pointed
         {
             get => pointed;
-            protected set
-            {
-                pointed = value;
-
-                if (!value)
-                {
-                    LeftPressed = RightPressed = MiddlePressed = false;
-                }
-            }
+            protected set => pointed = value;
         }
         #endregion
 

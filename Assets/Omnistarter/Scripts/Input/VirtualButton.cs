@@ -1,20 +1,35 @@
-using Omnis;
-using UnityEngine.Events;
-
-public class VirtualButton : PointerBase
+namespace Omnis
 {
-    public UnityEvent callback;
-
-    public override bool LeftPressed
+    /// <summary>
+    /// Call <i>callback</i> when left button clicked on self.
+    /// </summary>
+    public class VirtualButton : PointerBase
     {
-        get => base.LeftPressed;
+        public UnityEngine.Events.UnityEvent callback;
 
-        protected set
+        public override bool LeftPressed
         {
-            base.LeftPressed = value;
+            get => base.LeftPressed;
 
-            if (!value && Pointed)
-                callback?.Invoke();
+            protected set
+            {
+                base.LeftPressed = value;
+
+                if (!value && Pointed)
+                    callback?.Invoke();
+            }
+        }
+
+        public override bool Pointed
+        {
+            get => base.Pointed;
+            protected set
+            {
+                base.Pointed = value;
+
+                if (!value)
+                    LeftPressed = false;
+            }
         }
     }
 }

@@ -1,9 +1,6 @@
-// author: Omnistudio
-// version: 2025.07.18
-
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Omnis
 {
@@ -11,31 +8,45 @@ namespace Omnis
     {
         #region Serialized Fields
         [SerializeField] private Vector3 localSlotPoint = Vector3.zero;
-        [SerializeField] private UnityEvent callback;
         #endregion
 
         #region Fields
-        #endregion
-
-        #region Properties
+        [HideInInspector] public DesktopDraggable currGem;
+        private Transform currGemLastParent;
         #endregion
 
         #region Methods
         protected override void OnInteracted(List<Collider> siblings)
         {
-            base.OnInteracted(siblings);
-            foreach (Collider c in siblings)
+            // If left button been pressed and is about to release.
+            if (LeftPressed)
             {
-                if (c.TryGetComponent<DesktopDraggable>(out var draggable))
+                foreach (Collider c in siblings)
                 {
-                    draggable.Drop(transform.localPosition + localSlotPoint);
-                    callback?.Invoke();
+                    if (c.TryGetComponent<DesktopDraggable>(out var gem))
+                    {
+                        currGem = gem;
+
+                        if (currGem.transform.parent == transform)
+                        {
+                            currGem.transform.parent = currGemLastParent;
+                        }
+                        else
+                        {
+                            currGemLastParent = currGem.transform.parent;
+                            currGem.transform.parent = transform;
+                            StartCoroutine(LateSetPosition(c.transform));
+                        }
+                    }
                 }
             }
         }
-        #endregion
 
-        #region Unity Methods
+        private IEnumerator LateSetPosition(Transform go)
+        {
+            yield return null;
+            go.position = transform.position + localSlotPoint;
+        }
         #endregion
     }
 }
