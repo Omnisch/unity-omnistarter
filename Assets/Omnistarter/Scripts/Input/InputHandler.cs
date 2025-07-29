@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.04.21
+// version: 2025.07.29
 
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +26,12 @@ namespace Omnis
 
         #region Fields
         private PlayerInput playerInput;
-        private List<Collider> hits;
-        private List<GameObject> listeners;
+        private List<Collider> hits = new();
+        /// <summary>
+        /// Used to handle LeftPressed-then-PointerOutOfBounds situations, in ReleaseLeftOOBs().
+        /// </summary>
+        private List<Collider> hitsLeftTrack = new();
+        private List<GameObject> listeners = new();
         #endregion
 
         #region Properties
@@ -48,10 +52,13 @@ namespace Omnis
         {
             foreach (var hit in hits)
             {
-                if (!hit.GetComponent<PointerBase>()) continue;
-                hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
-                hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
-                if (hit.GetComponent<PointerBase>() && hit.GetComponent<PointerBase>().opaque) break;
+                if (hit.TryGetComponent<PointerBase>(out var pb))
+                {
+                    hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
+                    hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
+                    // if opaque, ignore colliders behind it.
+                    if (pb.opaque) break;
+                }
             }
         }
         protected void ForwardMessageToListeners(string methodName, object value = null)
@@ -60,6 +67,19 @@ namespace Omnis
             {
                 listener.SendMessage("OnInteract", listeners, SendMessageOptions.DontRequireReceiver);
                 listener.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
+            }
+        }
+
+        protected void ReleaseLeftOOBs()
+        {
+            foreach (var hit in hitsLeftTrack)
+            {
+                if (hit.TryGetComponent<PointerBase>(out var pb) && pb.LeftPressed)
+                {
+                    hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
+                    hit.SendMessage("OnLeftRelease", SendMessageOptions.DontRequireReceiver);
+                    if (pb.opaque) break;
+                }
             }
         }
         #endregion
@@ -71,9 +91,6 @@ namespace Omnis
 
             foreach (var map in playerInput.actions.actionMaps)
                 map.Enable();
-
-            hits = new();
-            listeners = new();
         }
         private void OnEnable()
         {
@@ -91,11 +108,13 @@ namespace Omnis
         private void OnLeftPress()
         {
             ForwardMessageToHits("OnLeftPress");
+            hitsLeftTrack = hits;
             CursorIcon = iconCursorPressed;
         }
         private void OnLeftRelease()
         {
             ForwardMessageToHits("OnLeftRelease");
+            ReleaseLeftOOBs();
             CursorIcon = iconCursor;
         }
         private void OnRightPress() => ForwardMessageToHits("OnRightPress");

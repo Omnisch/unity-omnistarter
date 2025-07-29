@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.21
+// version: 2025.07.29
 
 using Omnis.Utils;
 using UnityEngine;
@@ -107,7 +107,7 @@ namespace Omnis
                 return;
 
             if (LeftPressed && MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true))
-                transform.position = mousePoint + mouseOffset;
+                transform.position = Vector3.Lerp(transform.position, mousePoint + mouseOffset, 0.5f);
         }
         #endregion
     }
