@@ -13,7 +13,7 @@
 >apple=1
 小红: 小红喜欢<color=red>苹果</color>。
 <apple=0
-<bark
+<amysay
 
 ---
 

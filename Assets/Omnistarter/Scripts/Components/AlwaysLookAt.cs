@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.10
+// version: 2025.07.24
 
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace Omnis
 
         private void LateUpdate()
         {
-            var actualTarget = lookAtCamera ? (Camera.current ? Camera.current.transform : null) : target;
+            var actualTarget = lookAtCamera ? (Camera.main ? Camera.main.transform : null) : target;
             if (actualTarget == null)
                 return;
 
