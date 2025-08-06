@@ -52,16 +52,16 @@ namespace Omnis
             }
         }
 
-        public static void SaveToFile(this byte[] bytes, string path) => SaveBytesToFile(bytes, path);
-        public static void SaveBytesToFile(byte[] bytes, string path)
+        public static bool SaveToFile(this byte[] bytes, string path) => SaveBytesToFile(bytes, path);
+        public static bool SaveBytesToFile(byte[] bytes, string path)
         {
             if (bytes == null || bytes.Length == 0)
             {
                 Debug.LogError("Null or empty byte data, saving aborted.");
-                return;
+                return false;
             }
 
-            EnsureDirectoryExists(path);
+            EnsureDirectoryExists(Path.GetDirectoryName(path));
 
             try
             {
@@ -71,11 +71,15 @@ namespace Omnis
 #if UNITY_EDITOR
                 UnityEditor.AssetDatabase.Refresh();
 #endif
+
+                return true;
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"Failed to write bytes: {e.Message}");
             }
+
+            return false;
         }
         #endregion
 
