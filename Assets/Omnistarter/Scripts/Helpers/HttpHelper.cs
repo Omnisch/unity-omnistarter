@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.06
+// version: 2025.08.15
 
 using System.Collections.Generic;
 using System.Text;
@@ -36,6 +36,7 @@ namespace Omnis.Utils
             string jsonBody = "{}",
             List<KeyValuePair<string, string>> moreHeaders = null)
         {
+            jsonBody = JsonPruneHelperLight.RemoveEmptyStringFields(jsonBody);
             Debug.Log($"POST data: {jsonBody}");
 
             var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST)
@@ -45,7 +46,7 @@ namespace Omnis.Utils
             };
             request.SetRequestHeader("Authorization", auth);
             request.SetRequestHeader("Content-Type", "application/json");
-
+            
             if (moreHeaders != null)
                 foreach (var header in moreHeaders)
                     request.SetRequestHeader(header.Key, header.Value);
@@ -58,24 +59,7 @@ namespace Omnis.Utils
             string auth,
             object body = null,
             List<KeyValuePair<string, string>> moreHeaders = null)
-        {
-            string jsonBody = JsonUtility.ToJson(body);
-            Debug.Log($"POST data: {jsonBody}");
-
-            var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST)
-            {
-                uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody)),
-                downloadHandler = new DownloadHandlerBuffer()
-            };
-            request.SetRequestHeader("Authorization", auth);
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            if (moreHeaders != null)
-                foreach (var header in moreHeaders)
-                    request.SetRequestHeader(header.Key, header.Value);
-
-            return request;
-        }
+            => MakePostJsonByString(url, auth, JsonUtility.ToJson(body), moreHeaders);
         #endregion
 
         public static Task<UnityWebRequest> SendWebRequestAsync(this UnityWebRequest request)
