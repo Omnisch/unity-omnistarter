@@ -107,6 +107,8 @@ namespace Omnis.Utils
             Mathf.Lerp(fromColor.g, toColor.g, t),
             Mathf.Lerp(fromColor.b, toColor.b, t),
             Mathf.Lerp(fromColor.a, toColor.a, t));
+
+        public static Color FadeAlpha(this Color color, float alpha) => new(color.r, color.g, color.b, alpha);
         #endregion
     }
 }
