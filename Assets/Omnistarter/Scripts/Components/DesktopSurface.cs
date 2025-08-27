@@ -1,7 +1,8 @@
 // author: Omnistudio
-// version: 2025.07.21
+// version: 2025.08.27
 
 using Omnis.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Omnis
@@ -16,9 +17,15 @@ namespace Omnis
         [SerializeField] private float liftUpHeight = 0.2f;
         #endregion
 
+
         #region Fields
+        [SerializeField][Editor.InspectorReadOnly] private List<DesktopDraggable> draggables = new();
+        [SerializeField][Editor.InspectorReadOnly] private List<DesktopSlot> slots = new();
+        public List<DesktopDraggable> Draggables => draggables;
+        public List<DesktopSlot > Slots => slots;
         private Plane plane;
         #endregion
+
 
         #region Methods
         public bool Raycast(Ray ray, out Vector3 point, bool doClamp, bool liftUp)
@@ -41,7 +48,19 @@ namespace Omnis
         }
 
         public Vector3 AdsordToSurface(Vector3 position) => plane.ClosestPointOnPlane(position);
+
+        public void MoveSelfWithAllDraggables(Vector3 delta)
+        {
+            foreach (var draggable in draggables)
+            {
+                if (draggable != null && draggable.transform.parent != this)
+                    draggable.WorldPosition += delta;
+            }
+            transform.position += delta;
+        }
+        public void MoveSelfWithAllDraggablesTo(Vector3 dest) => MoveSelfWithAllDraggables(dest - transform.position);
         #endregion
+
 
         #region Unity Methods
         private void Awake()
