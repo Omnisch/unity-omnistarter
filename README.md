@@ -13,10 +13,11 @@ It was made by myself and for myself, so it may be difficult to use for others.
 
 Before using OUT, one should import these packages to their project first:
 
+- **Unity UI** by Unity (for UI)
 - **Input System** by Unity (for input)
-- ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
 - **TextMesh Pro** by Unity (for UI)
-- [Another File Browser](https://github.com/SrejonKhan/AnotherFileBrowser) by [SrejonKhan](https://github.com/SrejonKhan) (for IO)
+- ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
+- [Unity Standalone File Browser](https://github.com/gkngkc/UnityStandaloneFileBrowser) by [gkngkc](https://github.com/gkngkc) (for IO)
 - [Odin Serializer](https://github.com/TeamSirenix/odin-serializer) by [TeamSirenix](https://github.com/TeamSirenix) (for IO)
 
 ## Special Thanks

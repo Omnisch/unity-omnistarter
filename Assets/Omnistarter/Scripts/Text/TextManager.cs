@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.07
+// version: 2025.08.27
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -101,11 +101,24 @@ namespace Omnis.Text
 
         public void Invoke()
         {
-            IO.OpenBrowserAndDo("*.ini | *.ini", path => ReadDialogIni(path));
-            IO.OpenBrowserAndDo("*.txt | *.txt", path => {
-                ReadDialogScript(path);
-                TryEnter("amysay");
-            });
+            var extensionsIni = new[] { new SFB.ExtensionFilter("Ini Files", "ini") };
+            void callbackIni(string[] paths)
+            {
+                if (paths.Length > 0)
+                    ReadDialogIni(paths[0]);
+            }
+            SFB.StandaloneFileBrowser.OpenFilePanelAsync("Load Ini", "", extensionsIni, false, callbackIni);
+
+            var extensionsTxt = new[] { new SFB.ExtensionFilter("Text Files", "txt") };
+            void callbackTxt(string[] paths)
+            {
+                if (paths.Length > 0)
+                {
+                    ReadDialogScript(paths[0]);
+                    TryEnter("amysay");
+                }
+            }
+            SFB.StandaloneFileBrowser.OpenFilePanelAsync("Load Dialogs", "", extensionsTxt, false, callbackTxt);
         }
         #endregion
     }
