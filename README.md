@@ -14,7 +14,7 @@ It was made by myself and for myself, so it may be difficult to use for others.
 Before using OUT, one should import these packages to their project first:
 
 - **Input System** by Unity (for input)
-- **Netcode for GameObjects** by Unity (for network)
+- ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
 - **TextMesh Pro** by Unity (for UI)
 - [Another File Browser](https://github.com/SrejonKhan/AnotherFileBrowser) by [SrejonKhan](https://github.com/SrejonKhan) (for IO)
 - [Odin Serializer](https://github.com/TeamSirenix/odin-serializer) by [TeamSirenix](https://github.com/TeamSirenix) (for IO)
@@ -22,3 +22,4 @@ Before using OUT, one should import these packages to their project first:
 ## Special Thanks
 
 - OUT included some codes from [Bordure](https://github.com/nani-core/Bordure) by the team [Nani Core](https://github.com/nani-core)
+- Included `IniStorage.cs` from [unity-IniStorage](https://github.com/illa4257/unity-IniStorage)
