@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.27
+// version: 2025.09.02
 
 using Omnis.Utils;
 using UnityEngine;
@@ -12,7 +12,8 @@ namespace Omnis
     {
         #region Serialized Fields
         [SerializeField] private bool draggable = true;
-        [SerializeField] private DesktopSurface surface;
+        [SerializeField] private DesktopSurface surface = null;
+        [SerializeField] private float gridSnap = 0f;
         [SerializeField] private UnityEvent pressCallback;
         #endregion
 
@@ -33,7 +34,7 @@ namespace Omnis
                 {
                     if (MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: false))
                     {
-                        mouseOffset = (WorldPosition - mousePoint).xoz();
+                        mouseOffset = WorldPosition - mousePoint;
                         positionMouseDown = WorldPosition;
                     }
                 }
@@ -42,7 +43,7 @@ namespace Omnis
                     if (MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: true, liftUp: false))
                     {
                         if (draggable)
-                            WorldPosition = mousePoint + mouseOffset.xoz();
+                            WorldPosition = mousePoint + mouseOffset;
 
                         if (WorldPosition.xz() == positionMouseDown.xz())
                             pressCallback?.Invoke();
@@ -71,7 +72,7 @@ namespace Omnis
         private bool MouseRayCastPointOnSurface(out Vector3 point, bool doClamp, bool liftUp)
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (surface.Raycast(ray, out point, doClamp, liftUp))
+            if (surface.Raycast(ray, out point, doClamp, liftUp, gridSnap))
                 return true;
 
             point = Vector3.zero;
@@ -82,23 +83,6 @@ namespace Omnis
         {
             LeftPressed = false;
             WorldPosition = position;
-        }
-
-        public void MoveAwayFrom(Collider other)
-        {
-            var otherParent = other.transform.parent;
-
-            if (otherParent && otherParent.TryGetComponent<DesktopDraggable>(out _))
-            {
-                Vector3 dir = WorldPosition - otherParent.position;
-
-                if (dir.sqrMagnitude.ApproxLoose(0f))
-                    dir = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-                else
-                    dir = dir.normalized;
-
-                WorldPosition += 0.2f * dir;
-            }
         }
         #endregion
 
@@ -124,8 +108,9 @@ namespace Omnis
             if (!Interactable || !draggable)
                 return;
 
-            if (LeftPressed && MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true))
+            if (LeftPressed && MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true)) {
                 WorldPosition = Vector3.Lerp(WorldPosition, mousePoint + mouseOffset, 0.5f);
+            }
         }
 
         private void OnDestroy()

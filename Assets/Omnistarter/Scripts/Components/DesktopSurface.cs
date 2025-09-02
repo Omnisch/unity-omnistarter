@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.27
+// version: 2025.09.02
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -28,23 +28,32 @@ namespace Omnis
 
 
         #region Methods
-        public bool Raycast(Ray ray, out Vector3 point, bool doClamp, bool liftUp)
+        public bool Raycast(Ray ray, out Vector3 point, bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
         {
-            Plane calcPlane = plane;
+            if (plane.Raycast(ray, out float dist)) {
+                point = ray.GetPoint(dist);
 
-            if (liftUp)
-                calcPlane.Translate(-liftUpHeight * inNormal);
-
-            if (calcPlane.Raycast(ray, out float dist))
-            {
                 if (doClamp)
-                    point = ray.GetPoint(dist).Clamp(lb.position, rt.position);
-                else
-                    point = ray.GetPoint(dist);
+                    point = point.Clamp(lb.position, rt.position);
+
+                point = point.GridSnap(gridSnap);
+
+                if (liftUp) {
+                    Plane calcPlane = plane;
+                    calcPlane.Translate(-liftUpHeight * inNormal);
+
+                    Ray rayRevert = new(point, (ray.origin - point).normalized);
+                    if (calcPlane.Raycast(rayRevert, out float distLiftUp)) {
+                        point = rayRevert.GetPoint(distLiftUp);
+                    }
+                }
+
                 return true;
             }
-            point = Vector3.zero;
-            return false;
+            else {
+                point = Vector3.zero;
+                return false;
+            }
         }
 
         public Vector3 AdsordToSurface(Vector3 position) => plane.ClosestPointOnPlane(position);
