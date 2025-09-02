@@ -683,6 +683,7 @@ GameObject:
   - component: {fileID: 1358051907}
   - component: {fileID: 1358051906}
   - component: {fileID: 1358051905}
+  - component: {fileID: 1358051910}
   - component: {fileID: 1358051904}
   - component: {fileID: 1358051909}
   m_Layer: 0
@@ -704,7 +705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e10f97df706e736419d1fb3ae87b44c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  opaque: 0
+  active: 1
   actorId: "\u5C0F\u660E"
   staticHead: <print><elastic>
   animScale: 0.3
@@ -899,6 +900,20 @@ MonoBehaviour:
   localUp: {x: 0, y: 1, z: 0}
   target: {fileID: 0}
   lookAtCamera: 1
+--- !u!114 &1358051910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358051903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b654320e14b0001479c1567c51db3b92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activated: 1
+  opaque: 0
 --- !u!1 &1453347822
 GameObject:
   m_ObjectHideFlags: 0
@@ -911,6 +926,7 @@ GameObject:
   - component: {fileID: 1453347827}
   - component: {fileID: 1453347826}
   - component: {fileID: 1453347825}
+  - component: {fileID: 1453347828}
   - component: {fileID: 1453347824}
   m_Layer: 5
   m_Name: Text Actor Hong
@@ -950,7 +966,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e10f97df706e736419d1fb3ae87b44c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  opaque: 0
+  active: 1
   actorId: "\u5C0F\u7EA2"
   staticHead: <print>
   animScale: 0.5
@@ -1073,6 +1089,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1453347822}
   m_CullTransparentMesh: 1
+--- !u!114 &1453347828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453347822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b654320e14b0001479c1567c51db3b92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activated: 1
+  opaque: 0
 --- !u!1 &1533390366
 GameObject:
   m_ObjectHideFlags: 0

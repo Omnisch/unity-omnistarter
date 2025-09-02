@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.29
+// version: 2025.09.03
 
 using System.Collections.Generic;
 using System.Linq;
@@ -52,12 +52,12 @@ namespace Omnis
         {
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<PointerBase>(out var pb))
+                if (hit.TryGetComponent<PointerReceiver>(out var pr))
                 {
                     hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
                     hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
                     // if opaque, ignore colliders behind it.
-                    if (pb.opaque) break;
+                    if (pr.opaque) break;
                 }
             }
         }
@@ -74,11 +74,13 @@ namespace Omnis
         {
             foreach (var hit in hitsLeftTrack)
             {
-                if (hit.TryGetComponent<PointerBase>(out var pb) && pb.LeftPressed)
+                if (hit.TryGetComponent<PointerReceiver>(out var pr))
                 {
-                    hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
-                    hit.SendMessage("OnLeftRelease", SendMessageOptions.DontRequireReceiver);
-                    if (pb.opaque) break;
+                    if (pr.TryGetComponent<PointerBase>(out var pb) && pb.LeftPressed) {
+                        hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
+                        hit.SendMessage("OnLeftRelease", SendMessageOptions.DontRequireReceiver);
+                    }
+                    if (pr.opaque) break;
                 }
             }
         }
@@ -133,13 +135,13 @@ namespace Omnis
                 if (hit)
                 {
                     hit.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
-                    if (hit.GetComponent<PointerBase>() && hit.GetComponent<PointerBase>().opaque) break;
+                    if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
                 }
             foreach (var hit in newHits.Except(hits).ToList())
                 if (hit)
                 {
                     hit.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
-                    if (hit.GetComponent<PointerBase>() && hit.GetComponent<PointerBase>().opaque) break;
+                    if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
                 }
             hits = newHits;
         }

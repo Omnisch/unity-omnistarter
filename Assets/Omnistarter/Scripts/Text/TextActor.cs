@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.21
+// version: 2025.09.03
 
 using System.Collections;
 using System.Collections.Generic;
@@ -203,10 +203,8 @@ namespace Omnis.Text
         #endregion
 
         #region Unity Methods
-        protected override void Start()
+        private void Start()
         {
-            base.Start();
-
             tmpro = GetComponent<TMP_Text>();
             TextManager.Instance.AddActor(this);
             Line = tmpro.text;

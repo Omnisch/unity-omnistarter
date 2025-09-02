@@ -1,9 +1,7 @@
 // author: Omnistudio
-// version: 2025.09.02
+// version: 2025.09.03
 
-using Omnis.Utils;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Omnis
@@ -11,16 +9,13 @@ namespace Omnis
     public class DesktopDraggable : PointerBase
     {
         #region Serialized Fields
-        [SerializeField] private bool draggable = true;
         [SerializeField] private DesktopSurface surface = null;
         [SerializeField] private float gridSnap = 0f;
-        [SerializeField] private UnityEvent pressCallback;
         #endregion
 
 
         #region Fields
         private Vector3 mouseOffset;
-        private Vector3 positionMouseDown;
         #endregion
 
 
@@ -32,21 +27,17 @@ namespace Omnis
             {
                 if (value && !base.LeftPressed)
                 {
-                    if (MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: false))
+                    if (this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: false))
                     {
-                        mouseOffset = WorldPosition - mousePoint;
-                        positionMouseDown = WorldPosition;
+                        this.mouseOffset = this.WorldPosition - mousePoint;
                     }
                 }
                 else if (!value && base.LeftPressed)
                 {
-                    if (MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: true, liftUp: false))
+                    if (this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: true, liftUp: false))
                     {
-                        if (draggable)
-                            WorldPosition = mousePoint + mouseOffset;
-
-                        if (WorldPosition.xz() == positionMouseDown.xz())
-                            pressCallback?.Invoke();
+                        if (this.Active)
+                            this.WorldPosition = mousePoint + this.mouseOffset;
                     }
                 }
 
@@ -56,13 +47,13 @@ namespace Omnis
 
         public Vector3 WorldPosition
         {
-            get => transform.position;
+            get => this.transform.position;
             set
             {
-                if (TryGetComponent<DesktopSurface>(out var selfSurface))
+                if (this.TryGetComponent<DesktopSurface>(out var selfSurface))
                     selfSurface.MoveSelfWithAllDraggablesTo(value);
                 else
-                    transform.position = value;
+                    this.transform.position = value;
             }
         }
         #endregion
@@ -72,7 +63,7 @@ namespace Omnis
         private bool MouseRayCastPointOnSurface(out Vector3 point, bool doClamp, bool liftUp)
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (surface.Raycast(ray, out point, doClamp, liftUp, gridSnap))
+            if (this.surface.Raycast(ray, out point, doClamp, liftUp, this.gridSnap))
                 return true;
 
             point = Vector3.zero;
@@ -81,44 +72,43 @@ namespace Omnis
 
         public void Drop(Vector3 position)
         {
-            LeftPressed = false;
-            WorldPosition = position;
+            this.LeftPressed = false;
+            this.WorldPosition = position;
         }
         #endregion
 
+
         #region Unity Methods
-        protected override void Start()
+        private void Start()
         {
-            base.Start();
+            if (this.surface == null)
+                this.surface = FindObjectOfType(typeof(DesktopSurface)) as DesktopSurface;
 
-            if (surface == null)
-                surface = FindObjectOfType(typeof(DesktopSurface)) as DesktopSurface;
-
-            if (surface == null)
+            if (this.surface == null)
                 Debug.LogError("There MUST be a DesktopSurface for any DesktopDraggable.");
             else
             {
-                surface.Draggables.Add(this);
-                WorldPosition = surface.AdsordToSurface(WorldPosition);
+                this.surface.Draggables.Add(this);
+                this.WorldPosition = this.surface.AdsordToSurface(this.WorldPosition);
             }
         }
 
         private void Update()
         {
-            if (!Interactable || !draggable)
+            if (!this.Active)
                 return;
 
-            if (LeftPressed && MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true)) {
-                WorldPosition = Vector3.Lerp(WorldPosition, mousePoint + mouseOffset, 0.5f);
+            if (this.LeftPressed && this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true)) {
+                this.WorldPosition = Vector3.Lerp(this.WorldPosition, mousePoint + this.mouseOffset, 0.5f);
             }
         }
 
         private void OnDestroy()
         {
-            if (surface != null)
+            if (this.surface != null)
             {
-                surface.Draggables.Remove(this);
-                surface = null;
+                this.surface.Draggables.Remove(this);
+                this.surface = null;
             }
         }
         #endregion

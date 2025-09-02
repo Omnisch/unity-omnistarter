@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.21
+// version: 2025.09.03
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,74 +7,66 @@ using UnityEngine;
 namespace Omnis
 {
     /// <summary>
-    /// The base class of mouse-interactive 3D GameObjects.<br/>
-    /// Needs an Omnis.InputHandler in the scene.
+    /// The base component of pointer-interactive 3D GameObjects.<br/>
+    /// Needs an Omnis.InputHandler in the scene<br/>
+    /// as well as an Omnis.PointerReceiver on this GameObject.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(PointerReceiver))]
     public abstract class PointerBase : MonoBehaviour
     {
-        #region Serialized fields
-        public bool opaque;
+        #region Serialized Fields
+        [SerializeField] private bool active = true;
         #endregion
 
         #region Fields
-        private bool interactable;
-        private bool pointed;
-        private bool leftPressed;
-        private bool rightPressed;
-        private bool middlePressed;
+        private bool pointed = false;
+        private bool leftPressed = false;
+        private bool rightPressed = false;
+        private bool middlePressed = false;
         #endregion
 
         #region Properties
-        public virtual bool Interactable
+        public virtual bool Active
         {
-            get => interactable;
-            protected set => interactable = value;
+            get => this.active;
+            protected set => this.active = value;
         }
         public virtual bool LeftPressed
         {
-            get => leftPressed;
-            protected set => leftPressed = value;
+            get => this.leftPressed;
+            protected set => this.leftPressed = value;
         }
         public virtual bool RightPressed
         {
-            get => rightPressed;
-            protected set => rightPressed = value;
+            get => this.rightPressed;
+            protected set => this.rightPressed = value;
         }
         public virtual bool MiddlePressed
         {
-            get => middlePressed;
-            protected set => middlePressed = value;
+            get => this.middlePressed;
+            protected set => this.middlePressed = value;
         }
         public virtual bool Pointed
         {
-            get => pointed;
-            protected set => pointed = value;
+            get => this.pointed;
+            protected set => this.pointed = value;
         }
         #endregion
 
         #region Functions
-        protected virtual void OnInteracted(List<Collider> siblings) {}
-        #endregion
-
-        #region Unity methods
-        protected virtual void Start()
-        {
-            interactable = true;
-            pointed = false;
-        }
+        protected virtual void OnInteracted(List<Collider> siblings) { }
         #endregion
 
         #region Messages
-        protected void OnInteract(List<Collider> siblings) { if (Interactable) OnInteracted(siblings); }
-        private void OnLeftPress()      { if (Interactable) LeftPressed = true; }
-        private void OnLeftRelease()    { if (Interactable) LeftPressed = false; }
-        private void OnRightPress()     { if (Interactable) RightPressed = true; }
-        private void OnRightRelease()   { if (Interactable) RightPressed = false; }
-        private void OnMiddlePress()    { if (Interactable) MiddlePressed = true; }
-        private void OnMiddleRelease()  { if (Interactable) MiddlePressed = false; }
-        private void OnPointerEnter()   { if (Interactable) Pointed = true; }
-        private void OnPointerExit()    { if (Interactable) Pointed = false; }
+        protected void InteractReceiver(List<Collider> siblings) { if (this.Active) OnInteracted(siblings); }
+        private void LeftPressReceiver()      { if (this.Active) this.LeftPressed = true; }
+        private void LeftReleaseReceiver()    { if (this.Active) this.LeftPressed = false; }
+        private void RightPressReceiver()     { if (this.Active) this.RightPressed = true; }
+        private void RightReleaseReceiver()   { if (this.Active) this.RightPressed = false; }
+        private void MiddlePressReceiver()    { if (this.Active) this.MiddlePressed = true; }
+        private void MiddleReleaseReceiver()  { if (this.Active) this.MiddlePressed = false; }
+        private void PointerEnterReceiver()   { if (this.Active) this.Pointed = true; }
+        private void PointerExitReceiver()    { if (this.Active) this.Pointed = false; }
         #endregion
     }
 }
