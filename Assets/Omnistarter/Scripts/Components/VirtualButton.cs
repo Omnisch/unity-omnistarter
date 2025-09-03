@@ -7,6 +7,8 @@ namespace Omnis
     {
         public UnityEngine.Events.UnityEvent callback;
 
+        private bool canceled = false;
+
         public override bool LeftPressed
         {
             get => base.LeftPressed;
@@ -15,8 +17,13 @@ namespace Omnis
             {
                 base.LeftPressed = value;
 
-                if (!value && Pointed)
-                    callback?.Invoke();
+                if (value) {
+                    this.canceled = false;
+                }
+                else {
+                    if (!this.canceled)
+                        this.callback?.Invoke();
+                }
             }
         }
 
@@ -27,9 +34,14 @@ namespace Omnis
             {
                 base.Pointed = value;
 
-                if (!value)
-                    LeftPressed = false;
+                if (!value && this.LeftPressed)
+                    this.canceled = true;
             }
+        }
+
+        private void CancelClick()
+        {
+            this.canceled = true;
         }
     }
 }

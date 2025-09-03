@@ -1,11 +1,11 @@
 // author: Omnistudio
-// version: 2025.07.24
+// version: 2025.09.03
 
 using UnityEngine;
 
 namespace Omnis
 {
-    public class AlwaysLookAt : MonoBehaviour
+    public sealed class AlwaysLookAt : MonoBehaviour
     {
         [SerializeField] private Vector3 localEye;
         [SerializeField] private Vector3 localUp;
@@ -14,12 +14,12 @@ namespace Omnis
 
         private void LateUpdate()
         {
-            var actualTarget = lookAtCamera ? (Camera.main ? Camera.main.transform : null) : target;
+            var actualTarget = this.lookAtCamera ? (Camera.main ? Camera.main.transform : null) : this.target;
             if (actualTarget == null)
                 return;
 
-            transform.LookAt(actualTarget);
-            transform.localRotation *= Quaternion.LookRotation(localEye, localUp);
+            this.transform.LookAt(actualTarget);
+            this.transform.localRotation *= Quaternion.LookRotation(this.localEye, this.localUp);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace Omnis
 
         #region Fields
         private Vector3 mouseOffset;
+        private Vector3 pressMousePosition;
+        private bool moved;
         #endregion
 
 
@@ -30,6 +32,8 @@ namespace Omnis
                     if (this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: false))
                     {
                         this.mouseOffset = this.WorldPosition - mousePoint;
+                        this.pressMousePosition = Input.mousePosition;
+                        this.moved = false;
                     }
                 }
                 else if (!value && base.LeftPressed)
@@ -100,6 +104,11 @@ namespace Omnis
 
             if (this.LeftPressed && this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true)) {
                 this.WorldPosition = Vector3.Lerp(this.WorldPosition, mousePoint + this.mouseOffset, 0.5f);
+
+                if (!this.moved && pressMousePosition != Input.mousePosition) {
+                    this.SendMessage("CancelClick");
+                    this.moved = true;
+                }
             }
         }
 
