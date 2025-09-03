@@ -10,8 +10,9 @@ using UnityEngine;
 
 namespace Omnis.Text
 {
-    [RequireComponent(typeof(TMP_Text))][DisallowMultipleComponent]
-    public class TextActor : PointerBase
+    [RequireComponent(typeof(TMP_Text))]
+    [DisallowMultipleComponent]
+    public class TextActor : MonoBehaviour
     {
         #region Serialized Fields
         public string actorId;
@@ -70,11 +71,6 @@ namespace Omnis.Text
                     StartCoroutine(ResetNextTrigger());
                 }
             }
-        }
-        public override bool LeftPressed
-        {
-            get => base.LeftPressed;
-            protected set => base.LeftPressed = Next = value;
         }
         #endregion
 

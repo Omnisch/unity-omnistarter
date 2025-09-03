@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 1557994040}
   - component: {fileID: 1557994039}
   m_Layer: 0
-  m_Name: Input Manager
+  m_Name: Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -372,6 +372,9 @@ MonoBehaviour:
   debugLogic:
     m_PersistentCalls:
       m_Calls: []
+  iconCursor: {fileID: 0}
+  iconCursorPressed: {fileID: 0}
+  cursorHotspot: {x: 16, y: 16}
 --- !u!114 &1557994040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -556,6 +559,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de51b0704733d148bc7cc1d599ca532, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactable: 1
+  jumpable: 1
   movingType: 0
   moveScale: 20
   initJumpForce: 100
