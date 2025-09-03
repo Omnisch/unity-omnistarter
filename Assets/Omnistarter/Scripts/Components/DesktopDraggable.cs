@@ -16,7 +16,7 @@ namespace Omnis
 
         #region Fields
         private Vector3 mouseOffset;
-        private Vector3 pressMousePosition;
+        private Vector2 pressMousePosition;
         private bool moved;
         #endregion
 
@@ -29,19 +29,25 @@ namespace Omnis
             {
                 if (value && !base.LeftPressed)
                 {
-                    if (this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: false))
+                    var raycastResult = this.surface.MouseRaycast(false, false, gridSnap);
+                    if (raycastResult.hit)
                     {
-                        this.mouseOffset = this.WorldPosition - mousePoint;
-                        this.pressMousePosition = Input.mousePosition;
+                        this.mouseOffset = this.WorldPosition - raycastResult.point;
+                        this.pressMousePosition = Mouse.current.position.ReadValue();
                         this.moved = false;
                     }
                 }
                 else if (!value && base.LeftPressed)
                 {
-                    if (this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: true, liftUp: false))
+                    var raycastResult = this.surface.MouseRaycast(true, false, gridSnap);
+                    if (this.Active && raycastResult.hit)
                     {
-                        if (this.Active)
-                            this.WorldPosition = mousePoint + this.mouseOffset;
+                        if (raycastResult.clamped) {
+                            this.WorldPosition = raycastResult.point;
+                        }
+                        else {
+                            this.WorldPosition = raycastResult.point + this.mouseOffset;
+                        }
                     }
                 }
 
@@ -64,16 +70,6 @@ namespace Omnis
 
 
         #region Methods
-        private bool MouseRayCastPointOnSurface(out Vector3 point, bool doClamp, bool liftUp)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (this.surface.Raycast(ray, out point, doClamp, liftUp, this.gridSnap))
-                return true;
-
-            point = Vector3.zero;
-            return false;
-        }
-
         public void Drop(Vector3 position)
         {
             this.LeftPressed = false;
@@ -99,13 +95,14 @@ namespace Omnis
 
         private void Update()
         {
-            if (!this.Active)
-                return;
+            if (this.Active && this.LeftPressed) {
+                var raycastResult = this.surface.MouseRaycast(false, true, gridSnap);
 
-            if (this.LeftPressed && this.MouseRayCastPointOnSurface(out Vector3 mousePoint, doClamp: false, liftUp: true)) {
-                this.WorldPosition = Vector3.Lerp(this.WorldPosition, mousePoint + this.mouseOffset, 0.5f);
+                if (raycastResult.hit) {
+                    this.WorldPosition = Vector3.Lerp(this.WorldPosition, raycastResult.point + this.mouseOffset, 0.5f);
+                }
 
-                if (!this.moved && pressMousePosition != Input.mousePosition) {
+                if (!this.moved && pressMousePosition != Mouse.current.position.ReadValue()) {
                     this.SendMessage("CancelClick", SendMessageOptions.DontRequireReceiver);
                     this.moved = true;
                 }

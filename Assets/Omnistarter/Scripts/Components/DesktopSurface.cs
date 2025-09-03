@@ -4,6 +4,7 @@
 using Omnis.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Omnis
 {
@@ -22,21 +23,32 @@ namespace Omnis
         #region Fields
         [SerializeField][Editor.InspectorReadOnly] private List<DesktopDraggable> draggables = new();
         [SerializeField][Editor.InspectorReadOnly] private List<DesktopSlot> slots = new();
-        public List<DesktopDraggable> Draggables => draggables;
-        public List<DesktopSlot > Slots => slots;
+        public List<DesktopDraggable> Draggables => this.draggables;
+        public List<DesktopSlot > Slots => this.slots;
         private Plane plane;
         #endregion
 
 
         #region Methods
-        public bool Raycast(Ray ray, out Vector3 point, bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
+        public RaycastResult MouseRaycast(bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            return this.Raycast(ray, doClamp, liftUp, gridSnap);
+        }
+
+        public RaycastResult Raycast(Ray ray, bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
         {
             if (this.plane.Raycast(ray, out float dist)) {
-                point = ray.GetPoint(dist);
+                Vector3 point = ray.GetPoint(dist);
 
+                bool clamped = false;
                 if (doClamp) {
                     OrientedBox obb = OrientedBox.FromDiagonalAndRef(this.diagonalFrom.position, this.diagonalTo.position, this.vertexRef.position, this.inNormal);
+                    var tmp = point;
                     point = obb.Clamp(point);
+                    if (point != tmp) {
+                        clamped = true;
+                    }
                 }
 
                 point = point.GridSnap(gridSnap);
@@ -51,11 +63,20 @@ namespace Omnis
                     }
                 }
 
-                return true;
+                return new RaycastResult
+                {
+                    hit = true,
+                    point = point,
+                    clamped = clamped
+                };
             }
             else {
-                point = Vector3.zero;
-                return false;
+                return new RaycastResult
+                {
+                    hit = false,
+                    point = Vector3.zero,
+                    clamped = false
+                };
             }
         }
 
@@ -78,6 +99,15 @@ namespace Omnis
         private void Awake()
         {
             this.plane = new(this.inNormal, this.transform.position + this.localInPoint);
+        }
+        #endregion
+
+        #region Structs
+        public struct RaycastResult
+        {
+            public bool hit;
+            public Vector3 point;
+            public bool clamped;
         }
         #endregion
     }
