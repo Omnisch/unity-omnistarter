@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.07
+// version: 2025.09.03
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Omnis.Text
     [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 243)]
     public class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
-        public override List<ScriptableRichTextTag> Tags => tags;
+        public override List<ScriptableRichTextTag> Tags => this.tags;
         protected readonly List<ScriptableRichTextTag> tags = new()
         {
             #region Offset

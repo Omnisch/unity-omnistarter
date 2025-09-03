@@ -2,7 +2,7 @@
 
 >apple=0
 小红: 现在是<size=80>小红</size>说话。
-小红: Shall I compare thee to a summer's day? <break>Thou art more lovely and more temperate.
+小红: Shall I compare thee to a summer's day? <break/>Thou art more lovely and more temperate.
 小明: 现在是小明说话。
 小明: 我再多说一句。
 <apple=1

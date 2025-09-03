@@ -1,7 +1,6 @@
 // author: Omnistudio
-// version: 2025.07.06
+// version: 2025.09.03
 
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -10,29 +9,20 @@ namespace Omnis.Text
 {
     public partial class TextManager
     {
-        #region Serialized Fields
-        #endregion
-
-        #region Fields
-        #endregion
-
-        #region Properties
-        #endregion
-
-        #region Methods
         public void ReadDialogIni(string path)
         {
-            dialogState = new();
+            this.DialogState = new();
             IniStorage ini = new(path);
             foreach (var line in ini.pairs)
             {
-                dialogState.TryAdd(line.Name, line.Get());
-                Debug.Log($"[Dialog Ini] {line.Name}: {line.Get()}");
+                this.DialogState.TryAdd(line.Name, line.Get());
+                Debug.Log($"[Dialog INI] {line.Name}: {line.Get()}");
             }
         }
+
         public void ReadDialogScript(string path)
         {
-            dialogScript = new();
+            this.dialogScript = new();
             string entryName = "";
             List<EntryBranch> entry = new();
             EntryBranch branch = new();
@@ -61,7 +51,7 @@ namespace Omnis.Text
                             {
                                 // Add last entry to the list.
                                 if (entryName != "")
-                                    dialogScript.Add(entryName, entry);
+                                    this.dialogScript.Add(entryName, entry);
 
                                 // Record the name of new entry.
                                 entry = new();
@@ -141,8 +131,7 @@ namespace Omnis.Text
 
             // Add the last entry to the list.
             if (entryName != "")
-                dialogScript.Add(entryName, entry);
+                this.dialogScript.Add(entryName, entry);
         }
-        #endregion
     }
 }

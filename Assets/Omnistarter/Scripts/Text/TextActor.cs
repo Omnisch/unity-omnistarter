@@ -26,49 +26,44 @@ namespace Omnis.Text
         #region Fields
         private TMP_Text tmpro;
         public PrintInfo pi;
-        public float AnimFactor => isWorldPos ? animScale : animScale * 50f;
+        public float AnimFactor => this.isWorldPos ? this.animScale : this.animScale * 50f;
         #endregion
 
         #region Properties
-        public TMP_Text TMPro => tmpro;
+        public TMP_Text TMPro => this.tmpro;
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
         public string RawLine
         {
-            set
-            {
-                StopAllCoroutines();
-                tmpro.text = value;
+            set {
+                this.StopAllCoroutines();
+                this.tmpro.text = value;
             }
         }
         public string Line
         {
-            set
-            {
-                StopAllCoroutines();
-                pi = new();
-                StartCoroutine(ShowLine(staticHead + value));
+            set {
+                this.StopAllCoroutines();
+                this.StartCoroutine(this.ShowLine(this.staticHead + value));
             }
         }
         private bool next;
         public bool Next
         {
-            get => next;
-            set
-            {
-                next = value;
-                if (value)
-                {
+            get => this.next;
+            set {
+                this.next = value;
+                if (value) {
                     IEnumerator ResetNextTrigger()
                     {
                         yield return 0;
                         yield return new WaitForEndOfFrame();
-                        if (next)
-                        {
-                            TextManager.Instance.NextLine(callFromActor: actorId);
-                            next = false;
+                        if (this.next) {
+                            TextManager.Instance.NextLine(callFromActor: this.actorId);
+                            this.next = false;
                         }
                     }
-                    StartCoroutine(ResetNextTrigger());
+
+                    this.StartCoroutine(ResetNextTrigger());
                 }
             }
         }
@@ -77,108 +72,120 @@ namespace Omnis.Text
         #region Methods
         private IEnumerator ShowLine(string line)
         {
-            var tagInfoList = ParseRichText(line, out string textVisible);
-            tmpro.SetText(textVisible);
+            this.pi = new();
 
+            var tagInfoList = ParseRichText(line, out string textVisible);
+            this.tmpro.SetText(textVisible);
+            
             if (tagInfoList.Count == 0) yield break;
 
-            while (!tagInfoList.All(tagInfo => tagInfo.finished))
-            {
+            while (!tagInfoList.All(tagInfo => tagInfo.finished)) {
                 // Refresh all infos.
-                tmpro.ForceMeshUpdate();
-                var textInfo = tmpro.textInfo;
+                this.tmpro.ForceMeshUpdate();
+                var textInfo = this.tmpro.textInfo;
 
                 // Perform rich text effects.
-                foreach (var tagInfo in tagInfoList)
-                {
+                foreach (var tagInfo in tagInfoList) {
                     if (tagInfo.finished) continue;
+
                     var tag = TextManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
-                    for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++)
+                    for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++) {
                         tag?.render(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
+                    }
                 }
 
                 // Update geometry.
-                for (int i = 0; i < textInfo.meshInfo.Length; i++)
-                {
+                for (int i = 0; i < textInfo.meshInfo.Length; i++) {
                     var meshInfo = textInfo.meshInfo[i];
                     meshInfo.mesh.vertices = meshInfo.vertices;
                     meshInfo.mesh.colors32 = meshInfo.colors32;
-                    tmpro.UpdateGeometry(meshInfo.mesh, i);
+                    this.tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
-                if (!pi.pause)
-                    pi.past += pi.speed * Time.deltaTime;
+                if (!this.pi.pause) {
+                    this.pi.past += this.pi.speed * Time.deltaTime;
+                }
 
                 yield return null;
             }
         }
 
 
-        private static readonly Regex openTag = new(@"<(?<name>\w+)(?<a>[^>]*?)>", RegexOptions.Compiled);
+        private static readonly Regex openTag = new(@"<(?<name>\w+)(?<attrs>[^>]*?)>", RegexOptions.Compiled);
         private static readonly Regex closeTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
         private static List<TagInfo> ParseRichText(string src, out string srcVisible)
         {
-            var infos = new List<TagInfo>();
-            var stack = new Stack<(string tag, Dictionary<string, string> attr, int start)>();
+            var result = new List<TagInfo>();
+            var tmpList = new List<TagInfo>();
             srcVisible = "";
 
             int visibleIndex = 0;
-            for (int i = 0; i < src.Length;)
-            {
+            for (int i = 0; i < src.Length;) {
                 var mClose = closeTag.Match(src, i);
-                if (mClose.Success && mClose.Index == i)
-                {
+                if (mClose.Success && mClose.Index == i) {
                     string n = mClose.Groups["name"].Value;
-                    var (openTag, da, s) = stack.Pop();
-                    if (openTag == n)
-                    {
-                        infos.Add(new TagInfo { name = n, attrs = da, startIndex = s, endIndex = visibleIndex });
+                    var open = tmpList.Find((tag) => tag.name == n);
+
+                    // open tag found.
+                    if (!Equals(open, null)) {
+                        open.endIndex = visibleIndex;
+                        result.Add(open);
+                        tmpList.Remove(open);
 
                         i += mClose.Length;
                         continue;
                     }
+                    // open tag not found, this is a bare close tag, just skip it.
+                    else {
+                        srcVisible += src[mClose.Index..(mClose.Index + mClose.Length)];
+                        visibleIndex += mClose.Length;
+                        i += mClose.Length;
+                    }
                 }
 
                 var mOpen = openTag.Match(src, i);
-                if (mOpen.Success && mOpen.Index == i)
-                {
+                if (mOpen.Success && mOpen.Index == i) {
                     string n = mOpen.Groups["name"].Value;
 
-                    if (TextManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n))
-                    {
+                    // the tag is a custom tag.
+                    if (TextManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n)) {
                         // Parse attributes.
-                        string a = mOpen.Groups["a"].Value.Trim(' ');
-                        var la = a.Split(" ");
-                        var da = new Dictionary<string, string>();
-                        bool iso = false;
-                        foreach (string entry in la)
+                        string a = mOpen.Groups["attrs"].Value.Trim(' ');
+                        var open = new TagInfo
                         {
-                            if (entry == "/")
-                            {
-                                iso = true;
-                                continue;
-                            }
+                            name = n,
+                            attrs = new(),
+                            startIndex = visibleIndex
+                        };
 
-                            var p = entry.Split('=');
-                            if (p.Length > 1)
-                                da.Add(p[0], p[1]);
-                            else
-                                da.Add(entry, "");
+                        var la = a.Split(" ");
+                        foreach (string entry in la) {
+                            if (entry != "/") {
+                                var p = entry.Split('=');
+                                open.attrs.Add(p[0], p.Length > 1 ? string.Join("=", p[1..]) : "");
+                            }
                         }
 
                         // Isolated tags, such as "<br />".
-                        if (iso)
-                        {
-                            infos.Add(new TagInfo { name = n, attrs = da, startIndex = visibleIndex, endIndex = visibleIndex + 1 });
+                        if (mOpen.Value[^2] == '/') {
+                            open.endIndex = visibleIndex + 1;
+                            result.Add(open);
                             // Add a zero width space for any iso tags, so that it won't affect other characters.
                             srcVisible += '\u200B';
                             visibleIndex++;
                         }
-                        else
-                            stack.Push((n, da, visibleIndex));
+                        else {
+                            tmpList.Add(open);
+                        }
 
                         i += mOpen.Length;
                         continue;
+                    }
+                    // the tag is not a custom tag, maybe a Unity-preserved tag. skip it.
+                    else {
+                        srcVisible += src[mOpen.Index..(mOpen.Index + mOpen.Length)];
+                        visibleIndex += mOpen.Length;
+                        i += mOpen.Length;
                     }
                 }
 
@@ -187,23 +194,20 @@ namespace Omnis.Text
                 i++;
             }
 
-            // Pop all the orphan tags.
-            while (stack.Count > 0)
-            {
-                var (openTag, a, s) = stack.Pop();
-                infos.Add(new TagInfo { name = openTag, attrs = a, startIndex = s, endIndex = visibleIndex });
+            foreach (var orphan in tmpList) {
+                orphan.endIndex = visibleIndex;
+                result.Add(orphan);
             }
 
-            return infos;
+            return result;
         }
         #endregion
 
         #region Unity Methods
         private void Start()
         {
-            tmpro = GetComponent<TMP_Text>();
+            this.tmpro = this.GetComponent<TMP_Text>();
             TextManager.Instance.AddActor(this);
-            Line = tmpro.text;
         }
 
         private void OnDestroy()
@@ -221,9 +225,9 @@ namespace Omnis.Text
             public bool pause;
             public PrintInfo()
             {
-                past = 0;
-                speed = DefaultPrintSpeed;
-                pause = false;
+                this.past = 0;
+                this.speed = DefaultPrintSpeed;
+                this.pause = false;
             }
         }
         #endregion

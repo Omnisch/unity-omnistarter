@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.27
+// version: 2025.09.03
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,34 +14,30 @@ namespace Omnis.Text
 
         #region Fields
         private readonly Dictionary<string, TextActor> actors = new();
-        private Dictionary<string, string> dialogState;
         private Dictionary<string, List<EntryBranch>> dialogScript;
+        public Dictionary<string, string> DialogState { get; private set; }
         private EntryBranch currBranch;
         #endregion
 
         #region Properties
-        public ScriptableStyleSheet StyleSheet => styleSheet;
+        public ScriptableStyleSheet StyleSheet => this.styleSheet;
         private int currLineIndex;
         protected int CurrLineIndex
         {
-            get => currLineIndex;
+            get => this.currLineIndex;
             set
             {
-                if (currBranch == null)
-                {
-                    currLineIndex = -1;
+                if (this.currBranch == null) {
+                    this.currLineIndex = -1;
                 }
-                else
-                {
-                    if (value >= currBranch.actorLines.Count)
-                    {
-                        FinishEntry();
+                else {
+                    if (value >= this.currBranch.actorLines.Count) {
+                        this.FinishEntry();
                     }
-                    else
-                    {
-                        currLineIndex = value;
-                        if (actors.TryGetValue(currBranch.actorLines[currLineIndex].actorId, out var actor))
-                            actor.Line = currBranch.actorLines[currLineIndex].line;
+                    else {
+                        this.currLineIndex = value;
+                        if (this.actors.TryGetValue(this.currBranch.actorLines[this.currLineIndex].actorId, out var actor))
+                            actor.Line = this.currBranch.actorLines[this.currLineIndex].line;
                     }
                 }
             }
@@ -51,19 +47,19 @@ namespace Omnis.Text
         #region Methods
         public bool TryEnter(string entryName)
         {
-            if (!dialogScript.ContainsKey(entryName))
+            if (!this.dialogScript.ContainsKey(entryName))
             {
                 Debug.LogWarning($"No entry named {entryName}.");
                 return false;
             }
 
-            var entry = dialogScript[entryName];
+            var entry = this.dialogScript[entryName];
             foreach (var branch in entry)
             {
                 bool found = true;
                 foreach (var condition in branch.conditions)
                 {
-                    if (dialogState.TryGetValue(condition.Key, out var value) && value != condition.Value)
+                    if (this.DialogState.TryGetValue(condition.Key, out var value) && value != condition.Value)
                     {
                         found = false;
                         break;
@@ -72,8 +68,8 @@ namespace Omnis.Text
 
                 if (found)
                 {
-                    currBranch = branch;
-                    CurrLineIndex = 0;
+                    this.currBranch = branch;
+                    this.CurrLineIndex = 0;
                     return true;
                 }
             }
@@ -83,20 +79,20 @@ namespace Omnis.Text
         public void NextLine(string callFromActor)
         {
             // If not from the active actor, then ignore it.
-            if (currBranch != null && currBranch.actorLines[CurrLineIndex].actorId == callFromActor)
-                CurrLineIndex++;
+            if (this.currBranch != null && this.currBranch.actorLines[this.CurrLineIndex].actorId == callFromActor)
+                this.CurrLineIndex++;
         }
-        public void FinishEntry()
+        private void FinishEntry()
         {
-            foreach (var result in currBranch.results)
-                dialogState[result.Key] = result.Value;
-            if (currBranch.nextEntry != "")
-                TryEnter(currBranch.nextEntry);
+            foreach (var result in this.currBranch.results)
+                this.DialogState[result.Key] = result.Value;
+            if (this.currBranch.nextEntry != "")
+                this.TryEnter(this.currBranch.nextEntry);
         }
 
 
-        public void AddActor(TextActor actor) => actors.Add(actor.actorId, actor);
-        public void RemoveActor(TextActor actor) => actors.Remove(actor.actorId);
+        public void AddActor(TextActor actor) => this.actors.Add(actor.actorId, actor);
+        public void RemoveActor(TextActor actor) => this.actors.Remove(actor.actorId);
 
 
         public void Invoke()
@@ -105,7 +101,7 @@ namespace Omnis.Text
             void callbackIni(string[] paths)
             {
                 if (paths.Length > 0)
-                    ReadDialogIni(paths[0]);
+                    this.ReadDialogIni(paths[0]);
             }
             SFB.StandaloneFileBrowser.OpenFilePanelAsync("Load Ini", "", extensionsIni, false, callbackIni);
 
@@ -114,8 +110,8 @@ namespace Omnis.Text
             {
                 if (paths.Length > 0)
                 {
-                    ReadDialogScript(paths[0]);
-                    TryEnter("amysay");
+                    this.ReadDialogScript(paths[0]);
+                    this.TryEnter("amysay");
                 }
             }
             SFB.StandaloneFileBrowser.OpenFilePanelAsync("Load Dialogs", "", extensionsTxt, false, callbackTxt);
@@ -132,10 +128,10 @@ namespace Omnis.Text
 
         public EntryBranch()
         {
-            actorLines = new();
-            conditions = new();
-            results = new();
-            nextEntry = "";
+            this.actorLines = new();
+            this.conditions = new();
+            this.results = new();
+            this.nextEntry = "";
         }
 
         public struct ActorLine
