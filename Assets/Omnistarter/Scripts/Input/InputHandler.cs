@@ -35,7 +35,29 @@ namespace Omnis
         #endregion
 
         #region Properties
-        public static Vector2 PointerPosition { get; private set; }
+        private Vector2 pointerPosition;
+        private Vector2 PointerPosition
+        {
+            get => pointerPosition;
+            set {
+                pointerPosition = value;
+                Ray r = Camera.main.ScreenPointToRay(value);
+                var rawHits = Physics.RaycastAll(r);
+                System.Array.Sort(rawHits, (a, b) => a.distance.CompareTo(b.distance));
+                List<Collider> newHits = rawHits.Select(hit => hit.collider).ToList();
+                foreach (var hit in hits.Except(newHits).ToList())
+                    if (hit) {
+                        hit.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
+                        if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
+                    }
+                foreach (var hit in newHits.Except(hits).ToList())
+                    if (hit) {
+                        hit.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
+                        if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
+                    }
+                hits = newHits;
+            }
+        }
         private Texture2D CursorIcon
         {
             set => Cursor.SetCursor(value, cursorHotspot, CursorMode.Auto);
@@ -50,6 +72,9 @@ namespace Omnis
         #region Functions
         protected void ForwardMessageToHits(string methodName, object value = null)
         {
+            // manually refresh hits to avoid resting.
+            PointerPosition = PointerPosition;
+            
             foreach (var hit in hits)
             {
                 if (hit.TryGetComponent<PointerReceiver>(out var pr))
@@ -124,27 +149,7 @@ namespace Omnis
         private void OnMiddlePress() => ForwardMessageToHits("OnMiddlePress");
         private void OnMiddleRelease() => ForwardMessageToHits("OnMiddleRelease");
         private void OnScroll(InputValue value) => ForwardMessageToHits("OnScroll", value.Get<float>());
-        private void OnPointer(InputValue value)
-        {
-            PointerPosition = value.Get<Vector2>();
-            Ray r = Camera.main.ScreenPointToRay(value.Get<Vector2>());
-            var rawHits = Physics.RaycastAll(r);
-            System.Array.Sort(rawHits, (a, b) => a.distance.CompareTo(b.distance));
-            List<Collider> newHits = rawHits.Select(hit => hit.collider).ToList();
-            foreach (var hit in hits.Except(newHits).ToList())
-                if (hit)
-                {
-                    hit.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
-                    if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
-                }
-            foreach (var hit in newHits.Except(hits).ToList())
-                if (hit)
-                {
-                    hit.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
-                    if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
-                }
-            hits = newHits;
-        }
+        private void OnPointer(InputValue value) => PointerPosition = value.Get<Vector2>();
 
         private void OnMove(InputValue value) => ForwardMessageToListeners("OnMove", value.Get<Vector2>());
         private void OnJump(InputValue value) => ForwardMessageToListeners("OnJump", value.Get<float>());
