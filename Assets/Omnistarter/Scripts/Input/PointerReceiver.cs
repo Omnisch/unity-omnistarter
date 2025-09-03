@@ -10,7 +10,7 @@ namespace Omnis
     /// PointerReceiver will send messages to all Omnis.PointerBase on self GameObject.<br/>
     /// Needs an Omnis.InputHandler in the scene.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(Collider))] [DisallowMultipleComponent]
     public sealed class PointerReceiver : MonoBehaviour
     {
         #region Serialized fields

@@ -106,7 +106,7 @@ namespace Omnis
                 this.WorldPosition = Vector3.Lerp(this.WorldPosition, mousePoint + this.mouseOffset, 0.5f);
 
                 if (!this.moved && pressMousePosition != Input.mousePosition) {
-                    this.SendMessage("CancelClick");
+                    this.SendMessage("CancelClick", SendMessageOptions.DontRequireReceiver);
                     this.moved = true;
                 }
             }
