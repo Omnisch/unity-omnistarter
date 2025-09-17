@@ -1,3 +1,6 @@
+// author: Omnistudio
+// version: 2025.09.17
+
 namespace Omnis
 {
     /// <summary>
