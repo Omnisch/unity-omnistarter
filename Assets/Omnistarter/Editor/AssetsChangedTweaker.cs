@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.10.04
+// version: 2025.11.01
 
 using System;
 using System.IO;
@@ -12,7 +12,7 @@ namespace Omnis.Editor
     public class AssetsChangedTweaker : AssetPostprocessor
     {
         private const string PrefKey = "Omnis.UpdateHeaderDateEnabled";
-        private const string MenuPath = "Omnis/Auto-Update Header Date";
+        private const string MenuPath = "Tools/Omnis/Auto-Update Header Date";
 
         // Read user toggle (default off)
         private static bool UpdateDateEnabled => EditorPrefs.GetBool(PrefKey, false);
