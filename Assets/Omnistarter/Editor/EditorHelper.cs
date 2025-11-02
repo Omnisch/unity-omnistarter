@@ -74,6 +74,22 @@ namespace Omnis.Editor
 
             EditorGUILayout.EndHorizontal();
         }
+
+
+        /// <summary>
+        /// Get the display string of a SerializedProperty.
+        /// </summary>
+        public static string GetDisplayString(SerializedProperty p) {
+            return p.propertyType switch
+            {
+                SerializedPropertyType.Boolean => p.boolValue.ToString(),
+                SerializedPropertyType.Integer => p.intValue.ToString(),
+                SerializedPropertyType.Float => p.floatValue.ToString(),
+                SerializedPropertyType.String => p.stringValue,
+                SerializedPropertyType.Enum => p.enumDisplayNames[p.enumValueIndex],
+                _ => p.displayName,
+            };
+        }
         #endregion
 
         #region Assets
