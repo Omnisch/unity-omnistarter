@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.11
+// version: 2025.11.02
 
 using Omnis.Utils;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Omnis.Editor
     /// <summary>
     /// Auxiliary functions of UnityEditor
     /// </summary>
-    public class EditorTweaker : UnityEditor.Editor
+    public class EditorHelper : UnityEditor.Editor
     {
         #region Inspector
         /// <summary>

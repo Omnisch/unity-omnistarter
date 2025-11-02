@@ -1,7 +1,6 @@
 // author: Omnistudio
-// version: 2025.06.11
+// version: 2025.11.02
 
-#if UNITY_EDITOR
 using Omnis.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -45,4 +44,3 @@ namespace Omnis.Editor
         }
     }
 }
-#endif

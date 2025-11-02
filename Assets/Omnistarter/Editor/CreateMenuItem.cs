@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.10
+// version: 2025.11.02
 
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace Omnis.Editor
         private static void CreateSingletonInstance()
         {
             string templatePath = "Assets/Omnistarter/Editor/SingletonTemplate.cs.txt";
-            string selectedObjectName = EditorTweaker.ExtractAssetMainNameFromObject(Selection.activeObject);
+            string selectedObjectName = EditorHelper.ExtractAssetMainNameFromObject(Selection.activeObject);
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(templatePath, $"{selectedObjectName}.singleton.cs");
         }
 
@@ -28,7 +28,7 @@ namespace Omnis.Editor
         private static void CreateClassEditor()
         {
             string templatePath = "Assets/Omnistarter/Editor/ClassEditorTemplate.cs.txt";
-            string selectedObjectName = EditorTweaker.ExtractAssetMainNameFromObject(Selection.activeObject);
+            string selectedObjectName = EditorHelper.ExtractAssetMainNameFromObject(Selection.activeObject);
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(templatePath, $"{selectedObjectName}Editor.cs");
         }
 
