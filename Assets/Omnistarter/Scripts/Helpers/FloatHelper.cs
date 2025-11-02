@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.05.02
+// version: 2025.11.03
 
 using System;
 using UnityEngine;
@@ -27,10 +27,12 @@ namespace Omnis.Utils
         #endregion
 
         #region Simple operations
+        /// <summary>0.0001</summary>
+        public static readonly float EpsilonLoose = 0.0001f;
         /// <summary>
-        /// The loose version of Mathf.Approximately(), where Epsilon is 0.001.
+        /// The loose version of Mathf.Approximately(), where Epsilon is 0.0001.
         /// </summary>
-        public static bool ApproxLoose(this float value, float target) => Mathf.Abs(target - value) < 0.001f;
+        public static bool ApproxLoose(this float value, float target) => Mathf.Abs(target - value) < EpsilonLoose;
         /// <returns>1 - value</returns>
         public static float Inv(this float value) => 1f - value;
         /// <summary>

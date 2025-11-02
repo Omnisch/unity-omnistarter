@@ -33,48 +33,6 @@ namespace Omnis.Editor
             EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
         }
 
-        /// <summary>
-        /// A shorthand for two fields that semantically are min and max.
-        /// </summary>
-        public static void MinMaxFloat(string label, SerializedProperty minProp, SerializedProperty maxProp)
-        {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField(label, GUILayout.MaxWidth(100));
-
-                float old = EditorGUIUtility.labelWidth;
-                EditorGUIUtility.labelWidth = 30;
-
-                EditorGUILayout.PropertyField(minProp, new GUIContent("Min"));
-                EditorGUILayout.PropertyField(maxProp, new GUIContent("Max"));
-
-                EditorGUIUtility.labelWidth = old;
-            }
-        }
-
-        /// <summary>
-        /// A shorthand for two fields that semantically are min and max, using a EditorGUILayout.MinMaxSlider.
-        /// </summary>
-        public static void MinMaxSlider(string label, SerializedProperty minProp, SerializedProperty maxProp, float minLimit, float maxLimit)
-        {
-            EditorGUILayout.BeginHorizontal();
-
-            float min = minProp.floatValue;
-            float max = maxProp.floatValue;
-            EditorGUILayout.LabelField(label, GUILayout.MinWidth(100));
-            GUI.enabled = false;
-            EditorGUILayout.PropertyField(minProp, GUIContent.none, GUILayout.MaxWidth(40));
-            GUI.enabled = true;
-            EditorGUILayout.MinMaxSlider(ref min, ref max, minLimit, maxLimit);
-            GUI.enabled = false;
-            EditorGUILayout.PropertyField(maxProp, GUIContent.none, GUILayout.MaxWidth(40));
-            GUI.enabled = true;
-            minProp.floatValue = min;
-            maxProp.floatValue = max;
-
-            EditorGUILayout.EndHorizontal();
-        }
-
 
         /// <summary>
         /// Get the display string of a SerializedProperty.
