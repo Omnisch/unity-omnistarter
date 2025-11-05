@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.20
+// version: 2025.11.05
 
 using UnityEngine;
 
@@ -113,17 +113,30 @@ namespace Omnis.Utils
 
         #region Color space
         public static float SRGBToLinear01(float c) => (c <= 0.04045f) ? (c / 12.92f) : Mathf.Pow((c + 0.055f) / 1.055f, 2.4f);
+        public static float SRGBToLinear01(byte c) => SRGBToLinear01(c / 255f);
+        public static byte SRGBToLinear32(float c) => (byte)Mathf.RoundToInt(255 * SRGBToLinear01(c));
+        public static byte SRGBToLinear32(byte c) => (byte)Mathf.RoundToInt(255 * SRGBToLinear01(c));
+
         public static Color SRGBToLinear01(Color c) => new(SRGBToLinear01(c.r), SRGBToLinear01(c.g), SRGBToLinear01(c.b), c.a);
+        public static Color SRGBToLinear01(Color32 c) => new(SRGBToLinear01(c.r), SRGBToLinear01(c.g), SRGBToLinear01(c.b), c.a / 255f);
+        public static Color32 SRGBToLinear32(Color c) => new(SRGBToLinear32(c.r), SRGBToLinear32(c.g), SRGBToLinear32(c.b), (byte)Mathf.RoundToInt(c.a * 255f));
+        public static Color32 SRGBToLinear32(Color32 c) => new(SRGBToLinear32(c.r), SRGBToLinear32(c.g), SRGBToLinear32(c.b), c.a);
+
+
         /// <summary>
         /// ITU-R BT.601 (Rec.601) formula: Y = 0.299R + 0.587G + 0.114B<br/>
         /// For CRT and SDTV.
         /// </summary>
         public static float Grayscaled601(Color c) => 0.299f * c.r + 0.587f * c.g + 0.114f * c.b;
+        /// <inheritdoc cref="Grayscaled601(Color)"/>
+        public static byte Grayscaled601(Color32 c) => (byte)Mathf.Clamp(Mathf.RoundToInt(0.299f * c.r + 0.587f * c.g + 0.114f * c.b), 0, 255);
         /// <summary>
         /// ITU-R BT.709 (Rec.709) formula: Y = 0.2126R + 0.7152G + 0.0722B<br/>
         /// For sRGB and HDTV.
         /// </summary>
         public static float Grayscaled709(Color c) => 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b;
+        /// <inheritdoc cref="Grayscaled709(Color)"/>
+        public static byte Grayscaled709(Color32 c) => (byte)Mathf.Clamp(Mathf.RoundToInt(0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b), 0, 255);
         #endregion
     }
 }
