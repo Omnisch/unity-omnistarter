@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.06.11
+// version: 2025.11.05
 
 namespace Omnis.Utils
 {
@@ -85,6 +85,14 @@ namespace Omnis.Utils
 
             return result;
         }
+        #endregion
+
+        #region Natural Order
+        /// <summary>
+        /// Used for System.Collections.Generic.IEnumerable&lt;string&gt;.OrderBy().
+        /// </summary>
+        public static string NaturalOrder(string s) 
+            => System.Text.RegularExpressions.Regex.Replace(s, "\\d+", m => int.Parse(m.Value, System.Globalization.CultureInfo.InvariantCulture).ToString("D10"));
         #endregion
 
         #region Extensions
