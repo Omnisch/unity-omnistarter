@@ -110,5 +110,20 @@ namespace Omnis.Utils
 
         public static Color FadeAlpha(this Color color, float alpha) => new(color.r, color.g, color.b, alpha);
         #endregion
+
+        #region Color space
+        public static float SRGBToLinear01(float c) => (c <= 0.04045f) ? (c / 12.92f) : Mathf.Pow((c + 0.055f) / 1.055f, 2.4f);
+        public static Color SRGBToLinear01(Color c) => new(SRGBToLinear01(c.r), SRGBToLinear01(c.g), SRGBToLinear01(c.b), c.a);
+        /// <summary>
+        /// ITU-R BT.601 (Rec.601) formula: Y = 0.299R + 0.587G + 0.114B<br/>
+        /// For CRT and SDTV.
+        /// </summary>
+        public static float Grayscaled601(Color c) => 0.299f * c.r + 0.587f * c.g + 0.114f * c.b;
+        /// <summary>
+        /// ITU-R BT.709 (Rec.709) formula: Y = 0.2126R + 0.7152G + 0.0722B<br/>
+        /// For sRGB and HDTV.
+        /// </summary>
+        public static float Grayscaled709(Color c) => 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b;
+        #endregion
     }
 }
