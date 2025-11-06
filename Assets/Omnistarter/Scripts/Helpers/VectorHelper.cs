@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.18
+// version: 2025.11.06
 
 using UnityEngine;
 
@@ -111,5 +111,14 @@ namespace Omnis.Utils
             => new((float)System.Math.Round(v.x, digits), (float)System.Math.Round(v.y, digits), (float)System.Math.Round(v.z, digits));
         #endregion
 
+        #region Transform
+        public static void SetGlobalScale(Transform t, Vector3 globalScale) {
+            t.localScale = new Vector3(
+                globalScale.x / t.lossyScale.x * t.localScale.x,
+                globalScale.y / t.lossyScale.y * t.localScale.y,
+                globalScale.z / t.lossyScale.z * t.localScale.z
+            );
+        }
+        #endregion
     }
 }

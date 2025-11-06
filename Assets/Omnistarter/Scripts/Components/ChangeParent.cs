@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2025.11.06
 
+using Omnis.Utils;
 using UnityEngine;
 
 namespace Omnis
@@ -14,8 +15,8 @@ namespace Omnis
 
         private Coroutine moveCoroutine = null;
 
-        public void NextLocation() => SetLocation((targetIndex + 1) % targets.Length);
-        public void SetLocation(int i) {
+        public void MoveToNextParent() => SetParent((targetIndex + 1) % targets.Length);
+        public void SetParent(int i) {
             if (i < 0 || i >= targets.Length) {
                 Debug.LogWarning("Manual-set index out of bounds.");
                 return;
@@ -31,25 +32,19 @@ namespace Omnis
             transform.GetPositionAndRotation(out var oldPosition, out var oldRotation);
             var oldScale = transform.lossyScale;
 
-            moveCoroutine = StartCoroutine(Utils.YieldHelper.Ease((value) => {
+            moveCoroutine = StartCoroutine(YieldHelper.Ease((value) => {
                 transform.SetPositionAndRotation(
                     Vector3.Lerp(oldPosition, targets[targetIndex].position, value),
                     Quaternion.Lerp(oldRotation, targets[targetIndex].rotation, value));
-                SetGlobalScale(transform, Vector3.Lerp(oldScale, targets[targetIndex].lossyScale, value));
+                VectorHelper.SetGlobalScale(transform, Vector3.Lerp(oldScale, targets[targetIndex].lossyScale, value));
 
                 if (value == 1f) {
                     moveCoroutine = null;
                     transform.parent = targets[targetIndex];
+                    transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    transform.localScale = Vector3.one;
                 }
-            }, Utils.Easing.OutCubic, lerpTime, false));
-        }
-
-        private void SetGlobalScale(Transform t, Vector3 globalScale) {
-            t.localScale = new Vector3(
-                globalScale.x / t.lossyScale.x * t.localScale.x,
-                globalScale.y / t.lossyScale.y * t.localScale.y,
-                globalScale.z / t.lossyScale.z * t.localScale.z
-            );
+            }, Easing.OutCubic, lerpTime, false));
         }
     }
 }
