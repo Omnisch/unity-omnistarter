@@ -1,11 +1,11 @@
 // author: Omnistudio
-// version: 2025.09.26
+// version: 2025.11.06
 
 using UnityEngine;
 
 namespace Omnis
 {
-    public class ParentSwitch : MonoBehaviour
+    public class ChangeParent : MonoBehaviour
     {
         [SerializeField] private Transform[] targets;
         [SerializeField] private int targetIndex = 0;
