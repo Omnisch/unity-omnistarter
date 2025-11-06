@@ -40,7 +40,7 @@ namespace Omnis
 
                 if (value == 1f) {
                     moveCoroutine = null;
-                    transform.parent = targets[targetIndex];
+                    transform.SetParent(targets[targetIndex]);
                     transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
                     transform.localScale = Vector3.one;
                 }
