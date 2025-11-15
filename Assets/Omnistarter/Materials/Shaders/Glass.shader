@@ -64,7 +64,7 @@ Shader "Omnis/Glass"
                 screenPos.x = (screenPos.x + 1) * 0.5;
                 screenPos.y = 1 - (screenPos.y + 1) * 0.5;
 
-                float4 gaussian = ApplyGaussianKernel(_GrabTex, screenPos, depth);
+                float4 gaussian = GaussianBlur5x5(_GrabTex, screenPos, depth);
                 return gaussian * _MainTint;
             }
 
