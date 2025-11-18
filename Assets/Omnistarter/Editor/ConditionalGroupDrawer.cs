@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.02
+// version: 2025.11.18
 // drafted by GPT
 
 using Omnis.Utils;
@@ -96,7 +96,7 @@ namespace Omnis.Editor
             bool matched = false;
             switch (other.propertyType) {
                 case SerializedPropertyType.Boolean:
-                    matched = anyEquals.Any(v => THelper.ToBool(v) == other.boolValue);
+                    matched = anyEquals.Any(v => TypeHelper.ToBool(v) == other.boolValue);
                     break;
                 case SerializedPropertyType.Enum:
                     // Match by name or index
@@ -105,12 +105,12 @@ namespace Omnis.Editor
                         if (v == null) return false;
                         if (v.GetType().IsEnum) return string.Equals(v.ToString(), currentName, StringComparison.Ordinal);
                         if (v is string s) return string.Equals(s, currentName, StringComparison.Ordinal);
-                        if (THelper.IsIntegerLike(v)) return Convert.ToInt32(v) == other.enumValueIndex;
+                        if (TypeHelper.IsIntegerLike(v)) return Convert.ToInt32(v) == other.enumValueIndex;
                         return false;
                     });
                     break;
                 case SerializedPropertyType.Integer:
-                    matched = anyEquals.Any(v => THelper.IsIntegerLike(v) && Convert.ToInt32(v) == other.intValue);
+                    matched = anyEquals.Any(v => TypeHelper.IsIntegerLike(v) && Convert.ToInt32(v) == other.intValue);
                     break;
                 case SerializedPropertyType.Float:
                     matched = anyEquals.Any(v => (v is float || v is double) && Mathf.Approximately((float)Convert.ToDouble(v), other.floatValue));
