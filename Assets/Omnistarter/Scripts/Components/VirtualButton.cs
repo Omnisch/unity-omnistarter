@@ -1,6 +1,9 @@
 // author: Omnistudio
-// version: 2025.11.23
+// version: 2025.11.24
 
+using Omnis.Editor;
+using Omnis.Utils;
+using System;
 using UnityEngine.Events;
 
 namespace Omnis
@@ -10,38 +13,60 @@ namespace Omnis
     /// </summary>
     public class VirtualButton : PointerBase
     {
+        [ConditionalGroup]
+        public LongPress longPress;
         public UnityEvent enterCallback;
         public UnityEvent pressCallback;
         public UnityEvent releaseCallback;
         public UnityEvent exitCallback;
 
         private bool canceled = false;
+        private float longPressProgress = 0; // 0 ~ 1
 
-        public override bool LeftPressed
-        {
+
+        public override bool LeftPressed {
             get => base.LeftPressed;
-
-            protected set
-            {
+            protected set {
                 base.LeftPressed = value;
 
                 if (value) {
                     pressCallback?.Invoke();
                     canceled = false;
-                }
-                else {
+
+                    // Long press
+                    if (longPress.needLongPress) {
+                        StartCoroutine(YieldHelper.Ease(
+                            (value) => {
+                                longPressProgress = value;
+                                longPress.progressCallback?.Invoke(value);
+                                if (value == 1f) {
+                                    longPress.longPressCallback?.Invoke();
+                                }
+                            },
+                            Easing.Linear,
+                            time: longPress.pressTime
+                        ));
+                    }
+
+                } else {
                     if (!canceled) {
                         releaseCallback?.Invoke();
+
+                        // Long press
+                        if (longPress.needLongPress) {
+                            StopAllCoroutines();
+                            if (longPressProgress > 0 && longPressProgress < 1f) {
+                                longPress.notLongEnoughCallback?.Invoke();
+                            }
+                        }
                     }
                 }
             }
         }
 
-        public override bool Pointed
-        {
+        public override bool Pointed {
             get => base.Pointed;
-            protected set
-            {
+            protected set {
                 base.Pointed = value;
 
                 if (value) {
@@ -52,12 +77,29 @@ namespace Omnis
                         canceled = true;
                     }
                 }
+
+                // Stop long press progress
+                StopAllCoroutines();
             }
         }
 
-        private void CancelClick()
-        {
+        private void CancelClick() {
             canceled = true;
+        }
+
+
+        [Serializable]
+        public class LongPress
+        {
+            public bool needLongPress;
+            [ShowIf("needLongPress", true)]
+            public float pressTime = 1f;
+            [ShowIf("needLongPress", true)]
+            public UnityEvent<float> progressCallback;
+            [ShowIf("needLongPress", true)]
+            public UnityEvent longPressCallback;
+            [ShowIf("needLongPress", true)]
+            public UnityEvent notLongEnoughCallback;
         }
     }
 }

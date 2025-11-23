@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -803,6 +802,7 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!114 &846001190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1195,7 +1195,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
-  callback:
+  longPress:
+    needLongPress: 0
+    pressTime: 1
+    progressCallback:
+      m_PersistentCalls:
+        m_Calls: []
+    longPressCallback:
+      m_PersistentCalls:
+        m_Calls: []
+    notLongEnoughCallback:
+      m_PersistentCalls:
+        m_Calls: []
+  enterCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  pressCallback:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1358051904}
@@ -1210,6 +1225,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  releaseCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  exitCallback:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1453347822
 GameObject:
   m_ObjectHideFlags: 0
