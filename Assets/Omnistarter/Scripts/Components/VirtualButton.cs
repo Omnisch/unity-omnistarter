@@ -1,5 +1,7 @@
 // author: Omnistudio
-// version: 2025.09.17
+// version: 2025.11.23
+
+using UnityEngine.Events;
 
 namespace Omnis
 {
@@ -8,7 +10,10 @@ namespace Omnis
     /// </summary>
     public class VirtualButton : PointerBase
     {
-        public UnityEngine.Events.UnityEvent callback;
+        public UnityEvent enterCallback;
+        public UnityEvent pressCallback;
+        public UnityEvent releaseCallback;
+        public UnityEvent exitCallback;
 
         private bool canceled = false;
 
@@ -21,11 +26,13 @@ namespace Omnis
                 base.LeftPressed = value;
 
                 if (value) {
-                    this.canceled = false;
+                    pressCallback?.Invoke();
+                    canceled = false;
                 }
                 else {
-                    if (!this.canceled)
-                        this.callback?.Invoke();
+                    if (!canceled) {
+                        releaseCallback?.Invoke();
+                    }
                 }
             }
         }
@@ -37,14 +44,20 @@ namespace Omnis
             {
                 base.Pointed = value;
 
-                if (!value && this.LeftPressed)
-                    this.canceled = true;
+                if (value) {
+                    enterCallback?.Invoke();
+                } else {
+                    exitCallback?.Invoke();
+                    if (LeftPressed) {
+                        canceled = true;
+                    }
+                }
             }
         }
 
         private void CancelClick()
         {
-            this.canceled = true;
+            canceled = true;
         }
     }
 }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2024.12.04
+// version: 2025.11.23
 
 using UnityEngine;
 using UnityEngine.Events;
