@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2025.11.24
 
 using System.Collections.Generic;
 using System.Linq;
@@ -77,7 +77,7 @@ namespace Omnis
             
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<PointerReceiver>(out var pr))
+                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr))
                 {
                     hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
                     hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
@@ -99,7 +99,7 @@ namespace Omnis
         {
             foreach (var hit in hitsLeftTrack)
             {
-                if (hit.TryGetComponent<PointerReceiver>(out var pr))
+                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr))
                 {
                     if (pr.TryGetComponent<PointerBase>(out var pb) && pb.LeftPressed) {
                         hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
