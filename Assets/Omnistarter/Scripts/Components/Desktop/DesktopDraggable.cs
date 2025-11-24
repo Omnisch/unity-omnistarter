@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2025.11.24
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,44 +9,36 @@ namespace Omnis
     public class DesktopDraggable : PointerBase
     {
         #region Serialized Fields
-        [SerializeField] private DesktopSurface surface = null;
-        [SerializeField] private float gridSnap = 0f;
+        [SerializeField] protected DesktopSurface surface = null;
+        [SerializeField] protected float gridSnap = 0f;
         #endregion
 
 
         #region Fields
-        private Vector3 mouseOffset;
-        private Vector2 pressMousePosition;
-        private bool moved;
+        protected Vector3 mouseOffset;
+        protected Vector2 pressMousePosition;
+        protected bool moved;
         #endregion
 
 
         #region Properties
-        public override bool LeftPressed
-        {
+        public override bool LeftPressed {
             get => base.LeftPressed;
-            protected set
-            {
-                if (value && !base.LeftPressed)
-                {
-                    var raycastResult = this.surface.MouseRaycast(false, false, gridSnap);
-                    if (raycastResult.hit)
-                    {
-                        this.mouseOffset = this.WorldPosition - raycastResult.point;
-                        this.pressMousePosition = Mouse.current.position.ReadValue();
-                        this.moved = false;
+            protected set {
+                if (value && !base.LeftPressed) {
+                    var raycastResult = surface.MouseRaycast(false, false, gridSnap);
+                    if (raycastResult.hit) {
+                        mouseOffset = WorldPosition - raycastResult.point;
+                        pressMousePosition = Mouse.current.position.ReadValue();
+                        moved = false;
                     }
-                }
-                else if (!value && base.LeftPressed)
-                {
-                    var raycastResult = this.surface.MouseRaycast(true, false, gridSnap);
-                    if (this.Active && raycastResult.hit)
-                    {
+                } else if (!value && base.LeftPressed) {
+                    var raycastResult = surface.MouseRaycast(true, false, gridSnap);
+                    if (Active && raycastResult.hit) {
                         if (raycastResult.clamped) {
-                            this.WorldPosition = raycastResult.point;
-                        }
-                        else {
-                            this.WorldPosition = raycastResult.point + this.mouseOffset;
+                            WorldPosition = raycastResult.point;
+                        } else {
+                            WorldPosition = raycastResult.point + mouseOffset;
                         }
                     }
                 }
@@ -55,66 +47,59 @@ namespace Omnis
             }
         }
 
-        public Vector3 WorldPosition
-        {
-            get => this.transform.position;
-            set
-            {
-                if (this.TryGetComponent<DesktopSurface>(out var selfSurface))
+        public Vector3 WorldPosition {
+            get => transform.position;
+            set {
+                if (TryGetComponent<DesktopSurface>(out var selfSurface)) {
                     selfSurface.MoveSelfWithAllDraggablesTo(value);
-                else
-                    this.transform.position = value;
+                } else {
+                    transform.position = value;
+                }
             }
         }
         #endregion
 
 
         #region Methods
-        public void Drop(Vector3 position)
-        {
-            this.LeftPressed = false;
-            this.WorldPosition = position;
+        public void Drop(Vector3 position) {
+            LeftPressed = false;
+            WorldPosition = position;
         }
         #endregion
 
 
         #region Unity Methods
-        private void Start()
-        {
-            if (this.surface == null)
-                this.surface = FindObjectOfType(typeof(DesktopSurface)) as DesktopSurface;
-
-            if (this.surface == null)
+        protected virtual void Start() {
+            if (surface == null) {
+                surface = FindObjectOfType(typeof(DesktopSurface)) as DesktopSurface;
+            }
+            if (surface == null) {
                 Debug.LogError("There MUST be a DesktopSurface for any DesktopDraggable.");
-            else
-            {
-                this.surface.Draggables.Add(this);
-                this.WorldPosition = this.surface.AdsordToSurface(this.WorldPosition);
+            } else {
+                surface.Draggables.Add(this);
+                WorldPosition = surface.AdsordToSurface(WorldPosition);
             }
         }
 
-        private void Update()
-        {
-            if (this.Active && this.LeftPressed) {
-                var raycastResult = this.surface.MouseRaycast(false, true, gridSnap);
+        protected virtual void Update() {
+            if (Active && LeftPressed) {
+                var raycastResult = surface.MouseRaycast(false, true, gridSnap);
 
                 if (raycastResult.hit) {
-                    this.WorldPosition = Vector3.Lerp(this.WorldPosition, raycastResult.point + this.mouseOffset, 0.5f);
+                    WorldPosition = Vector3.Lerp(WorldPosition, raycastResult.point + mouseOffset, 0.5f);
                 }
 
-                if (!this.moved && pressMousePosition != Mouse.current.position.ReadValue()) {
-                    this.SendMessage("CancelClick", SendMessageOptions.DontRequireReceiver);
-                    this.moved = true;
+                if (!moved && pressMousePosition != Mouse.current.position.ReadValue()) {
+                    SendMessage("CancelClick", SendMessageOptions.DontRequireReceiver);
+                    moved = true;
                 }
             }
         }
 
-        private void OnDestroy()
-        {
-            if (this.surface != null)
-            {
-                this.surface.Draggables.Remove(this);
-                this.surface = null;
+        private void OnDestroy() {
+            if (surface != null) {
+                surface.Draggables.Remove(this);
+                surface = null;
             }
         }
         #endregion
