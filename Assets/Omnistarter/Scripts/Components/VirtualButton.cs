@@ -51,14 +51,7 @@ namespace Omnis
                 } else {
                     if (!canceled) {
                         releaseCallback?.Invoke();
-
-                        // Long press
-                        if (longPress.needLongPress) {
-                            StopAllCoroutines();
-                            if (longPressProgress > 0 && longPressProgress < 1f) {
-                                longPress.notLongEnoughCallback?.Invoke();
-                            }
-                        }
+                        AbortLongPress();
                     }
                 }
             }
@@ -75,6 +68,7 @@ namespace Omnis
                     exitCallback?.Invoke();
                     if (LeftPressed) {
                         canceled = true;
+                        AbortLongPress();
                     }
                 }
 
@@ -83,8 +77,13 @@ namespace Omnis
             }
         }
 
-        private void CancelClick() {
-            canceled = true;
+        private void AbortLongPress() {
+            if (longPress.needLongPress) {
+                StopAllCoroutines();
+                if (longPressProgress > 0f && longPressProgress < 1f) {
+                    longPress.notLongEnoughCallback?.Invoke();
+                }
+            }
         }
 
 
