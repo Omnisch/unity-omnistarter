@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.24
+// version: 2025.11.25
 
 using UnityEngine;
 
@@ -42,7 +42,7 @@ namespace Omnis
         #endregion
 
         #region Unity Methods
-        private void Start() {
+        private void Awake() {
             mpb = new MaterialPropertyBlock();
         }
         #endregion
