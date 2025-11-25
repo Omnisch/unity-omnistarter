@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.06
+// version: 2025.11.25
 
 using UnityEngine;
 
@@ -113,11 +113,15 @@ namespace Omnis.Utils
 
         #region Transform
         public static void SetGlobalScale(Transform t, Vector3 globalScale) {
-            t.localScale = new Vector3(
-                globalScale.x / t.lossyScale.x * t.localScale.x,
-                globalScale.y / t.lossyScale.y * t.localScale.y,
-                globalScale.z / t.lossyScale.z * t.localScale.z
-            );
+            try {
+                t.localScale = new Vector3(
+                    t.lossyScale.x == 0f ? globalScale.x : globalScale.x / t.lossyScale.x * t.localScale.x,
+                    globalScale.y / t.lossyScale.y * t.localScale.y,
+                    globalScale.z / t.lossyScale.z * t.localScale.z
+                );
+            } catch {
+                Debug.LogError("Scale cannot be set, because the lossy scale contains 0.");
+            }
         }
         #endregion
     }
