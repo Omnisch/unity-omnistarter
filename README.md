@@ -1,6 +1,6 @@
 # Omnistarter Unity Toolkit
 
-OUT for short, is a Unity 2022.3.16f1 toolkit, including
+Omnistarter Unity Toolkit, or OUT for short, is a Unity toolkit under 2022.3.62f3, including
 
 - handy scripts, e.g. simple logics, input, file IO, utilities
 - editor tweakers, e.g. auto updating modified date in scripts
@@ -11,13 +11,14 @@ It was made by myself and for myself, so it may be difficult to use for others.
 
 ## Prerequisites
 
-Before using OUT, one should import these packages to their project first:
+Before using OUT, you may need to import these packages to your project first:
 
 - **Unity UI** by Unity (for UI)
 - **Input System** by Unity (for input)
 - **TextMesh Pro** by Unity (for UI)
 - ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
 - [Unity Standalone File Browser](https://github.com/gkngkc/UnityStandaloneFileBrowser) by [gkngkc](https://github.com/gkngkc) (for IO)
+  - I personally recommend [add from OpenUPM](https://github.com/shiena/UnityStandaloneFileBrowser?tab=readme-ov-file#installation).
 - [Odin Serializer](https://github.com/TeamSirenix/odin-serializer) by [TeamSirenix](https://github.com/TeamSirenix) (for IO)
 
 ## Special Thanks
