@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.12.13
+// version: 2025.12.14
 
 using Omnis.Utils;
 using System;
@@ -49,28 +49,20 @@ namespace Omnis.API
                 new("X-Api-Request-Id", Guid.NewGuid().ToString()),
                 new("X-Api-Sequence", "-1")
             };
-            ASRRequest request;
-            if (url != null) {
-                request = new ASRRequest() {
-                    audio = new() {
+            var request = new ASRRequest() {
+                audio = string.IsNullOrEmpty(url)
+                    ? new() {
+                        data = data,
+                        format = format
+                    }
+                    : new() {
                         url = url,
                         format = format
                     },
-                    request = new() {
-                        enable_punc = true
-                    }
-                };
-            } else {
-                request = new ASRRequest() {
-                    audio = new() {
-                        data = data,
-                        format = format
-                    },
-                    request = new() {
-                        enable_punc = true
-                    }
-                };
-            }
+                request = new() {
+                    enable_punc = true
+                }
+            };
             var requestString = JsonUtility.ToJson(request);
             var responseRaw = await HttpHelper.PostJsonAsync(ASRUrl, "", requestString, header);
             var response = JsonUtility.FromJson<ASRResponse>(Encoding.UTF8.GetString(responseRaw));
