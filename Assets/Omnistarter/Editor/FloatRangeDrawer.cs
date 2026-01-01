@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.03
+// version: 2026.01.02
 
 using Omnis.Utils;
 using UnityEditor;
@@ -23,7 +23,7 @@ namespace Omnis.Editor
             var limSup = property.FindPropertyRelative("limSup");
             var allowZero = property.FindPropertyRelative("allowZeroWidth");
 
-            // Draw min-max line
+            // Draw min-max text
             Rect rFlatContent = EditorGUI.PrefixLabel(position, new GUIContent(label.text));
 
             float oldLabel = EditorGUIUtility.labelWidth;
@@ -46,7 +46,7 @@ namespace Omnis.Editor
             if (property.isExpanded) {
                 EditorGUI.indentLevel++;
 
-                // Draw limit line
+                // Draw limit text
                 Rect rLim = new(
                     position.x, position.y + EditorGUIUtility.singleLineHeight + vSpace,
                     position.width, EditorGUIUtility.singleLineHeight);
@@ -64,7 +64,7 @@ namespace Omnis.Editor
                 EditorGUIUtility.labelWidth = oldLabel;
                 EditorGUI.indentLevel++;
 
-                // Draw allow-zero line
+                // Draw allow-zero text
                 Rect rAllowZero = new(
                     position.x, position.y + 2 * (EditorGUIUtility.singleLineHeight + vSpace),
                     position.width, EditorGUIUtility.singleLineHeight);

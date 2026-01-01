@@ -21,10 +21,11 @@ namespace Omnis.Text
             }
         }
 
-        private void Awake()
-        {
-            if (!EnsureSingleton())
-                return;
-        }
+        // written in DialogManager.cs
+        //private void Awake()
+        //{
+        //    if (!EnsureSingleton())
+        //        return;
+        //}
     }
 }

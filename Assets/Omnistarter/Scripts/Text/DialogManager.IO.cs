@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.01
+// version: 2026.01.02
 
 using System.Collections.Generic;
 using System.IO;
@@ -22,10 +22,10 @@ namespace Omnis.Text
         }
 
         public void ReadDialogIni(string path) {
-            DialogVariables = new();
+            flags = new();
             IniStorage ini = new(path);
             foreach (var line in ini.pairs) {
-                DialogVariables.TryAdd(line.Name, line.Get());
+                flags.TryAdd(line.Name, line.Get());
                 Debug.Log($"[Dialog Ini] {line.Name}: {line.Get()}");
             }
         }
@@ -47,90 +47,87 @@ namespace Omnis.Text
 
         public void ReadDialogScript(string path) {
             dialogScript = new();
+
             string entryName = "";
-            List<EntryBranch> entry = new();
-            EntryBranch branch = new();
+            var entry = new List<EntryBranch>();
+            var branch = new EntryBranch();
+            var actorLine = new ActorLine();
 
             string[] texts = File.ReadAllLines(path);
 
-            foreach (string text in texts) {
-                var trimmed = text.Trim();
+            for (int i = 0; i < texts.Length; i++) {
+                var line = texts[i].Trim();
 
-                // Skip empty or space lines.
-                if (trimmed.Length == 0)
+                // skip empty or space lines
+                if (line.Length == 0)
                     continue;
 
-                switch (trimmed[0]) {
-                    // Entry
-                    case '[': {
-                            int rightBracketIndex = trimmed.IndexOf(']');
-                            if (rightBracketIndex == -1) {
-                                Debug.LogError($"Missing closing bracket at \"{trimmed}\"");
-                            } else {
-                                // Add last entry to the list.
-                                if (entryName != "")
-                                    dialogScript.Add(entryName, entry);
+                // entry
+                if (line.StartsWith("#")) {
+                    // push last entry to the list
+                    if (entryName != "")
+                        dialogScript.Add(entryName, entry);
 
-                                // Record the name of new entry.
-                                entry = new();
-                                entryName = trimmed[1..rightBracketIndex];
-                                branch = new();
-                            }
-                            break;
-                        }
-                    // Condition
-                    case '>': {
-                            string content = trimmed[1..];
-                            int equalsSignIndex = content.IndexOf('=');
-                            if (equalsSignIndex == -1) {
-                                Debug.LogError($"Illegal syntax at \"{trimmed}\"");
-                            } else {
-                                // Add one condition to current branch node.
-                                branch.conditions.Add(new(content[..equalsSignIndex], content[(equalsSignIndex + 1)..]));
-                            }
-                            break;
-                        }
-                    // Result
-                    case '<': {
-                            string content = trimmed[1..];
-                            int equalsSignIndex = content.IndexOf('=');
-                            if (equalsSignIndex == -1) {
-                                if (branch.nextEntry == "") {
-                                    // If not an equation, set next entry.
-                                    branch.nextEntry = content;
-                                } else {
-                                    // Only 1 next entry per branch.
-                                    Debug.LogError($"Multiple next entry at \"{trimmed}\"");
-                                }
-                            } else {
-                                // Add one condition to current branch node.
-                                branch.results.Add(new(content[..equalsSignIndex], content[(equalsSignIndex + 1)..]));
-                            }
-                            break;
-                        }
-                    // Separation of branches
-                    case '-': {
-                            entry.Add(branch);
-                            branch = new();
-                            break;
-                        }
-                    // All other lines will try to parse as speeches.
-                    default: {
-                            int colonIndex = trimmed.IndexOf(":");
-                            if (colonIndex == -1) {
-                                Debug.LogError($"Invalid line at \"{trimmed}\"");
-                            } else {
-                                branch.actorLines.Add(new EntryBranch.ActorLine {
-                                    actorId = trimmed[..colonIndex].Trim(),
-                                    line = trimmed[(colonIndex + 1)..].Trim()
-                                });
-                            }
-                            break;
-                        }
+                    // record the name of new entry
+                    entry = new();
+                    entryName = line[1..].Trim().ToLowerInvariant();
+                    branch = new();
+                }
+
+                // flag conditions
+                else if (line.StartsWith("if ")) {
+                    string content = line[3..].Trim();
+                    int equalsSignIndex = content.IndexOf('=');
+                    if (equalsSignIndex == -1) {
+                        Debug.LogError($"Illegal syntax at text {i}: '{line}'.");
+                    } else {
+                        // add one condition to current branch node
+                        branch.conditions.Add(new(content[..equalsSignIndex].Trim(), content[(equalsSignIndex + 1)..].Trim()));
+                    }
+                }
+
+                // commands, before the speech text
+                else if (line.StartsWith("/")) {
+                    string content = line[1..].Trim();
+                    string[] args = Utils.StringHelper.ParseArgs(content);
+                    if (args.Length < 1) {
+                        Debug.LogError($"Illegal command at text {i}: '{line}'.");
+                    } else if (args.Length == 1) {
+                        actorLine.cmds.Add(new() { keyword = args[0] });
+                    } else {
+                        actorLine.cmds.Add(new() { keyword = args[0], args = args[1..] });
+                    }
+                }
+
+                // next entry
+                else if (line.StartsWith("goto ")) {
+                    string content = line[5..].Trim();
+                    branch.nextEntry = content;
+                    // push uncovered commands
+                    if (actorLine.cmds.Count > 0) {
+                        branch.actorLines.Add(actorLine);
+                    }
+                    // push branch
+                    entry.Add(branch);
+                    branch = new();
+                }
+
+                // all other lines will try to parse as speeches
+                else {
+                    int colonIndex = line.IndexOf(":");
+                    if (colonIndex == -1) {
+                        Debug.LogError($"Invalid text at \"{line}\"");
+                    } else {
+                        actorLine.actorId = line[..colonIndex].Trim();
+                        actorLine.text = line[(colonIndex + 1)..].Trim();
+
+                        branch.actorLines.Add(actorLine);
+                        actorLine = new();
+                    }
                 }
             }
 
-            // Add the last entry to the list.
+            // push the last entry to the list
             if (entryName != "")
                 dialogScript.Add(entryName, entry);
         }

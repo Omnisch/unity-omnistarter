@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.02
+// version: 2026.01.02
 
 using Omnis.Utils;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Omnis.Editor
     {
         #region Inspector
         /// <summary>
-        /// Add one line of self script in Inspector.
+        /// Add one text of self script in Inspector.
         /// </summary>
         public static void Script(Object target, System.Type classType)
         {
@@ -25,7 +25,7 @@ namespace Omnis.Editor
         }
 
         /// <summary>
-        /// Add one line of Header and prior space.
+        /// Add one text of Header and prior space.
         /// </summary>
         public static void Header(string header)
         {

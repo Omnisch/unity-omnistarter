@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.01
+// version: 2026.01.02
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,8 +16,10 @@ namespace Omnis.Text
         #region Fields
         private readonly Dictionary<string, TextActor> actors = new();
         private Dictionary<string, List<EntryBranch>> dialogScript;
-        public Dictionary<string, string> DialogVariables { get; private set; }
         private EntryBranch currBranch;
+
+        public DialogCommands commands;
+        public Dictionary<string, string> flags;
         #endregion
 
 
@@ -34,14 +36,22 @@ namespace Omnis.Text
                         FinishEntry();
                     } else {
                         currLineIndex = value;
-                        if (actors.TryGetValue(currBranch.actorLines[currLineIndex].actorId, out var actor))
-                            actor.Line = currBranch.actorLines[currLineIndex].line;
+                        var actorLine = currBranch.actorLines[value];
+                        if (actors.TryGetValue(actorLine.actorId, out var actor))
+                            actor.Line = actorLine.text;
+                        // execute commands
+                        foreach (var cmd in actorLine.cmds) {
+                            if (commands.TryGet(cmd.keyword, out var exe)) {
+                                StartCoroutine(exe.Execute(cmd.args, this));
+                            }
+                        }
                     }
                 }
             }
         }
         public TextActor CurrActor => actors[currBranch.actorLines[currLineIndex].actorId];
         #endregion
+
 
         #region Methods
         public bool TryEnter(string entryName) {
@@ -54,7 +64,7 @@ namespace Omnis.Text
             foreach (var branch in entry) {
                 bool found = true;
                 foreach (var condition in branch.conditions) {
-                    if (DialogVariables.TryGetValue(condition.Key, out var value) && value != condition.Value) {
+                    if (flags.TryGetValue(condition.Key, out var value) && value != condition.Value) {
                         found = false;
                         break;
                     }
@@ -77,8 +87,6 @@ namespace Omnis.Text
         }
 
         private void FinishEntry() {
-            foreach (var result in currBranch.results)
-                DialogVariables[result.Key] = result.Value;
             if (currBranch.nextEntry != "")
                 TryEnter(currBranch.nextEntry);
         }
@@ -87,28 +95,40 @@ namespace Omnis.Text
         public void AddActor(TextActor actor) => actors.Add(actor.actorId, actor);
         public void RemoveActor(TextActor actor) => actors.Remove(actor.actorId);
         #endregion
+
+
+        #region Unity Methods
+        private void Awake() {
+            if (!EnsureSingleton())
+                return;
+
+            commands = new();
+
+            // register any new commands at here
+            commands.Register("set", new DialogCommandSet());
+        }
+        #endregion
     }
 
 
 
     public class EntryBranch
     {
-        public List<ActorLine> actorLines;
-        public List<KeyValuePair<string, string>> conditions;
-        public List<KeyValuePair<string, string>> results;
-        public string nextEntry;
+        public List<ActorLine> actorLines = new();
+        public List<KeyValuePair<string, string>> conditions = new();
+        public string nextEntry = null;
+    }
 
-        public EntryBranch() {
-            actorLines = new();
-            conditions = new();
-            results = new();
-            nextEntry = "";
-        }
+    public class ActorLine
+    {
+        public string actorId = null;
+        public string text = null;
+        public List<CommandInfo> cmds = new();
+    }
 
-        public struct ActorLine
-        {
-            public string actorId;
-            public string line;
-        }
+    public struct CommandInfo
+    {
+        public string keyword;
+        public string[] args;
     }
 }

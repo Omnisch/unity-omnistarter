@@ -1,5 +1,9 @@
 // author: Omnistudio
-// version: 2025.11.05
+// version: 2026.01.02
+
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Omnis.Utils
 {
@@ -93,6 +97,101 @@ namespace Omnis.Utils
         /// </summary>
         public static string NaturalOrder(string s) 
             => System.Text.RegularExpressions.Regex.Replace(s, "\\d+", m => int.Parse(m.Value, System.Globalization.CultureInfo.InvariantCulture).ToString("D10"));
+        #endregion
+
+        #region Args Parser
+        /// <summary>
+        /// Parse a text into arguments.<br/>
+        /// Whitespace separates args; consecutive whitespace is treated as one separator.<br/>
+        /// Supports quotes: "..." or '...'<br/>
+        /// Supports backslash escaping: \", \', \\ and optionally \n, \t, \r
+        /// </summary>
+        public static string[] ParseArgs(string line, bool supportEscapes = true, bool supportSpecialEscapes = true) {
+            if (line == null) return Array.Empty<string>();
+
+            var args = new List<string>();
+            var sb = new StringBuilder();
+
+            bool inQuotes = false;
+            char quoteChar = '\0';
+            bool escaping = false;
+
+            void FlushToken() {
+                if (sb.Length > 0) {
+                    args.Add(sb.ToString());
+                    sb.Clear();
+                }
+            }
+
+            for (int i = 0; i < line.Length; i++) {
+                char c = line[i];
+
+                if (escaping) {
+                    escaping = false;
+
+                    if (!supportEscapes) {
+                        sb.Append('\\');
+                        sb.Append(c);
+                        continue;
+                    }
+
+                    if (supportSpecialEscapes) {
+                        // Basic special escapes
+                        sb.Append(c switch {
+                            'n' => '\n',
+                            't' => '\t',
+                            'r' => '\r',
+                            _ => c
+                        });
+                    } else {
+                        sb.Append(c);
+                    }
+                    continue;
+                }
+
+                if (supportEscapes && c == '\\') {
+                    escaping = true;
+                    continue;
+                }
+
+                if (inQuotes) {
+                    if (c == quoteChar) {
+                        inQuotes = false;
+                        quoteChar = '\0';
+                    } else {
+                        sb.Append(c);
+                    }
+                    continue;
+                }
+
+                // Not in quotes
+                if (c == '"' || c == '\'') {
+                    inQuotes = true;
+                    quoteChar = c;
+                    continue;
+                }
+
+                if (char.IsWhiteSpace(c)) {
+                    // Treat any run of whitespace as separator
+                    FlushToken();
+                    continue;
+                }
+
+                sb.Append(c);
+            }
+
+            if (escaping) {
+                // Trailing backslash; interpret literally
+                sb.Append('\\');
+            }
+
+            if (inQuotes) {
+                throw new FormatException("Unclosed quote in argument string.");
+            }
+
+            FlushToken();
+            return args.ToArray();
+        }
         #endregion
 
         #region Extensions
