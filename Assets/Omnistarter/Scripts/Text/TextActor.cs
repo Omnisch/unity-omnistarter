@@ -23,66 +23,65 @@ namespace Omnis.Text
         [SerializeField] private bool isWorldPos;
         #endregion
 
+
         #region Fields
         private TMP_Text tmpro;
         public PrintInfo pi;
-        public float AnimFactor => this.isWorldPos ? this.animScale : this.animScale * 50f;
+        public float AnimFactor => isWorldPos ? animScale : animScale * 50f;
         #endregion
 
+
         #region Properties
-        public TMP_Text TMPro => this.tmpro;
+        public TMP_Text TMPro => tmpro;
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
-        public string RawLine
-        {
+        public string RawLine {
             set {
-                this.StopAllCoroutines();
-                this.tmpro.text = value;
+                StopAllCoroutines();
+                tmpro.text = value;
             }
         }
-        public string Line
-        {
+        public string Line {
             set {
-                this.StopAllCoroutines();
-                this.StartCoroutine(this.ShowLine(this.staticHead + value));
+                StopAllCoroutines();
+                StartCoroutine(ShowLine(staticHead + value));
             }
         }
+
         private bool next;
-        public bool Next
-        {
-            get => this.next;
+        public bool Next {
+            get => next;
             set {
-                this.next = value;
+                next = value;
                 if (value) {
-                    IEnumerator ResetNextTrigger()
-                    {
+                    IEnumerator ResetNextTrigger() {
                         yield return 0;
                         yield return new WaitForEndOfFrame();
-                        if (this.next) {
-                            TextManager.Instance.NextLine(callFromActor: this.actorId);
-                            this.next = false;
+                        if (next) {
+                            TextManager.Instance.NextLine(callFromActor: actorId);
+                            next = false;
                         }
                     }
 
-                    this.StartCoroutine(ResetNextTrigger());
+                    StartCoroutine(ResetNextTrigger());
                 }
             }
         }
         #endregion
 
+
         #region Methods
-        private IEnumerator ShowLine(string line)
-        {
-            this.pi = new();
+        private IEnumerator ShowLine(string line) {
+            pi = new();
 
             var tagInfoList = ParseRichText(line, out string textVisible);
-            this.tmpro.SetText(textVisible);
-            
+            tmpro.SetText(textVisible);
+
             if (tagInfoList.Count == 0) yield break;
 
             while (!tagInfoList.All(tagInfo => tagInfo.finished)) {
                 // Refresh all infos.
-                this.tmpro.ForceMeshUpdate();
-                var textInfo = this.tmpro.textInfo;
+                tmpro.ForceMeshUpdate();
+                var textInfo = tmpro.textInfo;
 
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList) {
@@ -99,11 +98,11 @@ namespace Omnis.Text
                     var meshInfo = textInfo.meshInfo[i];
                     meshInfo.mesh.vertices = meshInfo.vertices;
                     meshInfo.mesh.colors32 = meshInfo.colors32;
-                    this.tmpro.UpdateGeometry(meshInfo.mesh, i);
+                    tmpro.UpdateGeometry(meshInfo.mesh, i);
                 }
 
-                if (!this.pi.pause) {
-                    this.pi.past += this.pi.speed * Time.deltaTime;
+                if (!pi.pause) {
+                    pi.past += pi.speed * Time.deltaTime;
                 }
 
                 yield return null;
@@ -113,8 +112,7 @@ namespace Omnis.Text
 
         private static readonly Regex openTag = new(@"<(?<name>\w+)(?<attrs>[^>]*?)>", RegexOptions.Compiled);
         private static readonly Regex closeTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
-        private static List<TagInfo> ParseRichText(string src, out string srcVisible)
-        {
+        private static List<TagInfo> ParseRichText(string src, out string srcVisible) {
             var result = new List<TagInfo>();
             var tmpList = new List<TagInfo>();
             srcVisible = "";
@@ -151,8 +149,7 @@ namespace Omnis.Text
                     if (TextManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n)) {
                         // Parse attributes.
                         string a = mOpen.Groups["attrs"].Value.Trim(' ');
-                        var open = new TagInfo
-                        {
+                        var open = new TagInfo {
                             name = n,
                             attrs = new(),
                             startIndex = visibleIndex
@@ -173,8 +170,7 @@ namespace Omnis.Text
                             // Add a zero width space for any iso tags, so that it won't affect other characters.
                             srcVisible += '\u200B';
                             visibleIndex++;
-                        }
-                        else {
+                        } else {
                             tmpList.Add(open);
                         }
 
@@ -203,19 +199,19 @@ namespace Omnis.Text
         }
         #endregion
 
+
         #region Unity Methods
-        private void Start()
-        {
-            this.tmpro = this.GetComponent<TMP_Text>();
+        private void Start() {
+            tmpro = GetComponent<TMP_Text>();
             TextManager.Instance.AddActor(this);
         }
 
-        private void OnDestroy()
-        {
+        private void OnDestroy() {
             if (TextManager.Instance != null)
                 TextManager.Instance.RemoveActor(this);
         }
         #endregion
+
 
         #region Structs
         public class PrintInfo
@@ -223,11 +219,10 @@ namespace Omnis.Text
             public float past;
             public float speed;
             public bool pause;
-            public PrintInfo()
-            {
-                this.past = 0;
-                this.speed = DefaultPrintSpeed;
-                this.pause = false;
+            public PrintInfo() {
+                past = 0;
+                speed = DefaultPrintSpeed;
+                pause = false;
             }
         }
         #endregion
