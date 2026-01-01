@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2026.01.01
 
 using System.Collections;
 using System.Collections.Generic;
@@ -57,7 +57,7 @@ namespace Omnis.Text
                         yield return 0;
                         yield return new WaitForEndOfFrame();
                         if (next) {
-                            TextManager.Instance.NextLine(callFromActor: actorId);
+                            DialogManager.Instance.NextLine(callFromActor: actorId);
                             next = false;
                         }
                     }
@@ -87,7 +87,7 @@ namespace Omnis.Text
                 foreach (var tagInfo in tagInfoList) {
                     if (tagInfo.finished) continue;
 
-                    var tag = TextManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
+                    var tag = DialogManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++) {
                         tag?.render(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
                     }
@@ -146,7 +146,7 @@ namespace Omnis.Text
                     string n = mOpen.Groups["name"].Value;
 
                     // the tag is a custom tag.
-                    if (TextManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n)) {
+                    if (DialogManager.Instance.StyleSheet.Tags.Exists(tag => tag.name == n)) {
                         // Parse attributes.
                         string a = mOpen.Groups["attrs"].Value.Trim(' ');
                         var open = new TagInfo {
@@ -203,12 +203,12 @@ namespace Omnis.Text
         #region Unity Methods
         private void Start() {
             tmpro = GetComponent<TMP_Text>();
-            TextManager.Instance.AddActor(this);
+            DialogManager.Instance.AddActor(this);
         }
 
         private void OnDestroy() {
-            if (TextManager.Instance != null)
-                TextManager.Instance.RemoveActor(this);
+            if (DialogManager.Instance != null)
+                DialogManager.Instance.RemoveActor(this);
         }
         #endregion
 

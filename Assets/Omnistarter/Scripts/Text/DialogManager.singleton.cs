@@ -1,8 +1,8 @@
 namespace Omnis.Text
 {
-    public partial class TextManager
+    public partial class DialogManager
     {
-        public static TextManager Instance { get; private set; }
+        public static DialogManager Instance { get; private set; }
 
         private bool EnsureSingleton()
         {

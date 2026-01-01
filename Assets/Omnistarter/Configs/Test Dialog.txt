@@ -1,4 +1,4 @@
-[amysay]
+[start]
 
 >apple=0
 小红: 现在是<size=80>小红</size>说话。
@@ -6,14 +6,14 @@
 小明: 现在是小明说话。
 小明: 我再多说一句。
 <apple=1
-<amysay
+<start
 
 ---
 
 >apple=1
 小红: 小红喜欢<color=red>苹果</color>。
 <apple=0
-<amysay
+<start
 
 ---
 
