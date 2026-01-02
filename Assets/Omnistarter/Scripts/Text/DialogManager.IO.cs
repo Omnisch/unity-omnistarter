@@ -53,6 +53,24 @@ namespace Omnis.Text
             var branch = new EntryBranch();
             var actorLine = new ActorLine();
 
+            void PushActorLine() {
+                if (actorLine.actorId != null)
+                    branch.actorLines.Add(actorLine);
+                actorLine = new();
+            }
+            void PushBranch() {
+                PushActorLine();
+                if (branch.actorLines.Count > 0)
+                    entry.Add(branch);
+                branch = new();
+            }
+            void PushEntry() {
+                PushBranch();
+                if (entryName != "")
+                    dialogScript.Add(entryName, entry);
+                entry = new();
+            }
+
             string[] texts = File.ReadAllLines(path);
 
             for (int i = 0; i < texts.Length; i++) {
@@ -62,19 +80,15 @@ namespace Omnis.Text
                 if (line.Length == 0)
                     continue;
 
-                // entry
+                // new entry
                 if (line.StartsWith("#")) {
-                    // push last entry to the list
-                    if (entryName != "")
-                        dialogScript.Add(entryName, entry);
+                    PushEntry();
 
                     // record the name of new entry
-                    entry = new();
                     entryName = line[1..].Trim().ToLowerInvariant();
-                    branch = new();
                 }
 
-                // flag conditions
+                // conditions
                 else if (line.StartsWith("if ")) {
                     string content = line[3..].Trim();
                     branch.cond = ConditionCompiler.Compile(content);
@@ -90,18 +104,17 @@ namespace Omnis.Text
                         actorLine.cmds.Add(new() { keyword = args[0], args = args });
                     }
                 }
-
-                // next entry
+                
+                // end w/ next entry
                 else if (line.StartsWith("goto ")) {
                     string content = line[5..].Trim();
                     branch.nextEntry = content;
-                    // push uncovered commands
-                    if (actorLine.cmds.Count > 0) {
-                        branch.actorLines.Add(actorLine);
-                    }
-                    // push branch
-                    entry.Add(branch);
-                    branch = new();
+                    PushBranch();
+                }
+
+                // end w/o next entry
+                else if (line == "end") {
+                    PushBranch();
                 }
 
                 // all other lines will try to parse as speeches
@@ -112,16 +125,12 @@ namespace Omnis.Text
                     } else {
                         actorLine.actorId = line[..colonIndex].Trim();
                         actorLine.text = line[(colonIndex + 1)..].Trim();
-
-                        branch.actorLines.Add(actorLine);
-                        actorLine = new();
+                        PushActorLine();
                     }
                 }
             }
 
-            // push the last entry to the list
-            if (entryName != "")
-                dialogScript.Add(entryName, entry);
+            PushEntry();
         }
     }
 }

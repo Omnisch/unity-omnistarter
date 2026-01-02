@@ -83,7 +83,7 @@ namespace Omnis.Text
         }
 
         private void FinishEntry() {
-            if (currBranch.nextEntry != "")
+            if (currBranch.nextEntry != null)
                 TryEnter(currBranch.nextEntry);
         }
 
