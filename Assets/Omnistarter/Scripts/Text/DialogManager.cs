@@ -18,6 +18,8 @@ namespace Omnis.Text
         private readonly Dictionary<string, TextActor> actors = new();
         private Dictionary<string, List<EntryBranch>> dialogScript;
         private EntryBranch currBranch;
+        private int currLineIndex;
+        public TextActor currActor;
 
         public DialogCommands commands;
         public Blackboard blackboard;
@@ -26,7 +28,6 @@ namespace Omnis.Text
 
         #region Properties
         public ScriptableStyleSheet StyleSheet => styleSheet;
-        private int currLineIndex;
         protected int CurrLineIndex {
             get => currLineIndex;
             set {
@@ -38,8 +39,10 @@ namespace Omnis.Text
                     } else {
                         currLineIndex = value;
                         var actorLine = currBranch.actorLines[value];
-                        if (actors.TryGetValue(actorLine.actorId, out var actor))
+                        if (actors.TryGetValue(actorLine.actorId, out var actor)) {
                             actor.Line = actorLine.text;
+                            currActor = actor;
+                        }
                         // execute commands
                         foreach (var cmd in actorLine.cmds) {
                             if (commands.TryGet(cmd.keyword, out var exe)) {
@@ -50,7 +53,6 @@ namespace Omnis.Text
                 }
             }
         }
-        public TextActor CurrActor => actors[currBranch.actorLines[currLineIndex].actorId];
         #endregion
 
 
