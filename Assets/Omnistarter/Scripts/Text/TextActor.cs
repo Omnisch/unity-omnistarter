@@ -57,7 +57,7 @@ namespace Omnis.Text
                         yield return 0;
                         yield return new WaitForEndOfFrame();
                         if (next) {
-                            DialogManager.Instance.NextLine(callFromActor: actorId);
+                            DialogManager.Instance.NextLine();
                             next = false;
                         }
                     }

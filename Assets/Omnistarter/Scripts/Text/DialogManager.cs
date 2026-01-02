@@ -77,9 +77,8 @@ namespace Omnis.Text
             return false;
         }
 
-        public void NextLine(string callFromActor) {
-            // If not from the active actor, then ignore it.
-            if (currBranch != null && currBranch.actorLines[CurrLineIndex].actorId == callFromActor)
+        public void NextLine() {
+            if (currBranch != null)
                 CurrLineIndex++;
         }
 
