@@ -92,10 +92,8 @@ namespace Omnis.Text
                     string[] args = Utils.StringHelper.ParseArgs(content);
                     if (args.Length < 1) {
                         Debug.LogError($"Illegal command at text {i}: '{line}'.");
-                    } else if (args.Length == 1) {
-                        actorLine.cmds.Add(new() { keyword = args[0] });
                     } else {
-                        actorLine.cmds.Add(new() { keyword = args[0], args = args[1..] });
+                        actorLine.cmds.Add(new() { keyword = args[0], args = args });
                     }
                 }
 
