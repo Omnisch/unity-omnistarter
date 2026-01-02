@@ -26,8 +26,6 @@ namespace Omnis.Text
                 throw new ArgumentException($"Invalid argument: {args[2]}. The delta value must be a number.");
             }
 
-            double original = DefaultValue;
-
             // flag not existed
             if (!ctx.blackboard.TryGet(args[1], out var flagValue)) {
                 ctx.blackboard[args[1]] = Value.From(DefaultValue);
@@ -37,7 +35,7 @@ namespace Omnis.Text
                 throw new ArgumentException($"Invalid argument: {args[1]}. The flag is existed but not a number: {flagValue}.");
             }
 
-            ctx.blackboard[args[1]] = Value.From(original + delta);
+            ctx.blackboard[args[1]] = Value.From(flagValue.Number + delta);
             yield break;
         }
     }
