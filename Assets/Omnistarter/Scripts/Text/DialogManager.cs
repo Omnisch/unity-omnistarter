@@ -19,7 +19,7 @@ namespace Omnis.Text
         private Dictionary<string, List<EntryBranch>> dialogScript;
         private EntryBranch currBranch;
         private int currLineIndex;
-        public TextActor currActor;
+        private TextActor currActor;
 
         public DialogCommands commands;
         public Blackboard blackboard;
@@ -53,11 +53,13 @@ namespace Omnis.Text
                 }
             }
         }
+        public TextActor CurrActor => currActor;
         #endregion
 
 
         #region Methods
         public bool TryEnter(string entryName) {
+            entryName = entryName.ToLowerInvariant();
             if (!dialogScript.ContainsKey(entryName)) {
                 Debug.LogWarning($"No entry named {entryName}.");
                 return false;
@@ -65,7 +67,7 @@ namespace Omnis.Text
 
             var entry = dialogScript[entryName];
             foreach (var branch in entry) {
-                if (branch.cond.Evaluate(blackboard)) {
+                if (branch.cond == null || branch.cond.Evaluate(blackboard)) {
                     currBranch = branch;
                     CurrLineIndex = 0;
                     return true;
@@ -111,7 +113,7 @@ namespace Omnis.Text
     public class EntryBranch
     {
         public List<ActorLine> actorLines = new();
-        public ICondition cond;
+        public ICondition cond = null;
         public string nextEntry = null;
     }
 
