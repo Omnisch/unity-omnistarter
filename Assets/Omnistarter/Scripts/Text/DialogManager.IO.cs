@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2026.01.02
 
+using Omnis.Text.Conditions;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -22,11 +23,10 @@ namespace Omnis.Text
         }
 
         public void ReadDialogIni(string path) {
-            flags = new();
+            blackboard = new();
             IniStorage ini = new(path);
             foreach (var line in ini.pairs) {
-                flags.TryAdd(line.Name, line.Get());
-                Debug.Log($"[Dialog Ini] {line.Name}: {line.Get()}");
+                blackboard.TryAdd(line.Name, Value.Auto(line.Get()));
             }
         }
 
@@ -77,13 +77,7 @@ namespace Omnis.Text
                 // flag conditions
                 else if (line.StartsWith("if ")) {
                     string content = line[3..].Trim();
-                    int equalsSignIndex = content.IndexOf('=');
-                    if (equalsSignIndex == -1) {
-                        Debug.LogError($"Illegal syntax at text {i}: '{line}'.");
-                    } else {
-                        // add one condition to current branch node
-                        branch.conditions.Add(new(content[..equalsSignIndex].Trim(), content[(equalsSignIndex + 1)..].Trim()));
-                    }
+                    branch.cond = ConditionCompiler.Compile(content);
                 }
 
                 // commands, before the speech text

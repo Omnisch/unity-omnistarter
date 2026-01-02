@@ -1,8 +1,8 @@
 // author: Omnistudio
 // version: 2026.01.02
 
+using Omnis.Text.Conditions;
 using System.Collections;
-using UnityEngine;
 
 namespace Omnis.Text
 {
@@ -15,8 +15,7 @@ namespace Omnis.Text
                 throw new System.ArgumentException("Too many arguments, needs to be exactly two arguments: flag name, flag value.");
             }
 
-            ctx.flags[args[1]] = args[2];
-            Debug.Log($"Set '{args[1]}' to '{args[2]}'.");
+            ctx.blackboard[args[1]] = Value.Auto(args[2]);
             yield break;
         }
     }

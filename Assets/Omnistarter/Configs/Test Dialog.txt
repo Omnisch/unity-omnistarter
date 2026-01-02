@@ -1,15 +1,15 @@
 # start
 
-if apple = 0
+if not apple
 小红: 现在是<size=80>小红</size>说话。
 小红: Shall I compare thee to a summer's day? <break/>Thou art more lovely and more temperate.
 小明: 现在是小明说话。
-/set apple 1
+/set apple true
 小明: 给你一个苹果。
 goto start
 
-if apple = 1
-/set apple 0
+if apple
+/set apple false
 小红: 我吃掉一个<color=red>苹果</color>。
 goto start
 

@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2026.01.02
 
+using Omnis.Text.Conditions;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace Omnis.Text
         private EntryBranch currBranch;
 
         public DialogCommands commands;
-        public Dictionary<string, string> flags;
+        public Blackboard blackboard;
         #endregion
 
 
@@ -62,15 +63,7 @@ namespace Omnis.Text
 
             var entry = dialogScript[entryName];
             foreach (var branch in entry) {
-                bool found = true;
-                foreach (var condition in branch.conditions) {
-                    if (flags.TryGetValue(condition.Key, out var value) && value != condition.Value) {
-                        found = false;
-                        break;
-                    }
-                }
-
-                if (found) {
+                if (branch.cond.Evaluate(blackboard)) {
                     currBranch = branch;
                     CurrLineIndex = 0;
                     return true;
@@ -105,6 +98,7 @@ namespace Omnis.Text
             commands = new();
 
             // register any new commands at here
+            commands.Register("add", new DialogCommandAdd());
             commands.Register("set", new DialogCommandSet());
         }
         #endregion
@@ -115,7 +109,7 @@ namespace Omnis.Text
     public class EntryBranch
     {
         public List<ActorLine> actorLines = new();
-        public List<KeyValuePair<string, string>> conditions = new();
+        public ICondition cond;
         public string nextEntry = null;
     }
 
