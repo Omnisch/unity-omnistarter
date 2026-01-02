@@ -93,7 +93,7 @@ namespace Omnis.Text
 
 
         #region Unity Methods
-        private void Awake() {
+        protected virtual void Awake() {
             if (!EnsureSingleton())
                 return;
 
