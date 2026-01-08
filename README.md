@@ -18,8 +18,9 @@ Before using OUT, you may need to import these packages to your project first:
 - **TextMesh Pro** by Unity (for UI)
 - ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
 - [Unity Standalone File Browser](https://github.com/gkngkc/UnityStandaloneFileBrowser) by [gkngkc](https://github.com/gkngkc) (for IO)
-  - I personally recommend [add from OpenUPM](https://github.com/shiena/UnityStandaloneFileBrowser?tab=readme-ov-file#installation).
+  - I personally recommend [add from OpenUPM / GitHub](https://github.com/shiena/UnityStandaloneFileBrowser?tab=readme-ov-file#installation).
 - [Odin Serializer](https://github.com/TeamSirenix/odin-serializer) by [TeamSirenix](https://github.com/TeamSirenix) (for IO)
+  - I created a [GitHub repo](https://github.com/Omnisch/unity-odinserializer-package.git) to be easily added to package manager.
 
 ## Special Thanks
 
