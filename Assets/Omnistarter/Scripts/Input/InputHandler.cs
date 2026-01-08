@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.24
+// version: 2026.01.08
 
 using System.Collections.Generic;
 using System.Linq;
@@ -163,10 +163,10 @@ namespace Omnis
         private void OnDebugTest() => debugLogic?.Invoke();
         private void OnEscape()
         {
-#if UNITY_STANDALONE
-            Application.Quit();
-#elif UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_STANDALONE
+            Application.Quit();
 #endif
         }
         #endregion

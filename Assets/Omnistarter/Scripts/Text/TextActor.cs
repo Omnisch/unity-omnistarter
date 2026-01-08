@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.01.08
 
 using System.Collections;
 using System.Collections.Generic;
@@ -203,6 +203,7 @@ namespace Omnis.Text
         #region Unity Methods
         private void Start() {
             tmpro = GetComponent<TMP_Text>();
+            Line = tmpro.text;
             DialogManager.Instance.AddActor(this);
         }
 
