@@ -17,6 +17,8 @@ Before using OUT, you may need to import these packages to your project first:
 - **Input System** by Unity (for input)
 - **TextMesh Pro** by Unity (for UI)
 - ~~**Netcode for GameObjects** by Unity (for network)~~ (WIP)
+- **Newtonsoft Json** by Unity (for API)
+  - Add package by name `com.unity.nuget.newtonsoft-json`.
 - [Unity Standalone File Browser](https://github.com/gkngkc/UnityStandaloneFileBrowser) by [gkngkc](https://github.com/gkngkc) (for IO)
   - I personally recommend [add from OpenUPM / GitHub](https://github.com/shiena/UnityStandaloneFileBrowser?tab=readme-ov-file#installation).
 - [Odin Serializer](https://github.com/TeamSirenix/odin-serializer) by [TeamSirenix](https://github.com/TeamSirenix) (for IO)

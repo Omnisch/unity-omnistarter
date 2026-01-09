@@ -1,6 +1,8 @@
 // author: Omnistudio
-// version: 2025.11.28
+// version: 2026.01.09
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Omnis.Utils;
 using System;
 using System.Text;
@@ -14,53 +16,71 @@ namespace Omnis.API
         private static readonly string BaseUrl = "https://api.openai.com/v1/responses";
 
         /// <returns>response.output[0].content[0].text</returns>
-        public static async Task<string> TextGeneration(string apiKey, string model, string sysPrompt, string userPrompt) {
-            var request = new Request
-            {
-                model = model,
-                input = new Request.Input[] {
-                    new() {
+        public static async Task<string> TextGeneration(string apiKey, string model, string userPrompt, string sysPrompt = null, object textFormat = null) {
+            var request = new {
+                model,
+                input = new object[] {
+                    string.IsNullOrEmpty(sysPrompt) ? new { } : new {
                         role = "developer",
-                        content = new Request.Input.Content[] {
-                            new() {
+                        content = new object[] {
+                            new {
                                 type = "input_text",
                                 text = sysPrompt
                             }
                         }
                     },
-                    new() {
+                    new {
                         role = "user",
-                        content = new Request.Input.Content[] {
-                            new() {
+                        content = new object[] {
+                            new {
                                 type = "input_text",
                                 text = userPrompt
                             }
                         }
                     }
+                },
+                text = new {
+                    format = textFormat?? new { },
                 }
             };
-            var requestString = JsonUtility.ToJson(request);
+            var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
-            var response = JsonUtility.FromJson<ChatCompletionResponse>(Encoding.UTF8.GetString(responseRaw));
-            Debug.Log($"{response.output[0].status}");
-            return response.output[0].content[0].text;
+            var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
+
+            Debug.Log($"{response["output"]?[0]?["status"]}");
+
+            var content0 = response["output"]?[0]?["content"]?[0];
+            if (content0 == null) {
+                throw new Exception("No output content.");
+            }
+
+            var type = content0.Value<string>("type");
+            if (type == "refusal") {
+                throw new Exception("Model refusal: " + content0.Value<string>("refusal"));
+            }
+
+            var text = content0.Value<string>("text");
+            if (string.IsNullOrEmpty(text)) {
+                throw new Exception("Empty output text.");
+            }
+
+            return text;
         }
 
         /// <returns>response.output[0].content[0].text</returns>
         public static async Task<string> AnalyseImage(string apiKey, string model, string prompt, byte[] original) {
             string originalBase64 = Convert.ToBase64String(original);
-            var request = new Request
-            {
-                model = model,
-                input = new Request.Input[] {
-                    new() {
+            var request = new {
+                model,
+                input = new object[] {
+                    new {
                         role = "user",
-                        content = new Request.Input.Content[] {
-                            new() {
+                        content = new object[] {
+                            new {
                                 type = "input_text",
                                 text = prompt
                             },
-                            new() {
+                            new {
                                 type = "input_image",
                                 image_url = originalBase64
                             }
@@ -68,59 +88,28 @@ namespace Omnis.API
                     }
                 }
             };
-            var requestString = JsonUtility.ToJson(request);
+            var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
-            var response = JsonUtility.FromJson<ChatCompletionResponse>(Encoding.UTF8.GetString(responseRaw));
-            Debug.Log($"{response.output[0].status}");
-            return response.output[0].content[0].text;
-        }
+            var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
-        #region Structs
-        [Serializable]
-        private class Request
-        {
-            public string model;
-            public Input[] input;
+            Debug.Log($"{response["output"]?[0]?["status"]}");
 
-            [Serializable]
-            public class Input
-            {
-                public string role;
-                public Content[] content;
-
-                [Serializable]
-                public class Content
-                {
-                    public string type;
-                    public string text;
-                    public string image_url;
-                }
+            var content0 = response["output"]?[0]?["content"]?[0];
+            if (content0 == null) {
+                throw new Exception("No output content.");
             }
-        }
 
-        [Serializable]
-        private class ChatCompletionResponse
-        {
-            public string id;
-            public Output[] output;
-
-            [Serializable]
-            public class Output
-            {
-                public string id;
-                public string type;
-                public string status;
-                public Content[] content;
-                public string role;
-
-                [Serializable]
-                public class Content
-                {
-                    public string type;
-                    public string text;
-                }
+            var type = content0.Value<string>("type");
+            if (type == "refusal") {
+                throw new Exception("Model refusal: " + content0.Value<string>("refusal"));
             }
+
+            var text = content0.Value<string>("text");
+            if (string.IsNullOrEmpty(text)) {
+                throw new Exception("Empty output text.");
+            }
+
+            return text;
         }
-        #endregion
     }
 }

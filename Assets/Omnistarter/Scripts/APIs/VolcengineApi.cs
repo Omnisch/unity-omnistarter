@@ -1,8 +1,11 @@
 // author: Omnistudio
-// version: 2025.12.14
+// version: 2026.01.09
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Omnis.Utils;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -16,161 +19,115 @@ namespace Omnis.API
 
         /// <returns>response.data</returns>
         public static async Task<string> VoiceSynthesis(string appid, string token, string prompt, string voice_type) {
-            var request = new VoiceSynthRequest() {
-                app = new() {
-                    appid = appid,
-                    token = token,
+            var request = new {
+                app = new {
+                    appid,
+                    token,
                     cluster = "volcano_tts",
                 },
-                user = new() {
+                user = new {
                     uid = Application.buildGUID
                 },
-                audio = new() {
-                    voice_type = voice_type,
+                audio = new {
+                    voice_type,
                 },
-                request = new() {
+                request = new {
                     reqid = Guid.NewGuid().ToString(),
                     text = prompt,
                     operation = "query"
                 }
             };
-            var requestString = JsonUtility.ToJson(request);
+            var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, $"Bearer;{token}", requestString);
-            var response = JsonUtility.FromJson<VoiceSynthResponse>(Encoding.UTF8.GetString(responseRaw));
-            Debug.Log($"[{response.code}] {response.message}");
-            return response.data;
+            var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
+            Debug.Log($"[{response["code"]}] {response["message"]}");
+            return response.Value<string>("data");
         }
 
         public static async Task<string> AutoSpeechRecognition(string appid, string token, string url, string data, string format) {
-            var header = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>>() {
+            var header = new List<KeyValuePair<string, string>>() {
                 new("X-Api-App-Key", appid),
                 new("X-Api-Access-Key", token),
                 new("X-Api-Resource-Id", "volc.bigasr.auc_turbo"),
                 new("X-Api-Request-Id", Guid.NewGuid().ToString()),
                 new("X-Api-Sequence", "-1")
             };
-            var request = new ASRRequest() {
+            var request = new {
                 audio = string.IsNullOrEmpty(url)
-                    ? new() {
-                        data = data,
-                        format = format
+                    ? new {
+                        url = "",
+                        data,
+                        format
                     }
-                    : new() {
-                        url = url,
-                        format = format
+                    : new {
+                        url,
+                        data = "",
+                        format
                     },
-                request = new() {
+                request = new {
+                    model_name = "bigmodel",
+                    enable_itn = true,
                     enable_punc = true
                 }
             };
-            var requestString = JsonUtility.ToJson(request);
+            var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(ASRUrl, "", requestString, header);
-            var response = JsonUtility.FromJson<ASRResponse>(Encoding.UTF8.GetString(responseRaw));
-            return response.result.text;
+            var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
+            return response["result"]?.Value<string>("text");
         }
 
         #region Structs
-        [Serializable]
-        private class VoiceSynthRequest {
-            public App app;
-            public User user;
-            public Audio audio;
-            public Request request;
+        //object VoiceSynthRequest {
+        //    object app;
+        //        string appid;
+        //        string token;
+        //        string cluster;
+        //    object user;
+        //        string uid;
+        //    object audio;
+        //        string voice_type;
+        //    object request;
+        //        string reqid;
+        //        string text;
+        //        string operation;
+        //}
 
-            [Serializable] public class App {
-                public string appid;
-                public string token;
-                public string cluster;
-            }
-            [Serializable] public class User {
-                public string uid;
-            }
-            [Serializable] public class Audio {
-                public string voice_type;
-            }
-            [Serializable] public class Request {
-                public string reqid;
-                public string text;
-                public string operation;
-            }
-        }
+        //object VoiceSynthResponse {
+        //    string reqid;
+        //    int code;
+        //    string message;
+        //    int sequence;
+        //    string data;
+        //    object addition;
+        //        string duration;
+        //        string frontend;
+        //}
 
-        [Serializable]
-        public class VoiceSynthResponse {
-            public string reqid;
-            public int code;
-            public string message;
-            public int sequence;
-            public string data;
-            public Addition addition;
+        //object ASRRequest {
+        //    object audio;
+        //        string url;       # *
+        //        string data;
+        //        string language;
+        //        string format;    # * raw / wav / mp3 / ogg
+        //        string codec;     # raw / opus
+        //        int rate;         # 16000 (recommended)
+        //    object request;
+        //        string model_name;    # * Must be set to "bigmodel" for now.
+        //        bool enable_itn;      # ITN will make the result more readable.
+        //        bool enable_punc;
+        //        bool enable_ddc;
+        //        object corpus;
+        //            string boosting_table_name;
+        //            string correct_table_name;
+        //            string context;
+        //}
 
-            [Serializable] public class Addition {
-                public string duration;
-                public string frontend;
-            }
-        }
-
-        /// <summary>
-        /// These are mandatory:<br/>
-        /// audio.url or audio.data<br/>
-        /// audio.format<br/>
-        /// request.model_name
-        /// </summary>
-        [Serializable]
-        public class ASRRequest {
-            public Audio audio;
-            public Request request;
-
-            [Serializable] public class Audio {
-                public string url;
-                public string data;
-                public string language;
-                /// <summary>
-                /// raw / wav / mp3 / ogg
-                /// </summary>
-                public string format;
-                /// <summary>
-                /// raw / opus
-                /// </summary>
-                public string codec = "raw";
-                /// <summary>
-                /// 16000 by default.
-                /// </summary>
-                public int rate = 16000;
-            }
-            [Serializable] public class Request {
-                /// <summary>
-                /// Must be set to "bigmodel" for now.
-                /// </summary>
-                public string model_name = "bigmodel";
-                /// <summary>
-                /// ITN will make the result more readable.
-                /// </summary>
-                public bool enable_itn = true;
-                public bool enable_punc = false;
-                public bool enable_ddc = false;
-                public Corpus corpus;
-
-                [Serializable] public class Corpus {
-                    public string boosting_table_name;
-                    public string correct_table_name;
-                    public string context;
-                }
-            }
-        }
-
-        [Serializable]
-        public class ASRResponse {
-            public Audio_info audio_info;
-            public Result result;
-
-            [Serializable] public class Audio_info {
-                public int duration;
-            }
-            [Serializable] public class Result {
-                public string text;
-            }
-        }
+        //object ASRResponse {
+        //    object audio_info;
+        //        int duration;
+        //    object result;
+        //        string text;
+        //}
         #endregion
     }
 }
