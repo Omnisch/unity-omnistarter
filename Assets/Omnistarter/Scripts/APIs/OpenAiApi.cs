@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.09
+// version: 2026.01.10
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -47,7 +47,7 @@ namespace Omnis.API
             var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
-            Debug.Log($"{response["output"]?[0]?["status"]}");
+            Debug.Log($"[OpenAI API] Status: {response["output"]?[0]?["status"]}");
 
             var content0 = response["output"]?[0]?["content"]?[0];
             if (content0 == null) {

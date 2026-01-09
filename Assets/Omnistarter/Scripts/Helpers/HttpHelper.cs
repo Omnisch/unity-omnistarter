@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.08.15
+// version: 2026.01.10
 
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,7 +60,7 @@ namespace Omnis.Utils
             string auth,
             object body = null,
             List<KeyValuePair<string, string>> moreHeaders = null)
-            => MakePostJsonByString(url, auth, JsonUtility.ToJson(body), moreHeaders);
+            => MakePostJsonByString(url, auth, JsonConvert.SerializeObject(body), moreHeaders);
         #endregion
 
         public static Task<UnityWebRequest> SendWebRequestAsync(this UnityWebRequest request)

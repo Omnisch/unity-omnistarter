@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.11.18
+// version: 2026.01.10
 
+using Newtonsoft.Json.Linq;
 using Omnis.Utils;
 using System;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Omnis.API
 
 
         /// <returns>data.image_token</returns>
-        public static async Task<string> UploadImage(string apiKey, byte[] imageData, string fileName) {
+        public static async Task<string> UploadImage(string api_key, byte[] imageData, string fileName) {
             string uploadUrl = $"{BaseUrl}/upload";
             string safeFileName = System.IO.Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             safeFileName = safeFileName.Replace(" ", "_").Replace(",", "").Replace("'", "");
@@ -26,106 +27,101 @@ namespace Omnis.API
             form.AddBinaryData("file", imageData, safeFileName, "image/jpeg");
 
             using UnityWebRequest request = UnityWebRequest.Post(uploadUrl, form);
-            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+            request.SetRequestHeader("Authorization", $"Bearer {api_key}");
             request.SetRequestHeader("Accept", "*/*");
 
             await request.SendWebRequestAsync();
 
-            if (request.result != UnityWebRequest.Result.Success)
-            {
+            if (request.result != UnityWebRequest.Result.Success) {
                 Debug.LogError($"HTTP Error: {request.responseCode} - {request.error}");
                 return null;
-            }
-            else
-            {
+            } else {
                 Debug.Log($"HTTP Success: {request.downloadHandler.text}");
-                var data = request.downloadHandler.data;
-                return data.GetJsonFieldByName<UploadResponse, string>("data.image_token");
+                var dataRaw = request.downloadHandler.data;
+                var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+                return data.SelectToken("data.image_token").Value<string>();
             }
         }
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateTextToImageTask(string apiKey, string prompt) {
-            var requestData = new GenerationRequest
-            {
+        public async static Task<string> CreateTextToImageTask(string api_key, string prompt) {
+            var requestData = new {
                 type = "generate_image",
-                prompt = prompt
+                prompt
             };
 
-            var data = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {apiKey}", requestData);
-            return data.GetJsonFieldByName<GenerationResponse, string>("data.task_id");
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.task_id").Value<string>();
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToImageTask(string apiKey, string fileToken, string prompt, bool tPose) {
-            var requestData = new GenerationRequest
-            {
+        public async static Task<string> CreateImageToImageTask(string api_key, string file_token, string prompt, bool t_pose) {
+            var requestData = new {
                 type = "generate_image",
-                prompt = prompt,
-                file = new()
-                {
+                prompt,
+                file = new {
                     type = "jpg",
-                    file_token = fileToken
+                    file_token
                 },
-                t_pose = tPose
+                t_pose
             };
 
-            var data = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {apiKey}", requestData);
-            return data.GetJsonFieldByName<GenerationResponse, string>("data.task_id");
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.task_id").Value<string>();
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromToken(string apiKey, string fileToken) {
-            var requestData = new GenerationRequest
-            {
+        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token) {
+            var requestData = new {
                 type = "image_to_model",
-                file = new()
-                {
+                file = new {
                     type = "jpg",
-                    file_token = fileToken
+                    file_token
                 },
                 auto_size = true
             };
 
-            var data = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {apiKey}", requestData);
-            return data.GetJsonFieldByName<GenerationResponse, string>("data.task_id");
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.task_id").Value<string>();
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromUrl(string apiKey, string url) {
-            var requestData = new GenerationRequest
-            {
+        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url) {
+            var requestData = new {
                 type = "image_to_model",
-                file = new()
-                {
+                file = new {
                     type = "jpg",
-                    url = url
+                    url
                 },
                 auto_size = true
             };
 
-            var data = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {apiKey}", requestData);
-            return data.GetJsonFieldByName<GenerationResponse, string>("data.task_id");
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.task_id").Value<string>();
         }
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateAnimateRigTask(string apiKey, string taskId) {
-            var requestData = new AnimationRequest
-            {
+        public async static Task<string> CreateAnimateRigTask(string api_key, string task_id) {
+            var requestData = new {
                 type = "animate_rig",
-                original_model_task_id = taskId,
+                original_model_task_id = task_id,
                 out_format = ModelFormat
             };
 
-            var data = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {apiKey}", requestData);
-            return data.GetJsonFieldByName<GenerationResponse, string>("data.task_id");
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.task_id").Value<string>();
         }
 
 
         /// <returns>data.output.pbr_model / data.output.model / data.output.generated_image</returns>
-        public static async Task<string> CheckTaskStatus(string apiKey, string taskId, int interval = 10000, Action<float> percentageCallback = null) {
+        public static async Task<string> CheckTaskStatus(string api_key, string task_id, int interval = 10000, Action<float> percentageCallback = null) {
             Debug.Log("Start checking task status...");
 
             int maxRetries = 5;
@@ -133,24 +129,25 @@ namespace Omnis.API
             string outputUrl = string.Empty;
 
             while (currentRetry < maxRetries) {
-                var downloadData = await HttpHelper.GetAsync($"{BaseUrl}/task/{taskId}", $"Bearer {apiKey}");
+                var downloadData = await HttpHelper.GetAsync($"{BaseUrl}/task/{task_id}", $"Bearer {api_key}");
 
                 if (downloadData != null) {
                     string downloadText = Encoding.UTF8.GetString(downloadData);
-                    var statusResponse = JsonUtility.FromJson<TaskResponse>(downloadText);
-                    if (statusResponse?.data != null) {
-                        var data = statusResponse.data;
-                        string currentStatus = data.status;
+                    var statusResponse = JObject.Parse(downloadText);
+                    if (statusResponse?["data"] != null) {
+                        var data = statusResponse["data"];
+                        var currentStatus = data?.Value<string>("status");
+                        var progress = data?.Value<float>("progress");
 
-                        percentageCallback?.Invoke(data.progress / 100f);
-                        Debug.Log($"Task Status: {currentStatus} | Progress: {data.progress}%");
+                        percentageCallback?.Invoke(progress ?? 0f / 100f);
+                        Debug.Log($"Task status: {currentStatus} | progress: {progress}%");
 
                         if (currentStatus.ToLower() == "success") {
                             try {
                                 outputUrl =
-                                    !string.IsNullOrEmpty(data.output.pbr_model) ? data.output.pbr_model :
-                                    !string.IsNullOrEmpty(data.output.model) ? data.output.model :
-                                    data.output.generated_image;
+                                    data?.SelectToken("output.pbr_model") != null ? data.SelectToken("output.pbr_model").Value<string>() :
+                                    data?.SelectToken("output.model") != null ? data.SelectToken("output.model").Value<string>() :
+                                    data?.SelectToken("output.generated_image").Value<string>();
                                 Debug.Log($"Task completed, result URL: {outputUrl}");
                             }
                             catch {
@@ -158,7 +155,7 @@ namespace Omnis.API
                             }
                             break;
                         } else if (currentStatus.ToLower() == "failed") {
-                            Debug.LogError($"Task failed: {statusResponse.code}");
+                            Debug.LogError($"Task failed: {statusResponse?.Value<string>("code")}");
                             break;
                         }
                     } else {
@@ -189,101 +186,50 @@ namespace Omnis.API
             return await HttpHelper.GetAsync(url, $"Bearer {apiKey}");
         }
 
-        #region Methods
-        private static TField GetJsonFieldByName<TStruct, TField>(this byte[] data, string fieldName) {
-            string json = Encoding.UTF8.GetString(data);
-            TStruct rootObj;
-
-            try {
-                rootObj = JsonUtility.FromJson<TStruct>(json);
-            }
-            catch (Exception e) {
-                Debug.LogError($"Data failed to fit TStruct: {e}");
-                return default;
-            }
-
-            return rootObj.GetFieldByName<TStruct, TField>(fieldName);
-        }
-        #endregion
 
         #region Structs
-        [Serializable]
-        private class UploadResponse
-        {
-            public int code;
-            public Data data;
+        //object UploadResponse {
+        //    int code;
+        //    object data;
+        //        string image_token;
+        //}
 
-            [Serializable]
-            public class Data
-            {
-                public string image_token;
-            }
-        }
+        //object GenerationRequest {
+        //    string type;
+        //    string prompt;
+        //    object file;
+        //        string type;
+        //        string file_token;
+        //        string url;
+        //    bool auto_size;       # Image to Model
+        //    bool t_pose;          # Advanced Generate Image
+        //}
 
-        [Serializable]
-        private class GenerationRequest
-        {
-            public string type;
-            public string prompt;
-            public File file;
-            public bool auto_size; // Image to Model
-            public bool t_pose; // Advanced Generate Image
+        //object AnimationRequest {
+        //    string type;
+        //    string original_model_task_id;
+        //    string out_format;
+        //}
 
-            [Serializable]
-            public class File
-            {
-                public string type;
-                public string file_token;
-                public string url;
-            }
-        }
+        //object GenerationResponse {
+        //    int code;
+        //    object data;
+        //        string task_id;
+        //}
 
-        [Serializable]
-        private class AnimationRequest
-        {
-            public string type;
-            public string original_model_task_id;
-            public string out_format;
-        }
-
-        [Serializable]
-        private class GenerationResponse
-        {
-            public int code;
-            public Data data;
-
-            [Serializable]
-            public class Data
-            {
-                public string task_id;
-            }
-        }
-
-        [Serializable]
-        private class TaskResponse
-        {
-            public int code;
-            public Data data;
-
-            [Serializable]
-            public class Data
-            {
-                public string task_id;
-                public string type;
-                public string status;
-                public int progress;
-                public Output output;
-
-                [Serializable]
-                public class Output
-                {
-                    public string model;
-                    public string base_model;
-                    public string pbr_model;
-                    public string generated_image;
-                }
-            }
-        }
+        //object TaskResponse {
+        //    int code;
+        //    object data;
+        //        string task_id;
+        //        string type;
+        //        string status;
+        //        int progress;
+        //        object output;
+        //            string model;
+        //            string base_model;
+        //            string pbr_model;
+        //            string generated_image;
+        //}
         #endregion
     }
 }
