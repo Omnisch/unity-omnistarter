@@ -161,7 +161,7 @@ namespace Omnis
         protected virtual void OnSave() => ForwardMessageToHits("OnSave");
         protected virtual void OnLoad() => ForwardMessageToHits("OnLoad");
         protected virtual void OnDebugTest() => debugLogic?.Invoke();
-        protected virtual void OnEscape()
+        protected virtual void OnQuitGame()
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

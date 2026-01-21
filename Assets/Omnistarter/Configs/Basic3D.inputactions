@@ -9,16 +9,16 @@
                     "name": "DebugTest",
                     "type": "Button",
                     "id": "75759059-939b-4dc4-b020-6b2af9bfa293",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Escape",
+                    "name": "QuitGame",
                     "type": "Button",
                     "id": "971d0926-61e1-45e5-bbf5-7e49f0403feb",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -27,7 +27,7 @@
                     "name": "Save",
                     "type": "Button",
                     "id": "6f75114a-3f5d-4010-91a4-5c284b3e3b25",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -36,7 +36,7 @@
                     "name": "Load",
                     "type": "Button",
                     "id": "5b91eb5a-93ad-4ee6-ba04-d9076d194ff6",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -55,15 +55,37 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "",
-                    "id": "ba873bb7-2221-4204-b85e-34dcc81f0b4c",
-                    "path": "<Keyboard>/escape",
+                    "name": "CtrlEsc",
+                    "id": "93e01b32-a499-4384-806b-674f3b81a3f9",
+                    "path": "OneModifier",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Escape",
-                    "isComposite": false,
+                    "action": "QuitGame",
+                    "isComposite": true,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "5984e202-8c4e-434d-98b1-2d2acb4ce7d2",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";PC",
+                    "action": "QuitGame",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "998ad361-1028-4827-a201-bd032f06a44c",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";PC",
+                    "action": "QuitGame",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "CtrlS",
