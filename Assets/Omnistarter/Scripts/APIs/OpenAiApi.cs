@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.10
+// version: 2026.01.21
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,7 +7,6 @@ using Omnis.Utils;
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Omnis.API
 {
@@ -16,7 +15,7 @@ namespace Omnis.API
         private static readonly string BaseUrl = "https://api.openai.com/v1/responses";
 
         /// <returns>response.output[0].content[0].text</returns>
-        public static async Task<string> TextGeneration(string apiKey, string model, string userPrompt, string sysPrompt = null, object textFormat = null) {
+        public static async Task<string> TextGeneration(string apiKey, string model, string userPrompt, string sysPrompt = null, object textFormat = null, Action<string, LogLevel> upstreamLog = null) {
             var request = new {
                 model,
                 input = new object[] {
@@ -40,35 +39,35 @@ namespace Omnis.API
                     }
                 },
                 text = new {
-                    format = textFormat?? new { },
+                    format = textFormat ?? new { },
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
-            Debug.Log($"[OpenAI API] Status: {response["output"]?[0]?["status"]}");
+            LogHelper.LogInfo($"[OpenAI API] Status: {response["output"]?[0]?["status"]}", upstreamLog);
 
             var content0 = response["output"]?[0]?["content"]?[0];
             if (content0 == null) {
-                throw new Exception("No output content.");
+                throw new Exception(LogHelper.LogError("No output content.", upstreamLog));
             }
 
             var type = content0.Value<string>("type");
             if (type == "refusal") {
-                throw new Exception("Model refusal: " + content0.Value<string>("refusal"));
+                throw new Exception(LogHelper.LogError("Model refusal: " + content0.Value<string>("refusal"), upstreamLog));
             }
 
             var text = content0.Value<string>("text");
             if (string.IsNullOrEmpty(text)) {
-                throw new Exception("Empty output text.");
+                throw new Exception(LogHelper.LogError("Empty output text.", upstreamLog));
             }
 
             return text;
         }
 
         /// <returns>response.output[0].content[0].text</returns>
-        public static async Task<string> AnalyseImage(string apiKey, string model, string prompt, byte[] original) {
+        public static async Task<string> AnalyseImage(string apiKey, string model, string prompt, byte[] original, Action<string, LogLevel> upstreamLog = null) {
             string originalBase64 = Convert.ToBase64String(original);
             var request = new {
                 model,
@@ -92,21 +91,21 @@ namespace Omnis.API
             var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
-            Debug.Log($"{response["output"]?[0]?["status"]}");
+            LogHelper.LogInfo($"{response["output"]?[0]?["status"]}", upstreamLog);
 
             var content0 = response["output"]?[0]?["content"]?[0];
             if (content0 == null) {
-                throw new Exception("No output content.");
+                throw new Exception(LogHelper.LogError("No output content.", upstreamLog));
             }
 
             var type = content0.Value<string>("type");
             if (type == "refusal") {
-                throw new Exception("Model refusal: " + content0.Value<string>("refusal"));
+                throw new Exception(LogHelper.LogError("Model refusal: " + content0.Value<string>("refusal"), upstreamLog));
             }
 
             var text = content0.Value<string>("text");
             if (string.IsNullOrEmpty(text)) {
-                throw new Exception("Empty output text.");
+                throw new Exception(LogHelper.LogError("Empty output text.", upstreamLog));
             }
 
             return text;

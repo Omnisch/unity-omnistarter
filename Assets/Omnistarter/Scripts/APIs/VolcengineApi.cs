@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.09
+// version: 2026.01.21
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -18,7 +18,7 @@ namespace Omnis.API
         public static readonly string ASRUrl = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash";
 
         /// <returns>response.data</returns>
-        public static async Task<string> VoiceSynthesis(string appid, string token, string prompt, string voice_type) {
+        public static async Task<string> VoiceSynthesis(string appid, string token, string prompt, string voice_type, Action<string, LogLevel> upstreamLog = null) {
             var request = new {
                 app = new {
                     appid,
@@ -40,11 +40,11 @@ namespace Omnis.API
             var requestString = JsonConvert.SerializeObject(request);
             var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, $"Bearer;{token}", requestString);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
-            Debug.Log($"[{response["code"]}] {response["message"]}");
+            LogHelper.LogInfo($"[{response["code"]}] {response["message"]}", upstreamLog);
             return response.Value<string>("data");
         }
 
-        public static async Task<string> AutoSpeechRecognition(string appid, string token, string url, string data, string format) {
+        public static async Task<string> AutoSpeechRecognition(string appid, string token, string url, string data, string format, Action<string, LogLevel> upstreamLog = null) {
             var header = new List<KeyValuePair<string, string>>() {
                 new("X-Api-App-Key", appid),
                 new("X-Api-Access-Key", token),

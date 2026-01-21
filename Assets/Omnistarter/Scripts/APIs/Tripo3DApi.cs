@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.10
+// version: 2026.01.21
 
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
@@ -18,7 +18,7 @@ namespace Omnis.API
 
 
         /// <returns>data.image_token</returns>
-        public static async Task<string> UploadImage(string api_key, byte[] imageData, string fileName) {
+        public static async Task<string> UploadImage(string api_key, byte[] imageData, string fileName, Action<string, LogLevel> upstreamLog = null) {
             string uploadUrl = $"{BaseUrl}/upload";
             string safeFileName = System.IO.Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             safeFileName = safeFileName.Replace(" ", "_").Replace(",", "").Replace("'", "");
@@ -33,10 +33,10 @@ namespace Omnis.API
             await request.SendWebRequestAsync();
 
             if (request.result != UnityWebRequest.Result.Success) {
-                Debug.LogError($"HTTP Error: {request.responseCode} - {request.error}");
+                LogHelper.LogError($"HTTP Error: {request.responseCode} - {request.error}", upstreamLog);
                 return null;
             } else {
-                Debug.Log($"HTTP Success: {request.downloadHandler.text}");
+                LogHelper.LogInfo($"HTTP Success: {request.downloadHandler.text}", upstreamLog);
                 var dataRaw = request.downloadHandler.data;
                 var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
                 return data.SelectToken("data.image_token").Value<string>();
@@ -45,7 +45,7 @@ namespace Omnis.API
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateTextToImageTask(string api_key, string prompt) {
+        public async static Task<string> CreateTextToImageTask(string api_key, string prompt, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "generate_image",
                 prompt
@@ -57,7 +57,7 @@ namespace Omnis.API
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToImageTask(string api_key, string file_token, string prompt, bool t_pose) {
+        public async static Task<string> CreateImageToImageTask(string api_key, string file_token, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "generate_image",
                 prompt,
@@ -74,9 +74,10 @@ namespace Omnis.API
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token) {
+        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "image_to_model",
+                model_version = "v3.0-20250812",
                 file = new {
                     type = "jpg",
                     file_token
@@ -90,9 +91,10 @@ namespace Omnis.API
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url) {
+        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "image_to_model",
+                model_version = "v3.0-20250812",
                 file = new {
                     type = "jpg",
                     url
@@ -107,7 +109,7 @@ namespace Omnis.API
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateAnimateRigTask(string api_key, string task_id) {
+        public async static Task<string> CreateAnimateRigTask(string api_key, string task_id, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "animate_rig",
                 original_model_task_id = task_id,
@@ -121,8 +123,8 @@ namespace Omnis.API
 
 
         /// <returns>data.output.pbr_model / data.output.model / data.output.generated_image</returns>
-        public static async Task<string> CheckTaskStatus(string api_key, string task_id, int interval = 10000, Action<float> percentageCallback = null) {
-            Debug.Log("Start checking task status...");
+        public static async Task<string> CheckTaskStatus(string api_key, string task_id, int interval = 10000, Action<float> percentageCallback = null, Action<string, LogLevel> upstreamLog = null) {
+            LogHelper.LogInfo("Start checking task status...", upstreamLog);
 
             int maxRetries = 5;
             int currentRetry = 0;
@@ -140,7 +142,7 @@ namespace Omnis.API
                         var progress = data?.Value<float>("progress");
 
                         percentageCallback?.Invoke(progress ?? 0f / 100f);
-                        Debug.Log($"Task status: {currentStatus} | progress: {progress}%");
+                        LogHelper.LogInfo($"Task status: {currentStatus} | progress: {progress}%", upstreamLog);
 
                         if (currentStatus.ToLower() == "success") {
                             try {
@@ -148,28 +150,28 @@ namespace Omnis.API
                                     data?.SelectToken("output.pbr_model") != null ? data.SelectToken("output.pbr_model").Value<string>() :
                                     data?.SelectToken("output.model") != null ? data.SelectToken("output.model").Value<string>() :
                                     data?.SelectToken("output.generated_image").Value<string>();
-                                Debug.Log($"Task completed, result URL: {outputUrl}");
+                                LogHelper.LogInfo($"Task completed, result URL: {outputUrl}", upstreamLog);
                             }
                             catch {
-                                Debug.LogError("Task completed but the result is empty.");
+                                LogHelper.LogError("Task completed but the result is empty.", upstreamLog);
                             }
                             break;
                         } else if (currentStatus.ToLower() == "failed") {
-                            Debug.LogError($"Task failed: {statusResponse?.Value<string>("code")}");
+                            LogHelper.LogError($"Task failed: {statusResponse?.Value<string>("code")}", upstreamLog);
                             break;
                         }
                     } else {
                         if (++currentRetry >= maxRetries) {
-                            Debug.LogError($"Failed to parse data, Retries have reached the limit {maxRetries}, the request is aborted.");
+                            LogHelper.LogError($"Failed to parse data, Retries have reached the limit {maxRetries}, the request is aborted.", upstreamLog);
                         } else {
-                            Debug.LogWarning($"Failed to parse data, {currentRetry}/{maxRetries} retries...");
+                            LogHelper.LogWarning($"Failed to parse data, {currentRetry}/{maxRetries} retries...", upstreamLog);
                         }
                     }
                 } else {
                     if (++currentRetry >= maxRetries) {
-                        Debug.LogError($"Failed to request status. Retries have reached the limit {maxRetries}, the request is aborted.");
+                        LogHelper.LogError($"Failed to request status. Retries have reached the limit {maxRetries}, the request is aborted.", upstreamLog);
                     } else {
-                        Debug.LogWarning($"Failed to request status, {currentRetry}/{maxRetries} retries...");
+                        LogHelper.LogWarning($"Failed to request status, {currentRetry}/{maxRetries} retries...", upstreamLog);
                     }
                 }
 
@@ -180,10 +182,10 @@ namespace Omnis.API
         }
 
 
-        public static async Task<byte[]> DownloadAsset(string url, string apiKey) {
-            Debug.Log($"Start downloading... URL: {url}");
+        public static async Task<byte[]> DownloadAsset(string api_key, string url, Action<string, LogLevel> upstreamLog = null) {
+            LogHelper.LogInfo($"Start downloading... URL: {url}", upstreamLog);
 
-            return await HttpHelper.GetAsync(url, $"Bearer {apiKey}");
+            return await HttpHelper.GetAsync(url, $"Bearer {api_key}");
         }
 
 
@@ -196,13 +198,14 @@ namespace Omnis.API
 
         //object GenerationRequest {
         //    string type;
-        //    string prompt;
+        //    string model_version; # v3.0-20250812 up to date
+        //    string prompt;        # only available in Advanced Generate Image
         //    object file;
         //        string type;
         //        string file_token;
         //        string url;
-        //    bool auto_size;       # Image to Model
-        //    bool t_pose;          # Advanced Generate Image
+        //    bool auto_size;       # only available in Image to Model
+        //    bool t_pose;          # only available in Advanced Generate Image
         //}
 
         //object AnimationRequest {
