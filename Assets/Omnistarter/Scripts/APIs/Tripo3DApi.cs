@@ -51,7 +51,7 @@ namespace Omnis.API
                 prompt
             };
 
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
             return data.SelectToken("data.task_id").Value<string>();
         }
@@ -68,7 +68,7 @@ namespace Omnis.API
                 t_pose
             };
 
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
             return data.SelectToken("data.task_id").Value<string>();
         }
@@ -85,7 +85,7 @@ namespace Omnis.API
                 auto_size = true
             };
 
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
             return data.SelectToken("data.task_id").Value<string>();
         }
@@ -102,7 +102,7 @@ namespace Omnis.API
                 auto_size = true
             };
 
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
             return data.SelectToken("data.task_id").Value<string>();
         }
@@ -116,7 +116,7 @@ namespace Omnis.API
                 out_format = ModelFormat
             };
 
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData);
+            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
             return data.SelectToken("data.task_id").Value<string>();
         }
@@ -131,7 +131,7 @@ namespace Omnis.API
             string outputUrl = string.Empty;
 
             while (currentRetry < maxRetries) {
-                var downloadData = await HttpHelper.GetAsync($"{BaseUrl}/task/{task_id}", $"Bearer {api_key}");
+                var downloadData = await HttpHelper.GetAsync($"{BaseUrl}/task/{task_id}", $"Bearer {api_key}", upstreamLog);
 
                 if (downloadData != null) {
                     string downloadText = Encoding.UTF8.GetString(downloadData);
@@ -185,7 +185,7 @@ namespace Omnis.API
         public static async Task<byte[]> DownloadAsset(string api_key, string url, Action<string, LogLevel> upstreamLog = null) {
             LogHelper.LogInfo($"Start downloading... URL: {url}", upstreamLog);
 
-            return await HttpHelper.GetAsync(url, $"Bearer {api_key}");
+            return await HttpHelper.GetAsync(url, $"Bearer {api_key}", upstreamLog);
         }
 
 

@@ -38,7 +38,7 @@ namespace Omnis.API
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, $"Bearer;{token}", requestString);
+            var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, $"Bearer;{token}", requestString, upstreamLog);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
             LogHelper.LogInfo($"[{response["code"]}] {response["message"]}", upstreamLog);
             return response.Value<string>("data");
@@ -71,7 +71,7 @@ namespace Omnis.API
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var responseRaw = await HttpHelper.PostJsonAsync(ASRUrl, "", requestString, header);
+            var responseRaw = await HttpHelper.PostJsonAsync(ASRUrl, "", requestString, header, upstreamLog);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
             return response["result"]?.Value<string>("text");
         }

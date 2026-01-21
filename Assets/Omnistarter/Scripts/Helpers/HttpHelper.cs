@@ -1,7 +1,8 @@
 // author: Omnistudio
-// version: 2026.01.10
+// version: 2026.01.21
 
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,41 +71,43 @@ namespace Omnis.Utils
             return tcs.Task;
         }
 
-        public static byte[] GetResultData(UnityWebRequest request)
+        public static byte[] GetResultData(UnityWebRequest request, Action<string, LogLevel> upstreamLog = null)
         {
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log($"HTTP Success: {request.downloadHandler.text}");
+                LogHelper.LogInfo($"HTTP Success: {request.downloadHandler.text}", upstreamLog);
                 return request.downloadHandler.data;
             }
             else
             {
-                Debug.LogError($"HTTP Error: {request.responseCode} - {request.error}");
+                LogHelper.LogError($"HTTP Error: {request.responseCode} - {request.error}", upstreamLog);
                 return null;
             }
         }
 
         #region Full Shorthands
-        public async static Task<byte[]> GetAsync(string url, string auth) => await GetAsync(url, auth, null);
+        public async static Task<byte[]> GetAsync(string url, string auth, Action<string, LogLevel> upstreamLog = null) => await GetAsync(url, auth, null, upstreamLog);
         public async static Task<byte[]> GetAsync(
             string url,
             string auth,
-            List<KeyValuePair<string, string>> moreHeaders)
+            List<KeyValuePair<string, string>> moreHeaders,
+            Action<string, LogLevel> upstreamLog = null)
         {
             UnityWebRequest request = MakeGet(url, auth, moreHeaders);
-            Debug.Log($"Waiting response from {url} ...");
+            LogHelper.LogInfo($"Waiting response from {url} ...", upstreamLog);
 
             await request.SendWebRequestAsync();
-            return GetResultData(request);
+            return GetResultData(request, upstreamLog);
         }
 
 
-        public async static Task<byte[]> PostJsonAsync(string url, string auth, object body) => await PostJsonAsync(url, auth, body, null);
+        public async static Task<byte[]> PostJsonAsync(string url, string auth, object body, Action<string, LogLevel> upstreamLog = null) => await PostJsonAsync(url, auth, body, null, upstreamLog);
         public async static Task<byte[]> PostJsonAsync(
             string url,
             string auth,
             object body,
-            List<KeyValuePair<string, string>> moreHeaders)
+            List<KeyValuePair<string, string>> moreHeaders,
+            Action<string, LogLevel> upstreamLog = null)
         {
             UnityWebRequest request;
 
@@ -113,10 +116,10 @@ namespace Omnis.Utils
             else
                 request = MakePostJsonFromStruct(url, auth, body, moreHeaders);
 
-            Debug.Log($"Waiting response from {url} ...");
+            LogHelper.LogInfo($"Waiting response from {url} ...", upstreamLog);
 
             await request.SendWebRequestAsync();
-            return GetResultData(request);
+            return GetResultData(request, upstreamLog);
         }
         #endregion
     }

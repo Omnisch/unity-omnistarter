@@ -43,7 +43,7 @@ namespace Omnis.API
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
+            var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString, upstreamLog);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
             LogHelper.LogInfo($"[OpenAI API] Status: {response["output"]?[0]?["status"]}", upstreamLog);
@@ -88,7 +88,7 @@ namespace Omnis.API
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString);
+            var responseRaw = await HttpHelper.PostJsonAsync(BaseUrl, $"Bearer {apiKey}", requestString, upstreamLog);
             var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
 
             LogHelper.LogInfo($"{response["output"]?[0]?["status"]}", upstreamLog);
