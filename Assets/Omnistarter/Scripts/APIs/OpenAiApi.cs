@@ -81,7 +81,7 @@ namespace Omnis.API
                             },
                             new {
                                 type = "input_image",
-                                image_url = originalBase64
+                                image_url = "data:image/jpeg;base64," + originalBase64
                             }
                         }
                     }
