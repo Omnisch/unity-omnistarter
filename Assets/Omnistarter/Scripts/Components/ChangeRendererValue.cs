@@ -2,6 +2,7 @@
 // version: 2026.01.22
 
 using Omnis.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Omnis
@@ -16,6 +17,7 @@ namespace Omnis
 
         #region Fields
         private MaterialPropertyBlock mpb;
+        private Dictionary<string, Coroutine> coroutineDict;
         #endregion
 
 
@@ -56,23 +58,30 @@ namespace Omnis
             rendererToEdit.SetPropertyBlock(mpb);
         }
         public void LerpTo(string nameOfParam, float f) {
-            StopAllCoroutines();
+            if (coroutineDict.TryGetValue(nameOfParam, out var last)) {
+                StopCoroutine(last);
+            }
+
             rendererToEdit.GetPropertyBlock(mpb);
             var startFloat = mpb.GetFloat(nameOfParam);
-            StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
+            coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
         }
         public void LerpTo(string nameOfParam, Color c) {
-            StopAllCoroutines();
+            if (coroutineDict.TryGetValue(nameOfParam, out var last)) {
+                StopCoroutine(last);
+            }
+
             rendererToEdit.GetPropertyBlock(mpb);
             var startColor = mpb.GetColor(nameOfParam);
-            StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
+            coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
         }
         #endregion
 
 
         #region Unity Methods
         private void Awake() {
-            mpb = new MaterialPropertyBlock();
+            mpb = new();
+            coroutineDict = new();
         }
         #endregion
     }
