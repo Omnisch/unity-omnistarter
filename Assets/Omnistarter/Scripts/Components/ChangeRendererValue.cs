@@ -18,7 +18,7 @@ namespace Omnis
 
         #region Fields
         private MaterialPropertyBlock mpb;
-        private Dictionary<string, Coroutine> coroutineDict;
+        private Dictionary<string, Coroutine> paramDict;
         #endregion
 
 
@@ -39,6 +39,8 @@ namespace Omnis
             throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
         }
         public T Get<T>(string nameOfParam) {
+            if (!paramDict.ContainsKey(nameOfParam)) return GetShared<T>(nameOfParam);
+
             rendererToEdit.GetPropertyBlock(mpb);
             Type t = typeof(T);
 
@@ -88,24 +90,25 @@ namespace Omnis
                     throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
             }
             rendererToEdit.SetPropertyBlock(mpb);
+            paramDict[nameOfParam] = null;
         }
 
 
         public void LerpTo(string nameOfParam, float f) {
-            if (coroutineDict.TryGetValue(nameOfParam, out var last)) {
+            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
             var startFloat = Get<float>(nameOfParam);
-            coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
+            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
         }
         public void LerpTo(string nameOfParam, Color c) {
-            if (coroutineDict.TryGetValue(nameOfParam, out var last)) {
+            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
             var startColor = Get<Color>(nameOfParam);
-            coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
+            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
         }
         #endregion
 
@@ -113,7 +116,7 @@ namespace Omnis
         #region Unity Methods
         private void Awake() {
             mpb = new();
-            coroutineDict = new();
+            paramDict = new();
         }
         #endregion
     }
