@@ -1,6 +1,7 @@
 // author: Omnistudio
 // version: 2026.01.22
 
+using System;
 using UnityEngine;
 
 namespace Omnis
@@ -8,6 +9,7 @@ namespace Omnis
     /// <summary>
     /// Use <i>FloatToPass</i> or <i>LerpTo</i> to pass a float to <i>rendererToEdit</i>.
     /// </summary>
+    [Obsolete("PassValueToRenderer is obsolete. Use ChangeRendererValue instead.")]
     public class PassValueToRenderer : MonoBehaviour
     {
         #region Serialized Fields
