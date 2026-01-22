@@ -2,6 +2,7 @@
 // version: 2026.01.22
 
 using Omnis.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,37 @@ namespace Omnis
 
 
         #region Methods
+        public T GetShared<T>(string nameOfParam) {
+            Type t = typeof(T);
+
+            if (t == typeof(float))     return (T)(object)rendererToEdit.sharedMaterial.GetFloat(nameOfParam);
+            if (t == typeof(int))       return (T)(object)rendererToEdit.sharedMaterial.GetInt(nameOfParam);
+            if (t == typeof(bool))      return (T)(object)rendererToEdit.sharedMaterial.GetInt(nameOfParam);
+            if (t == typeof(Color))     return (T)(object)rendererToEdit.sharedMaterial.GetColor(nameOfParam);
+            if (t == typeof(Texture))   return (T)(object)rendererToEdit.sharedMaterial.GetTexture(nameOfParam);
+            if (t == typeof(Vector2))   return (T)(object)rendererToEdit.sharedMaterial.GetVector(nameOfParam);
+            if (t == typeof(Vector3))   return (T)(object)rendererToEdit.sharedMaterial.GetVector(nameOfParam);
+            if (t == typeof(Vector4))   return (T)(object)rendererToEdit.sharedMaterial.GetVector(nameOfParam);
+            if (t == typeof(Matrix4x4)) return (T)(object)rendererToEdit.sharedMaterial.GetMatrix(nameOfParam);
+
+            throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
+        }
+        public T Get<T>(string nameOfParam) {
+            rendererToEdit.GetPropertyBlock(mpb);
+            Type t = typeof(T);
+
+            if (t == typeof(float))     return (T)(object)mpb.GetFloat(nameOfParam);
+            if (t == typeof(int))       return (T)(object)mpb.GetInt(nameOfParam);
+            if (t == typeof(bool))      return (T)(object)mpb.GetInt(nameOfParam);
+            if (t == typeof(Color))     return (T)(object)mpb.GetColor(nameOfParam);
+            if (t == typeof(Texture))   return (T)(object)mpb.GetTexture(nameOfParam);
+            if (t == typeof(Vector2))   return (T)(object)mpb.GetVector(nameOfParam);
+            if (t == typeof(Vector3))   return (T)(object)mpb.GetVector(nameOfParam);
+            if (t == typeof(Vector4))   return (T)(object)mpb.GetVector(nameOfParam);
+            if (t == typeof(Matrix4x4)) return (T)(object)mpb.GetMatrix(nameOfParam);
+
+            throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
+        }
         public void Set<T>(string nameOfParam, T value) {
             rendererToEdit.GetPropertyBlock(mpb);
             switch (value) {
@@ -37,33 +69,34 @@ namespace Omnis
                 case Color c:
                     mpb.SetColor(nameOfParam, c);
                     break;
-                case Vector4 v4:
-                    mpb.SetVector(nameOfParam, v4);
-                    break;
-                case Vector3 v3:
-                    mpb.SetVector(nameOfParam, (Vector4)v3);
+                case Texture tex:
+                    mpb.SetTexture(nameOfParam, tex);
                     break;
                 case Vector2 v2:
                     mpb.SetVector(nameOfParam, (Vector4)v2);
                     break;
+                case Vector3 v3:
+                    mpb.SetVector(nameOfParam, (Vector4)v3);
+                    break;
+                case Vector4 v4:
+                    mpb.SetVector(nameOfParam, v4);
+                    break;
                 case Matrix4x4 m:
                     mpb.SetMatrix(nameOfParam, m);
                     break;
-                case Texture tex:
-                    mpb.SetTexture(nameOfParam, tex);
-                    break;
                 default:
-                    throw new System.NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
+                    throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
             }
             rendererToEdit.SetPropertyBlock(mpb);
         }
+
+
         public void LerpTo(string nameOfParam, float f) {
             if (coroutineDict.TryGetValue(nameOfParam, out var last)) {
                 StopCoroutine(last);
             }
 
-            rendererToEdit.GetPropertyBlock(mpb);
-            var startFloat = mpb.GetFloat(nameOfParam);
+            var startFloat = Get<float>(nameOfParam);
             coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
         }
         public void LerpTo(string nameOfParam, Color c) {
@@ -71,8 +104,7 @@ namespace Omnis
                 StopCoroutine(last);
             }
 
-            rendererToEdit.GetPropertyBlock(mpb);
-            var startColor = mpb.GetColor(nameOfParam);
+            var startColor = Get<Color>(nameOfParam);
             coroutineDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => Set(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
         }
         #endregion
