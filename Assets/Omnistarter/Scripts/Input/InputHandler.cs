@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.21
+// version: 2026.01.29
 
 using System.Collections.Generic;
 using System.Linq;
@@ -112,19 +112,19 @@ namespace Omnis
         #endregion
 
         #region Unity Methods
-        private void Awake()
+        protected virtual void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
 
             foreach (var map in playerInput.actions.actionMaps)
                 map.Enable();
         }
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             if (playerInput) playerInput.enabled = true;
             Cursor.visible = true;
         }
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             if (playerInput) playerInput.enabled = false;
             Cursor.visible = false;
