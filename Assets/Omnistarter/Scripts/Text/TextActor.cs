@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.08
+// version: 2026.01.30
 
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +18,7 @@ namespace Omnis.Text
         public string actorId;
         [SerializeField] private string staticHead;
         public static readonly float DefaultPrintSpeed = 20f;
+        public bool allowEarlyNext = false;
         [Header("Animation Scale")]
         [SerializeField][Range(-1, 1)] private float animScale = 1f;
         [SerializeField] private bool isWorldPos;
@@ -27,12 +28,13 @@ namespace Omnis.Text
         #region Fields
         private TMP_Text tmpro;
         public PrintInfo pi;
-        public float AnimFactor => isWorldPos ? animScale : animScale * 50f;
         #endregion
 
 
         #region Properties
         public TMP_Text TMPro => tmpro;
+        public float AnimFactor => isWorldPos ? animScale : animScale * 50f;
+
         /// <summary>TextActor won't render rich text when using RawLine instead of Line.</summary>
         public string RawLine {
             set {
@@ -46,6 +48,8 @@ namespace Omnis.Text
                 StartCoroutine(ShowLine(staticHead + value));
             }
         }
+
+        public bool Ready { get; protected set; }
 
         private bool next;
         public bool Next {
@@ -78,14 +82,17 @@ namespace Omnis.Text
 
             if (tagInfoList.Count == 0) yield break;
 
-            while (!tagInfoList.All(tagInfo => tagInfo.finished)) {
+            while (!tagInfoList.All(tagInfo => tagInfo.finished ?? false)) {
                 // Refresh all infos.
                 tmpro.ForceMeshUpdate();
                 var textInfo = tmpro.textInfo;
+                Ready = true;
 
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList) {
-                    if (tagInfo.finished) continue;
+                    Ready &= tagInfo.finished ?? true;
+
+                    if (tagInfo.finished ?? false) continue;
 
                     var tag = DialogManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++) {

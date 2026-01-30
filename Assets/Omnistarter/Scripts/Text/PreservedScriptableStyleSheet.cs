@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2026.01.30
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -102,24 +102,28 @@ namespace Omnis.Text
         private static void PrintingPresets(CharInfo c)
         {
             // All shown, stop calculations.
-            if (c.actor.pi.past >= c.tagInfo.endIndex)
+            if (c.actor.pi.past >= c.tagInfo.endIndex) {
                 c.tagInfo.finished = true;
+                return;
+            } else {
+                c.tagInfo.finished = false;
+            }
 
             // Start printing.
-            else if (c.actor.pi.past >= c.tagInfo.startIndex && !c.tagInfo.active)
-            {
+            if (c.actor.pi.past >= c.tagInfo.startIndex && !c.tagInfo.active) {
                 c.tagInfo.active = true;
                 if (c.tagInfo.attrs.TryGetValue("speed", out string o) && float.TryParse(o, out float speed))
                     c.actor.pi.speed = speed;
             }
 
             // Click to skip printing.
-            else if (c.actor.pi.past > c.tagInfo.startIndex)
-            {
-                if (c.actor.Next)
-                {
+            else if (c.actor.pi.past > c.tagInfo.startIndex) {
+                if (c.actor.Next) {
                     c.actor.Next = false;
-                    c.actor.pi.past = c.tagInfo.endIndex;
+                    // Only skip when allowing early next.
+                    if (c.actor.allowEarlyNext) {
+                        c.actor.pi.past = c.tagInfo.endIndex;
+                    }
                 }
             }
         }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.07.06
+// version: 2026.01.30
 
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace Omnis.Text
         public int startIndex = 0;
         public int endIndex = 0;
         public bool active = false;
-        public bool finished = false;
+        public bool? finished = null;
     }
 
     /// <summary>
