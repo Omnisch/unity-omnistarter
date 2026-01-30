@@ -90,6 +90,7 @@ namespace Omnis.Text
 
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList) {
+                    // If all the finish-able tags are finished, it also count as ready.
                     Ready &= tagInfo.finished ?? true;
 
                     if (tagInfo.finished ?? false) continue;
@@ -114,6 +115,8 @@ namespace Omnis.Text
 
                 yield return null;
             }
+
+            Ready = true;
         }
 
 
