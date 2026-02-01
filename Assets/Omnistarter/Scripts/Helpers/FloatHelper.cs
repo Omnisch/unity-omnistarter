@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.03
+// version: 2026.02.01
 
 using System;
 using UnityEngine;
@@ -81,6 +81,17 @@ namespace Omnis.Utils
         /// <returns>(value, value, value)</returns>
         [Obsolete("Please use StickV3() instead.")] public static Vector3 nnn(this float value) => new(value, value, value);
 
+        public static Vector2 Make(this in (float x, float y) tuple) => new(tuple.x, tuple.y);
+        public static Vector2Int Make(this in (int x, int y) tuple) => new(tuple.x, tuple.y);
+        public static Vector3 Make(this in (float x, float y, float z) tuple) => new(tuple.x, tuple.y, tuple.z);
+        public static Vector3Int Make(this in (int x, int y, int z) tuple) => new(tuple.x, tuple.y, tuple.z);
+        #endregion
+
+        #region Angle
+        /// <returns>the angle of (x, y) from axis +x</returns>
+        public static float ToRadians(float x, float y) => Mathf.Atan2(y, x);
+        /// <returns>the angle of (x, y) from axis +x</returns>
+        public static float ToDegrees(float x, float y) => Mathf.Atan2(y, x) * Mathf.Rad2Deg;
         public static Vector2 RadiansToVector2(this float value) => new(Mathf.Cos(value), Mathf.Sin(value));
         public static Vector2 DegreesToVector2(this float value) => RadiansToVector2(Mathf.Deg2Rad * value);
         #endregion
