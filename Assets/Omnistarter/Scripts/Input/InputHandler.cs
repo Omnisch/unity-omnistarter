@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.02
+// version: 2026.02.03
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace Omnis
     /// Hooked with .inputactions in the new Input System.
     /// </summary>
     [RequireComponent(typeof(PlayerInput))]
-    public class InputHandler : MonoBehaviour
+    public partial class InputHandler : MonoBehaviour
     {
         #region Serialized Fields
         [SerializeField] protected UnityEvent debugLogic;
@@ -106,6 +106,9 @@ namespace Omnis
 
         #region Unity Methods
         protected virtual void Awake() {
+            if (!EnsureSingleton())
+                return;
+
             playerInput = GetComponent<PlayerInput>();
 
             foreach (var map in playerInput.actions.actionMaps)
