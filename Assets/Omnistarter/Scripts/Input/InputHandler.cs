@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.29
+// version: 2026.02.02
 
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +36,11 @@ namespace Omnis
 
         #region Properties
         private Vector2 pointerPosition;
-        private Vector2 PointerPosition
-        {
+        public Vector2 PointerPosition {
             get => pointerPosition;
-            set {
+            private set {
                 pointerPosition = value;
+
                 Ray r = Camera.main.ScreenPointToRay(value);
                 var rawHits = Physics.RaycastAll(r);
                 System.Array.Sort(rawHits, (a, b) => a.distance.CompareTo(b.distance));
@@ -58,8 +58,9 @@ namespace Omnis
                 hits = newHits;
             }
         }
-        private Texture2D CursorIcon
-        {
+        public Vector2 PointerDelta { get; private set; }
+
+        private Texture2D CursorIcon {
             set => Cursor.SetCursor(value, cursorHotspot, CursorMode.Auto);
         }
         #endregion
@@ -70,15 +71,12 @@ namespace Omnis
         #endregion
 
         #region Functions
-        protected void ForwardMessageToHits(string methodName, object value = null)
-        {
+        protected void ForwardMessageToHits(string methodName, object value = null) {
             // manually refresh hits to avoid resting.
             PointerPosition = PointerPosition;
-            
-            foreach (var hit in hits)
-            {
-                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr))
-                {
+
+            foreach (var hit in hits) {
+                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr)) {
                     hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
                     hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
                     // if opaque, ignore colliders behind it.
@@ -86,21 +84,16 @@ namespace Omnis
                 }
             }
         }
-        protected void ForwardMessageToListeners(string methodName, object value = null)
-        {
-            foreach (var listener in listeners)
-            {
+        protected void ForwardMessageToListeners(string methodName, object value = null) {
+            foreach (var listener in listeners) {
                 listener.SendMessage("OnInteract", listeners, SendMessageOptions.DontRequireReceiver);
                 listener.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
             }
         }
 
-        protected void ReleaseLeftOOBs()
-        {
-            foreach (var hit in hitsLeftTrack)
-            {
-                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr))
-                {
+        protected void ReleaseLeftOOBs() {
+            foreach (var hit in hitsLeftTrack) {
+                if (hit && hit.TryGetComponent<PointerReceiver>(out var pr)) {
                     if (pr.TryGetComponent<PointerBase>(out var pb) && pb.LeftPressed) {
                         hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
                         hit.SendMessage("OnLeftRelease", SendMessageOptions.DontRequireReceiver);
@@ -112,34 +105,29 @@ namespace Omnis
         #endregion
 
         #region Unity Methods
-        protected virtual void Awake()
-        {
+        protected virtual void Awake() {
             playerInput = GetComponent<PlayerInput>();
 
             foreach (var map in playerInput.actions.actionMaps)
                 map.Enable();
         }
-        protected virtual void OnEnable()
-        {
+        protected virtual void OnEnable() {
             if (playerInput) playerInput.enabled = true;
             Cursor.visible = true;
         }
-        protected virtual void OnDisable()
-        {
+        protected virtual void OnDisable() {
             if (playerInput) playerInput.enabled = false;
             Cursor.visible = false;
         }
         #endregion
 
         #region Messages
-        protected virtual void OnLeftPress()
-        {
+        protected virtual void OnLeftPress() {
             ForwardMessageToHits("OnLeftPress");
             hitsLeftTrack = hits;
             CursorIcon = iconCursorPressed;
         }
-        protected virtual void OnLeftRelease()
-        {
+        protected virtual void OnLeftRelease() {
             ForwardMessageToHits("OnLeftRelease");
             ReleaseLeftOOBs();
             CursorIcon = iconCursor;
@@ -150,6 +138,7 @@ namespace Omnis
         protected virtual void OnMiddleRelease() => ForwardMessageToHits("OnMiddleRelease");
         protected virtual void OnScroll(InputValue value) => ForwardMessageToHits("OnScroll", value.Get<float>());
         protected virtual void OnPointer(InputValue value) => PointerPosition = value.Get<Vector2>();
+        protected virtual void OnPointerDelta(InputValue value) => PointerDelta = value.Get<Vector2>();
 
         protected virtual void OnMove(InputValue value) => ForwardMessageToListeners("OnMove", value.Get<Vector2>());
         protected virtual void OnJump(InputValue value) => ForwardMessageToListeners("OnJump", value.Get<float>());
@@ -161,8 +150,7 @@ namespace Omnis
         protected virtual void OnSave() => ForwardMessageToHits("OnSave");
         protected virtual void OnLoad() => ForwardMessageToHits("OnLoad");
         protected virtual void OnDebugTest() => debugLogic?.Invoke();
-        protected virtual void OnQuitGame()
-        {
+        protected virtual void OnQuitGame() {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #elif UNITY_STANDALONE
