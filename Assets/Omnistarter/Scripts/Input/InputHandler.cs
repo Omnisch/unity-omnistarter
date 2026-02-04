@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.03
+// version: 2026.02.04
 
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace Omnis
         #endregion
 
         #region Fields
-        private PlayerInput playerInput;
+        protected PlayerInput playerInput;
         private List<Collider> hits = new();
         /// <summary>
         /// Used to handle LeftPressed-then-PointerOutOfBounds situations, in ReleaseLeftOOBs().
@@ -60,7 +60,7 @@ namespace Omnis
         }
         public Vector2 PointerDelta { get; private set; }
 
-        private Texture2D CursorIcon {
+        protected Texture2D CursorIcon {
             set => Cursor.SetCursor(value, cursorHotspot, CursorMode.Auto);
         }
         #endregion
