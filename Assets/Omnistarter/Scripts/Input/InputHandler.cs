@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.04
+// version: 2026.02.05
 
 using System.Collections.Generic;
 using System.Linq;
@@ -115,12 +115,16 @@ namespace Omnis
                 map.Enable();
         }
         protected virtual void OnEnable() {
-            if (playerInput) playerInput.enabled = true;
-            Cursor.visible = true;
+            if (playerInput)
+                playerInput.enabled = true;
+            if (Instance == null || Instance == this)
+                Cursor.visible = true;
         }
         protected virtual void OnDisable() {
-            if (playerInput) playerInput.enabled = false;
-            Cursor.visible = false;
+            if (playerInput)
+                playerInput.enabled = false;
+            if (Instance == this)
+                Cursor.visible = false;
         }
         #endregion
 
