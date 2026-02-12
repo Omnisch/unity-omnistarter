@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.06
+// version: 2026.02.12
 
 using Omnis.Utils;
 using UnityEngine;
@@ -11,12 +11,12 @@ namespace Omnis
         [SerializeField] private Transform[] targets;
         [SerializeField] private int targetIndex = 0;
         [Space]
-        [SerializeField] private float lerpTime = 0.3f;
+        public float lerpTime = 0.3f;
 
         private Coroutine moveCoroutine = null;
 
         public void MoveToNextParent() => SetParent((targetIndex + 1) % targets.Length);
-        public void SetParent(int i) {
+        public void SetParent(int i, System.Action callback = null) {
             if (i < 0 || i >= targets.Length) {
                 Debug.LogWarning("Manual-set index out of bounds.");
                 return;
@@ -43,6 +43,7 @@ namespace Omnis
                     transform.SetParent(targets[targetIndex]);
                     transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
                     transform.localScale = Vector3.one;
+                    callback?.Invoke();
                 }
             }, Easing.OutCubic, lerpTime, false));
         }

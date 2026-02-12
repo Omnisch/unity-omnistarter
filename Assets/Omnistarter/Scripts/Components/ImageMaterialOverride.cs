@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.02
+// version: 2026.02.12
 
 using Omnis.Utils;
 using System;
@@ -14,7 +14,7 @@ namespace Omnis
         #region Serialized Fields
         [SerializeField] private Image imageToEdit;
         [Range(0.1f, 10f)]
-        [SerializeField] private float lerpSpeed = 1f;
+        public float lerpSpeed = 1f;
         #endregion
 
         #region Fields
@@ -93,21 +93,33 @@ namespace Omnis
         }
 
 
-        public void LerpTo(string nameOfParam, float f) {
+        public void LerpTo(string nameOfParam, float f, Action callback = null) {
             if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
             var startFloat = Get<float>(nameOfParam);
-            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => PrivateSet(nameOfParam, Mathf.Lerp(startFloat, f, value)), Easing.Linear, lerpSpeed));
+            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
+                PrivateSet(nameOfParam, Mathf.Lerp(startFloat, f, value));
+
+                if (value == 1f) {
+                    callback?.Invoke();
+                }
+            }, Easing.Linear, lerpSpeed));
         }
-        public void LerpTo(string nameOfParam, Color c) {
+        public void LerpTo(string nameOfParam, Color c, Action callback = null) {
             if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
             var startColor = Get<Color>(nameOfParam);
-            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => PrivateSet(nameOfParam, ColorHelper.Lerp(startColor, c, value)), Easing.Linear, lerpSpeed));
+            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
+                PrivateSet(nameOfParam, ColorHelper.Lerp(startColor, c, value));
+
+                if (value == 1f) {
+                    callback?.Invoke();
+                }
+            }, Easing.Linear, lerpSpeed));
         }
         #endregion
 
