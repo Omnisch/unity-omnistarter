@@ -62,6 +62,7 @@ namespace Omnis
             }
 
             PrivateSet(nameOfParam, value);
+            paramDict[nameOfParam] = null;
         }
         private void PrivateSet<T>(string nameOfParam, T value) {
             rendererToEdit.GetPropertyBlock(mpb);
