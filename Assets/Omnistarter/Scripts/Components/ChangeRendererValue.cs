@@ -101,28 +101,31 @@ namespace Omnis
         }
 
 
-        public void LerpTo(string nameOfParam, float f, Action callback = null) {
+        public void LerpTo(string nameOfParam, float to, Action callback = null)
+            => LerpTo(nameOfParam, Get<float>(nameOfParam), to, callback);
+        public void LerpTo(string nameOfParam, float from, float to, Action callback = null) {
             if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
-            var startFloat = Get<float>(nameOfParam);
             paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
-                PrivateSet(nameOfParam, Mathf.Lerp(startFloat, f, value));
+                PrivateSet(nameOfParam, Mathf.Lerp(from, to, value));
 
                 if (value == 1f) {
                     callback?.Invoke();
                 }
             }, Easing.Linear, lerpSpeed));
         }
-        public void LerpTo(string nameOfParam, Color c, Action callback = null) {
+
+        public void LerpTo(string nameOfParam, Color to, Action callback = null)
+            => LerpTo(nameOfParam, Get<Color>(nameOfParam), to, callback);
+        public void LerpTo(string nameOfParam, Color from, Color to, Action callback = null) {
             if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
                 StopCoroutine(last);
             }
 
-            var startColor = Get<Color>(nameOfParam);
             paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
-                PrivateSet(nameOfParam, ColorHelper.Lerp(startColor, c, value));
+                PrivateSet(nameOfParam, ColorHelper.Lerp(from, to, value));
 
                 if (value == 1f) {
                     callback?.Invoke();
