@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.21
+// version: 2026.02.14
 
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
@@ -141,7 +141,7 @@ namespace Omnis.API
                         var currentStatus = data?.Value<string>("status");
                         var progress = data?.Value<float>("progress");
 
-                        percentageCallback?.Invoke(progress ?? 0f / 100f);
+                        percentageCallback?.Invoke((progress ?? 0f) / 100f);
                         LogHelper.LogInfo($"Task status: {currentStatus} | progress: {progress}%", upstreamLog);
 
                         if (currentStatus.ToLower() == "success") {
