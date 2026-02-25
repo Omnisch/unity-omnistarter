@@ -1,9 +1,10 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.02.25
 
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Omnis.Utils
 {
@@ -199,6 +200,52 @@ namespace Omnis.Utils
             => str != null && trimString != null && str.StartsWith(trimString, cmp) ? str[trimString.Length..] : str;
         public static string TrimEnd(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
             => str != null && trimString != null && str.EndsWith(trimString, cmp) ? str[..^trimString.Length] : str;
+
+
+        /// <summary>
+        /// Repeat the string for count times (fractional is fine).
+        /// </summary>
+        public static string Repeat(this string s, float count) {
+            // handle null/empty and non-positive counts
+            if (string.IsNullOrEmpty(s) || count <= 0f) {
+                return string.Empty;
+            }
+
+            int len = s.Length;
+
+            // integer part
+            int full = Mathf.FloorToInt(count);
+
+            // fractional part
+            float frac = count - full;
+
+            // clamp due to floating-point noise
+            if (frac < 0f) frac = 0f;
+            if (frac > 1f) frac = 1f;
+
+            // add a tiny epsilon to reduce cases like 0.5f * 3 -> 1.4999999f
+            int extra = Mathf.FloorToInt(frac * len + 1e-6f);
+
+            // pre-calc total length (guard overflow)
+            long totalLenLong = (long)full * len + extra;
+            if (totalLenLong > int.MaxValue) {
+                throw new OverflowException("Resulting string is too large.");
+            }
+
+            int totalLen = (int)totalLenLong;
+
+            var sb = new StringBuilder(totalLen);
+
+            for (int i = 0; i < full; i++) {
+                sb.Append(s);
+            }
+
+            if (extra > 0) {
+                sb.Append(s, 0, extra);
+            }
+
+            return sb.ToString();
+        }
         #endregion
     }
 }
