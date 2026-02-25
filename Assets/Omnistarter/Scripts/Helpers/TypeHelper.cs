@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.12.14
+// version: 2026.02.25
 
 using System;
 using UnityEngine;
@@ -170,23 +170,51 @@ namespace Omnis.Utils
         #endregion
 
 
+        #region Image (Written by ChatGPT)
+        public static byte[] ToJpgBytes_GPU(Sprite sprite, int quality = 90) {
+            var r = sprite.textureRect;
+            int w = Mathf.RoundToInt(r.width);
+            int h = Mathf.RoundToInt(r.height);
 
-        public static TField GetFieldByName<TStruct, TField>(this TStruct rootObj, string fieldName)
-        {
+            // 1) blit whole source texture to RT
+            var src = sprite.texture;
+            var prev = RenderTexture.active;
+
+            RenderTexture rt = RenderTexture.GetTemporary(src.width, src.height, 0, RenderTextureFormat.ARGB32);
+            Graphics.Blit(src, rt);
+
+            // 2) read Sprite rect from RT
+            RenderTexture.active = rt;
+            Texture2D tmp = new(w, h, TextureFormat.RGBA32, false);
+
+            tmp.ReadPixels(new Rect(r.x, r.y, r.width, r.height), 0, 0);
+            tmp.Apply(false, false);
+
+            // 3) encoding
+            byte[] jpg = tmp.EncodeToJPG(Mathf.Clamp(quality, 1, 100));
+
+            // 4) cleanup
+            UnityEngine.Object.Destroy(tmp);
+            RenderTexture.active = prev;
+            RenderTexture.ReleaseTemporary(rt);
+
+            return jpg;
+        }
+        #endregion
+
+
+        public static TField GetFieldByName<TStruct, TField>(this TStruct rootObj, string fieldName) {
             object currObj = rootObj;
             Type currType = typeof(TStruct);
 
-            foreach (var layer in fieldName.Split('.'))
-            {
-                if (currObj == null)
-                {
+            foreach (var layer in fieldName.Split('.')) {
+                if (currObj == null) {
                     Debug.LogError($"Null encountered at {layer} in {fieldName}");
                     return default;
                 }
 
                 var field = currType.GetField(layer);
-                if (field != null)
-                {
+                if (field != null) {
                     currObj = field.GetValue(currObj);
                     currType = field.FieldType;
                     continue;
@@ -196,12 +224,10 @@ namespace Omnis.Utils
                 return default;
             }
 
-            try
-            {
+            try {
                 return (TField)currObj;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Debug.LogError($"Type mismatch: {e}");
                 return default;
             }
