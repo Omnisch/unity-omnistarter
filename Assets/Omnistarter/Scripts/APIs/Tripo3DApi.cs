@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.14
+// version: 2026.02.26
 
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
@@ -57,13 +57,22 @@ namespace Omnis.API
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToImageTask(string api_key, string file_token, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null) {
+        public async static Task<string> CreateImageToImageTaskFromToken(string api_key, string file_token, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
+            => await CreateImageToImageTask(api_key, file_token, null, prompt, t_pose, upstreamLog);
+
+        /// <returns>data.task_id</returns>
+        public async static Task<string> CreateImageToImageTaskFromUrl(string api_key, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
+            => await CreateImageToImageTask(api_key, null, url, prompt, t_pose, upstreamLog);
+
+        private async static Task<string> CreateImageToImageTask(string api_key, string file_token, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "generate_image",
+                //model_version = "gemini_2.5_flash_image_preview",
                 prompt,
                 file = new {
                     type = "jpg",
-                    file_token
+                    file_token,
+                    url
                 },
                 t_pose
             };
@@ -74,29 +83,20 @@ namespace Omnis.API
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token, Action<string, LogLevel> upstreamLog = null) {
-            var requestData = new {
-                type = "image_to_model",
-                model_version = "v3.0-20250812",
-                file = new {
-                    type = "jpg",
-                    file_token
-                },
-                auto_size = true
-            };
-
-            var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
-            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-            return data.SelectToken("data.task_id").Value<string>();
-        }
+        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token, Action<string, LogLevel> upstreamLog = null)
+            => await CreateImageToModelTask(api_key, file_token, null, upstreamLog);
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url, Action<string, LogLevel> upstreamLog = null) {
+        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url, Action<string, LogLevel> upstreamLog = null)
+            => await CreateImageToModelTask(api_key, null, url, upstreamLog);
+
+        private async static Task<string> CreateImageToModelTask(string api_key, string file_token, string url, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "image_to_model",
                 model_version = "v3.0-20250812",
                 file = new {
                     type = "jpg",
+                    file_token,
                     url
                 },
                 auto_size = true
