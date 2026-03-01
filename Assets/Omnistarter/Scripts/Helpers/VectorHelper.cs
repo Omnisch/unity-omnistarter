@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.11.25
+// version: 2026.02.28
 
 using UnityEngine;
 
@@ -106,6 +106,7 @@ namespace Omnis.Utils
 
         #region Round
         public static Vector3 Round(this Vector3 v) => new(Mathf.Round(v.x), Mathf.Round(v.y), Mathf.Round(v.z));
+        public static Vector3Int RoundToInt(this Vector3 v) => new(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y), Mathf.RoundToInt(v.z));
         public static Vector3 GridSnap(this Vector3 v, float increment = 1f) => increment == 0f ? v : increment * Round(v / increment);
         public static Vector3 RoundDigits(this Vector3 v, int digits)
             => new((float)System.Math.Round(v.x, digits), (float)System.Math.Round(v.y, digits), (float)System.Math.Round(v.z, digits));
