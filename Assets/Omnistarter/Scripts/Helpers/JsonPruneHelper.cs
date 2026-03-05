@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.08.15
+// version: 2026.03.05
 
 using System;
 using System.Text;
@@ -10,19 +10,19 @@ namespace Omnis.Utils
     public static class JsonPruneHelperLight
     {
         /// <summary>
-        /// Remove all "" fields in JSON created by JsonUtility.ToJson.
+        /// Remove all null or "" fields in JSON created by JsonUtility.ToJson.
         /// </summary>
         /// <returns>Condensed JSON</returns>
-        public static string RemoveEmptyStringFields(
+        public static string RemoveEmptyFields(
             string json,
             bool removeEmptyContainers = true,
-            bool removeEmptyStringArrayElements = false)
+            bool removeEmptyArrayElements = true)
         {
             if (string.IsNullOrEmpty(json)) return json;
 
             var parser = new Parser(json);
             Node root = parser.ParseValue();
-            PruneInPlace(root, removeEmptyContainers, removeEmptyStringArrayElements, isRoot: true);
+            PruneInPlace(root, removeEmptyContainers, removeEmptyArrayElements, isRoot: true);
 
             var sb = new StringBuilder(json.Length);
             WriteJson(root, sb);
@@ -232,7 +232,7 @@ namespace Omnis.Utils
         }
 
         // ----------- Pruner -----------
-        private static void PruneInPlace(Node node, bool removeEmptyContainers, bool removeEmptyStringArrayElements, bool isRoot)
+        private static void PruneInPlace(Node node, bool removeEmptyContainers, bool removeEmptyArrayElements, bool isRoot)
         {
             if (node is Obj o)
             {
@@ -240,13 +240,13 @@ namespace Omnis.Utils
                 {
                     var m = o.Members[idx];
 
-                    if (m.Value is Str s && s.Value.Length == 0)
+                    if ((m.Value is Str s && s.Value.Length == 0) || (m.Value is Lit l && l.Raw == "null"))
                     {
                         o.Members.RemoveAt(idx);
                         continue;
                     }
 
-                    PruneInPlace(m.Value, removeEmptyContainers, removeEmptyStringArrayElements, isRoot: false);
+                    PruneInPlace(m.Value, removeEmptyContainers, removeEmptyArrayElements, isRoot: false);
 
                     if (removeEmptyContainers && IsEmptyContainer(m.Value))
                     {
@@ -260,13 +260,13 @@ namespace Omnis.Utils
                 {
                     var v = a.Items[i];
 
-                    if (removeEmptyStringArrayElements && v is Str sv && sv.Value.Length == 0)
+                    if (removeEmptyArrayElements && ((v is Str sv && sv.Value.Length == 0) || (v is Lit lv && lv.Raw == "null")))
                     {
                         a.Items.RemoveAt(i);
                         continue;
                     }
 
-                    PruneInPlace(v, removeEmptyContainers, removeEmptyStringArrayElements, isRoot: false);
+                    PruneInPlace(v, removeEmptyContainers, removeEmptyArrayElements, isRoot: false);
 
                     if (removeEmptyContainers && IsEmptyContainer(v))
                     {

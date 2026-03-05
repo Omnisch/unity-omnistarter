@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.03.25
+// version: 2026.03.05
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -75,7 +75,7 @@ namespace Omnis
 
         #region Messages
         protected void OnInteract(List<GameObject> fellows) { if (Interactable) OnInteracted(fellows); }
-        private void OnMove(Vector2 value)
+        protected virtual void OnMove(Vector2 value)
         {
             if (Interactable)
             {
@@ -83,7 +83,7 @@ namespace Omnis
                 VerticalAxis = value.y;
             }
         }
-        private void OnJump(float value) { if (Interactable) JumpAxis = value; }
+        protected virtual void OnJump(float value) { if (Interactable) JumpAxis = value; }
         #endregion
     }
 

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.02
+// version: 2026.03.05
 
 using Newtonsoft.Json;
 using System;
@@ -37,7 +37,7 @@ namespace Omnis.Utils
                 string jsonBody = "{}",
                 List<KeyValuePair<string, string>> moreHeaders = null)
         {
-            jsonBody = JsonPruneHelperLight.RemoveEmptyStringFields(jsonBody);
+            jsonBody = JsonPruneHelperLight.RemoveEmptyFields(jsonBody);
             Debug.Log($"POST data: {jsonBody}");
 
             var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST) {
@@ -111,6 +111,18 @@ namespace Omnis.Utils
 
             await request.SendWebRequestAsync();
             return GetResultData(request, upstreamLog);
+        }
+        #endregion
+
+
+        #region Schema
+        public static object CombineJsonSchema(string name, object schema, string description = null, bool strict = true) {
+            return new {
+                name,
+                schema,
+                description,
+                strict,
+            };
         }
         #endregion
     }
