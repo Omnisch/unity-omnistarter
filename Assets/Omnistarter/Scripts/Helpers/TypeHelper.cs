@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.25
+// version: 2026.03.02
 
 using System;
 using UnityEngine;
@@ -171,7 +171,7 @@ namespace Omnis.Utils
 
 
         #region Image (Written by ChatGPT)
-        public static byte[] ToJpgBytes_GPU(Sprite sprite, int quality = 90) {
+        public static byte[] SpriteToJpgBytes_GPU(Sprite sprite, int quality = 90) {
             var r = sprite.textureRect;
             int w = Mathf.RoundToInt(r.width);
             int h = Mathf.RoundToInt(r.height);
@@ -199,6 +199,14 @@ namespace Omnis.Utils
             RenderTexture.ReleaseTemporary(rt);
 
             return jpg;
+        }
+        public static string BytesToDataUrl(byte[] imageBytes, string mimeType = "image/jpeg") {
+            if (imageBytes == null || imageBytes.Length == 0) {
+                return $"data:{mimeType};base64,";
+            }
+
+            var b64 = Convert.ToBase64String(imageBytes);
+            return $"data:{mimeType};base64,{b64}";
         }
         #endregion
 
