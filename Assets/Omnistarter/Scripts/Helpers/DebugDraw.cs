@@ -34,7 +34,7 @@ public static partial class DebugDraw
     /// </param>
     public static void Point(Vector3 position, Quaternion rotation, Color color, float scale = 1.0f, float duration = 0, bool depthTest = true)
     {
-        color = (color == default(Color)) ? Color.white : color;
+        color = (color == default) ? Color.white : color;
 
         Debug.DrawRay(position + rotation * (Vector3.up * (scale * 0.5f)), rotation * -Vector3.up * scale, color, duration, depthTest);
         Debug.DrawRay(position + rotation * (Vector3.right * (scale * 0.5f)), rotation * -Vector3.right * scale, color, duration, depthTest);
@@ -181,7 +181,7 @@ public static partial class DebugDraw
     /// <param name='depthTest'>
     /// 	- Whether or not the cube should be faded when behind other objects.
     /// </param>
-    public static void LocalCube(Transform transform, Vector3 size, Color color, Vector3 center = default(Vector3), float duration = 0, bool depthTest = true)
+    public static void LocalCube(Transform transform, Vector3 size, Color color, Vector3 center = default, float duration = 0, bool depthTest = true)
     {
         Vector3 lbb = transform.TransformPoint(center + ((-size) * 0.5f));
         Vector3 rbb = transform.TransformPoint(center + (new Vector3(size.x, -size.y, -size.z) * 0.5f));
@@ -229,7 +229,7 @@ public static partial class DebugDraw
     /// <param name='depthTest'>
     /// 	- Whether or not the cube should be faded when behind other objects.
     /// </param>
-    public static void LocalCube(Transform transform, Vector3 size, Vector3 center = default(Vector3), float duration = 0, bool depthTest = true)
+    public static void LocalCube(Transform transform, Vector3 size, Vector3 center = default, float duration = 0, bool depthTest = true)
     {
         LocalCube(transform, size, Color.white, center, duration, depthTest);
     }
@@ -255,9 +255,9 @@ public static partial class DebugDraw
     /// <param name='depthTest'>
     /// 	- Whether or not the cube should be faded when behind other objects.
     /// </param>
-    public static void LocalCube(Matrix4x4 space, Vector3 size, Color color, Vector3 center = default(Vector3), float duration = 0, bool depthTest = true)
+    public static void LocalCube(Matrix4x4 space, Vector3 size, Color color, Vector3 center = default, float duration = 0, bool depthTest = true)
     {
-        color = (color == default(Color)) ? Color.white : color;
+        color = (color == default) ? Color.white : color;
 
         Vector3 lbb = space.MultiplyPoint3x4(center + ((-size) * 0.5f));
         Vector3 rbb = space.MultiplyPoint3x4(center + (new Vector3(size.x, -size.y, -size.z) * 0.5f));
@@ -305,7 +305,7 @@ public static partial class DebugDraw
     /// <param name='depthTest'>
     /// 	- Whether or not the cube should be faded when behind other objects.
     /// </param>
-    public static void LocalCube(Matrix4x4 space, Vector3 size, Vector3 center = default(Vector3), float duration = 0, bool depthTest = true)
+    public static void LocalCube(Matrix4x4 space, Vector3 size, Vector3 center = default, float duration = 0, bool depthTest = true)
     {
         LocalCube(space, size, Color.white, center, duration, depthTest);
     }
@@ -337,7 +337,7 @@ public static partial class DebugDraw
         Vector3 _forward = Vector3.Slerp(_up, -_up, 0.5f);
         Vector3 _right = Vector3.Cross(_up, _forward).normalized * radius;
 
-        Matrix4x4 matrix = new Matrix4x4();
+        Matrix4x4 matrix = new();
 
         matrix[0] = _right.x;
         matrix[1] = _right.y;
@@ -354,7 +354,7 @@ public static partial class DebugDraw
         Vector3 _lastPoint = position + matrix.MultiplyPoint3x4(new Vector3(Mathf.Cos(0), 0, Mathf.Sin(0)));
         Vector3 _nextPoint = Vector3.zero;
 
-        color = (color == default(Color)) ? Color.white : color;
+        color = (color == default) ? Color.white : color;
 
         sides = Mathf.Clamp(sides, 3, 90);
         float increment = 360.0f / sides;
@@ -416,7 +416,7 @@ public static partial class DebugDraw
         }
     }
 
-    static Dictionary<CE, ElementCoords> ElementLookup = new Dictionary<CE, ElementCoords>
+    static Dictionary<CE, ElementCoords> ElementLookup = new()
     {
         {CE.T                  , new ElementCoords(-1.00f,  1.00f,  1.00f,  1.00f) },
         {CE.TL                 , new ElementCoords(-1.00f,  1.00f, -1.00f,  0.00f) },
@@ -436,7 +436,7 @@ public static partial class DebugDraw
         {CE.CM                 , new ElementCoords( 0.40f, -1.00f,  0.60f, -0.90f) },
     };
 
-    static Dictionary<char, CE> CharElementLookup = new Dictionary<char, CE>
+    static Dictionary<char, CE> CharElementLookup = new()
     {
         { '0' , CE.T | CE.B | CE.TL | CE.TR | CE.BL | CE.BR | CE.NE | CE.SW },
         { '1' , CE.TR | CE.BR },
@@ -496,7 +496,7 @@ public static partial class DebugDraw
         Vector3 _forward = Vector3.Slerp(_up, -_up, 0.5f);
         Vector3 _right = Vector3.Cross(_forward, _up).normalized * radius;
 
-        Matrix4x4 matrix = new Matrix4x4();
+        Matrix4x4 matrix = new();
 
         matrix[0] = _right.x;
         matrix[1] = _right.y;
@@ -528,7 +528,7 @@ public static partial class DebugDraw
         Vector3 _forward = Vector3.Slerp(_up, -_up, 0.5f);
         Vector3 _right = Vector3.Cross(_forward, _up).normalized * radius;
 
-        Matrix4x4 matrix = new Matrix4x4();
+        Matrix4x4 matrix = new();
 
         matrix[0] = _right.x;
         matrix[1] = _right.y;
@@ -542,9 +542,9 @@ public static partial class DebugDraw
         matrix[9] = _forward.y;
         matrix[10] = _forward.z;
 
-        Vector3 offsetIncrement_X = matrix.MultiplyPoint3x4(Vector3.left * radius * 1.25f);
-        Vector3 offsetIncrement_Y = matrix.MultiplyPoint3x4(Vector3.forward * radius * 2.25f);
-        Vector3 offset = Vector3.zero;
+        Vector3 offsetIncrement_X = matrix.MultiplyPoint3x4(1.25f * radius * Vector3.left);
+        Vector3 offsetIncrement_Y = matrix.MultiplyPoint3x4(2.25f * radius * Vector3.forward);
+        Vector3 offset;
         int column = 0;
         int row = 0;
         foreach (char c in message)
@@ -610,7 +610,7 @@ public static partial class DebugDraw
         Vector3 _forward = Vector3.Slerp(_up, -_up, 0.5f);
         Vector3 _right = Vector3.Cross(_up, _forward).normalized * radius;
 
-        Matrix4x4 matrix = new Matrix4x4();
+        Matrix4x4 matrix = new();
 
         matrix[0] = _right.x;
         matrix[1] = _right.y;
@@ -627,7 +627,7 @@ public static partial class DebugDraw
         Vector3 _lastPoint = position + matrix.MultiplyPoint3x4(new Vector3(Mathf.Cos(0), 0, Mathf.Sin(0)));
         Vector3 _nextPoint = Vector3.zero;
 
-        color = (color == default(Color)) ? Color.white : color;
+        color = (color == default) ? Color.white : color;
 
         for (var i = 0; i < 91; i++)
         {
@@ -735,9 +735,9 @@ public static partial class DebugDraw
         Vector3 _forward = forward.normalized * radius;
 
         Vector3 _lastPoint = position + _forward;
-        Vector3 _nextPoint = Vector3.zero;
+        Vector3 _nextPoint;
 
-        color = (color == default(Color)) ? Color.white : color;
+        color = (color == default) ? Color.white : color;
 
         float sweep = Mathf.Lerp(0, 90, Mathf.InverseLerp(0, 360, Mathf.Abs(angle)));
         float incr = angle / sweep;
@@ -746,7 +746,7 @@ public static partial class DebugDraw
         {
             _nextPoint = position + Quaternion.AngleAxis(i * incr, _up) * _forward;
 
-            Debug.DrawLine(_lastPoint, _nextPoint, color.FadeAlpha(Mathf.Lerp(0.25f, 1, Mathf.InverseLerp(0, sweep - 1, i))), duration, depthTest);
+            Debug.DrawLine(_lastPoint, _nextPoint, color.rgbn(Mathf.Lerp(0.25f, 1, Mathf.InverseLerp(0, sweep - 1, i))), duration, depthTest);
 
             _lastPoint = _nextPoint;
         }
@@ -759,17 +759,14 @@ public static partial class DebugDraw
 
         Vector3 direction = Vector3.Cross(up, Quaternion.AngleAxis(angle, up) * forward.normalized) * (angle >= 0 ? -1 : 1);
 
-        Cone(_nextPoint, direction.normalized * radius * 0.1f, color, 30, duration, depthTest);
+        Cone(_nextPoint, 0.1f * radius * direction.normalized, color, 30, duration, depthTest);
         String(string.Format("{1}{0:0.000}", angle, angle < 0 ? " " : "  "), position + radial * 1.5f, color, radius * 0.5f);
 
     }
 
     public static void Arc(Vector3 position, Vector3 forward, Quaternion rotation, Color color, float radius = 1.0f, float duration = 0, bool depthTest = true)
     {
-        float angle;
-        Vector3 up;
-
-        rotation.ToAngleAxis(out angle, out up);
+        rotation.ToAngleAxis(out float angle, out Vector3 up);
 
         Arc(position, up, forward, angle, color, radius, duration, depthTest);
     }
@@ -865,9 +862,9 @@ public static partial class DebugDraw
     {
         float angle = 10.0f;
 
-        Vector3 x = new Vector3(position.x, position.y + radius * Mathf.Sin(0), position.z + radius * Mathf.Cos(0));
-        Vector3 y = new Vector3(position.x + radius * Mathf.Cos(0), position.y, position.z + radius * Mathf.Sin(0));
-        Vector3 z = new Vector3(position.x + radius * Mathf.Cos(0), position.y + radius * Mathf.Sin(0), position.z);
+        Vector3 x = new(position.x, position.y + radius * Mathf.Sin(0), position.z + radius * Mathf.Cos(0));
+        Vector3 y = new(position.x + radius * Mathf.Cos(0), position.y, position.z + radius * Mathf.Sin(0));
+        Vector3 z = new(position.x + radius * Mathf.Cos(0), position.y + radius * Mathf.Sin(0), position.z);
 
         Vector3 new_x;
         Vector3 new_y;
@@ -876,9 +873,9 @@ public static partial class DebugDraw
         for (int i = 1; i < 37; i++)
         {
 
-            new_x = new Vector3(position.x, position.y + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad), position.z + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad));
-            new_y = new Vector3(position.x + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad), position.y, position.z + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad));
-            new_z = new Vector3(position.x + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad), position.y + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad), position.z);
+            new_x = new(position.x, position.y + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad), position.z + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad));
+            new_y = new(position.x + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad), position.y, position.z + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad));
+            new_z = new(position.x + radius * Mathf.Cos(angle * i * Mathf.Deg2Rad), position.y + radius * Mathf.Sin(angle * i * Mathf.Deg2Rad), position.z);
 
             Debug.DrawLine(x, new_x, color, duration, depthTest);
             Debug.DrawLine(y, new_y, color, duration, depthTest);
@@ -1014,11 +1011,10 @@ public static partial class DebugDraw
 
         Vector3 slerpedVector = Vector3.Slerp(_forward, _up, angle / 90.0f);
 
-        float dist;
         var farPlane = new Plane(-direction, position + _forward);
         var distRay = new Ray(position, slerpedVector);
 
-        farPlane.Raycast(distRay, out dist);
+        farPlane.Raycast(distRay, out float dist);
 
         Debug.DrawRay(position, slerpedVector.normalized * dist, color);
         Debug.DrawRay(position, Vector3.Slerp(_forward, -_up, angle / 90.0f).normalized * dist, color, duration, depthTest);
@@ -1359,7 +1355,7 @@ public static partial class DebugDraw
     /// <param name='color'>
     /// 	- The color of the cube.
     /// </param>
-    public static void GLocalCube(Transform transform, Vector3 size, Color color, Vector3 center = default(Vector3))
+    public static void GLocalCube(Transform transform, Vector3 size, Color color, Vector3 center = default)
     {
         Color oldColor = Gizmos.color;
         Gizmos.color = color;
@@ -1406,7 +1402,7 @@ public static partial class DebugDraw
     /// <param name='center'>
     ///		- The local position of the cube.
     /// </param>
-    public static void GLocalCube(Transform transform, Vector3 size, Vector3 center = default(Vector3))
+    public static void GLocalCube(Transform transform, Vector3 size, Vector3 center = default)
     {
         GLocalCube(transform, size, Color.white, center);
     }
@@ -1426,7 +1422,7 @@ public static partial class DebugDraw
     /// <param name='color'>
     /// 	- The color of the cube.
     /// </param>
-    public static void GLocalCube(Matrix4x4 space, Vector3 size, Color color, Vector3 center = default(Vector3))
+    public static void GLocalCube(Matrix4x4 space, Vector3 size, Color color, Vector3 center = default)
     {
         Color oldColor = Gizmos.color;
         Gizmos.color = color;
@@ -1473,7 +1469,7 @@ public static partial class DebugDraw
     /// <param name='center'>
     /// 	- The local position of the cube.
     /// </param>
-    public static void GLocalCube(Matrix4x4 space, Vector3 size, Vector3 center = default(Vector3))
+    public static void GLocalCube(Matrix4x4 space, Vector3 size, Vector3 center = default)
     {
         GLocalCube(space, size, Color.white, center);
     }
@@ -1499,7 +1495,7 @@ public static partial class DebugDraw
         Vector3 _forward = Vector3.Slerp(up, -up, 0.5f);
         Vector3 _right = Vector3.Cross(up, _forward).normalized * radius;
 
-        Matrix4x4 matrix = new Matrix4x4();
+        Matrix4x4 matrix = new();
 
         matrix[0] = _right.x;
         matrix[1] = _right.y;
@@ -1517,7 +1513,7 @@ public static partial class DebugDraw
         Vector3 _nextPoint = Vector3.zero;
 
         Color oldColor = Gizmos.color;
-        Gizmos.color = (color == default(Color)) ? Color.white : color;
+        Gizmos.color = (color == default) ? Color.white : color;
 
         for (var i = 0; i < 91; i++)
         {
@@ -1675,11 +1671,10 @@ public static partial class DebugDraw
 
         Vector3 slerpedVector = Vector3.Slerp(_forward, _up, angle / 90.0f);
 
-        float dist;
         var farPlane = new Plane(-direction, position + _forward);
         var distRay = new Ray(position, slerpedVector);
 
-        farPlane.Raycast(distRay, out dist);
+        farPlane.Raycast(distRay, out float dist);
 
         Color oldColor = Gizmos.color;
         Gizmos.color = color;
