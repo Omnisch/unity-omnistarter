@@ -1,9 +1,11 @@
 // author: Omnistudio
-// version: 2025.11.24
+// version: 2026.03.08
 
 using Omnis.Editor;
 using Omnis.Utils;
 using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Omnis
@@ -13,15 +15,27 @@ namespace Omnis
     /// </summary>
     public class VirtualButton : PointerBase
     {
-        [ConditionalGroup]
-        public LongPress longPress;
         public UnityEvent enterCallback;
         public UnityEvent pressCallback;
         public UnityEvent releaseCallback;
         public UnityEvent exitCallback;
+        [ConditionalGroup]
+        public LongPress longPress;
+        [ConditionalGroup]
+        public Animation anim;
 
         private bool canceled = false;
         private float longPressProgress = 0; // 0 ~ 1
+        private Coroutine longPressCoroutine;
+        private Coroutine zoomCoroutine;
+        private Coroutine ZoomCoroutine {
+            set {
+                if (zoomCoroutine != null)
+                    StopCoroutine(zoomCoroutine);
+                zoomCoroutine = value;
+            }
+        }
+        private Vector3 originalLocalScale;
 
 
         public override bool LeftPressed {
@@ -35,23 +49,28 @@ namespace Omnis
 
                     // Long press
                     if (longPress.needLongPress) {
-                        StartCoroutine(YieldHelper.Ease(
-                            (value) => {
-                                longPressProgress = value;
-                                longPress.progressCallback?.Invoke(value);
-                                if (value == 1f) {
-                                    longPress.longPressCallback?.Invoke();
-                                }
-                            },
-                            Easing.Linear,
-                            time: longPress.pressTime
-                        ));
+                        longPressCoroutine = StartCoroutine(LongPressHold());
+                    }
+
+                    // animation
+                    if (anim.animType == Animation.AnimType.Zooming) {
+                        ZoomCoroutine = StartCoroutine(Zoom(anim.scale == 0f ? 1f : (1f / anim.scale)));
                     }
 
                 } else {
                     if (!canceled) {
                         releaseCallback?.Invoke();
                         AbortLongPress();
+
+                        // animation
+                        if (anim.animType == Animation.AnimType.Zooming) {
+                            ZoomCoroutine = StartCoroutine(Zoom(anim.scale));
+                        }
+                    } else {
+                        // animation
+                        if (anim.animType == Animation.AnimType.Zooming) {
+                            ZoomCoroutine = StartCoroutine(Zoom(1f));
+                        }
                     }
                 }
             }
@@ -64,22 +83,35 @@ namespace Omnis
 
                 if (value) {
                     enterCallback?.Invoke();
+
+                    // animation
+                    if (anim.animType == Animation.AnimType.Zooming) {
+                        ZoomCoroutine = StartCoroutine(Zoom(anim.scale));
+                    }
+
                 } else {
                     exitCallback?.Invoke();
+
                     if (LeftPressed) {
                         canceled = true;
-                        AbortLongPress();
+                    }
+
+                    // animation
+                    if (anim.animType == Animation.AnimType.Zooming) {
+                        ZoomCoroutine = StartCoroutine(Zoom(1f));
                     }
                 }
 
-                // Stop long press progress
-                StopAllCoroutines();
+                // Whether this is pointed or not, both should abort potential long press.
+                AbortLongPress();
             }
         }
 
         private void AbortLongPress() {
             if (longPress.needLongPress) {
-                StopAllCoroutines();
+                if (longPressCoroutine != null) {
+                    StopCoroutine(longPressCoroutine);
+                }
                 if (longPressProgress > 0f && longPressProgress < 1f) {
                     longPress.notLongEnoughCallback?.Invoke();
                 }
@@ -87,6 +119,46 @@ namespace Omnis
         }
 
 
+        private IEnumerator LongPressHold() {
+            yield return YieldHelper.Ease(
+                (value) => {
+                    longPressProgress = value;
+                    longPress.progressCallback?.Invoke(value);
+                },
+                () => {
+                    longPress.longPressCallback?.Invoke();
+                    longPressProgress = 0f;
+                },
+                Easing.Linear,
+                longPress.pressTime);
+        }
+        private IEnumerator Zoom(float scale) {
+            var oldLocalScale = transform.localScale;
+            var newLocalScale = scale * originalLocalScale;
+            Func<float, float> easingFunc = anim.easeType switch {
+                Animation.ZoomingEaseType.Bounce => Easing.OutBounce,
+                Animation.ZoomingEaseType.Elastic => Easing.OutElastic,
+                _ => Easing.OutQuart
+            };
+            float time = anim.easeType switch {
+                Animation.ZoomingEaseType.Bounce => 0.2f,
+                Animation.ZoomingEaseType.Elastic => 0.6f,
+                _ => 0.1f
+            };
+
+            yield return YieldHelper.Ease(
+                (value) => {
+                    transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
+                },
+                easingFunc, time);
+        }
+
+        private void Start() {
+            originalLocalScale = transform.localScale;
+        }
+
+
+        #region Structs
         [Serializable]
         public class LongPress
         {
@@ -100,5 +172,19 @@ namespace Omnis
             [ShowIf("needLongPress", true)]
             public UnityEvent notLongEnoughCallback;
         }
+
+        [Serializable]
+        public class Animation
+        {
+            public AnimType animType = AnimType.None;
+            [ShowIf("animType", AnimType.Zooming)]
+            public float scale = 1.1f;
+            [ShowIf("animType", AnimType.Zooming)]
+            public ZoomingEaseType easeType = ZoomingEaseType.Elastic;
+
+            public enum AnimType { None, Zooming }
+            public enum ZoomingEaseType { Bounce, Elastic, Smoothstep }
+        }
+        #endregion
     }
 }
