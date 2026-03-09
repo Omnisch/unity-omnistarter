@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2026.03.09
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,10 +14,17 @@ namespace Omnis
     [DisallowMultipleComponent]
     public sealed class PointerReceiver : MonoBehaviour
     {
-        #region Serialized fields
+        #region Serialized Fields
         public bool activated = true;
         public bool opaque = false;
         #endregion
+
+
+        #region Methods
+        public void SetActivated(bool a) { activated = a; }
+        public void SetOpaque(bool o) { opaque = o; }
+        #endregion
+
 
         #region Messages
         private void OnInteract(List<Collider> siblings) { if (this.activated) this.SendMessage("InteractReceiver", siblings); }
