@@ -16,7 +16,8 @@ namespace Omnis
         private Coroutine moveCoroutine = null;
 
         public void MoveToNextParent() => SetParent((targetIndex + 1) % targets.Length);
-        public void SetParent(int i, System.Action callback = null) {
+        public void SetParent(int i) => SetParent(i, null);
+        public void SetParent(int i, System.Action callback) {
             if (i < 0 || i >= targets.Length) {
                 Debug.LogWarning("Manual-set index out of bounds.");
                 return;
