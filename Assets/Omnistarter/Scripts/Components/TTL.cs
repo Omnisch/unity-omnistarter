@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.11.24
+// version: 2026.03.09
 
+using Omnis.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -25,13 +26,13 @@ namespace Omnis
 
         #region Unity methods
         private void Start() {
-            StartCoroutine(Utils.YieldHelper.Ease((value) => {
+            this.Ease((value) => {
                 OnLifeSpan?.Invoke(value);
                 if (value == 1f) {
                     goodbyeCallback?.Invoke();
                     Destroy(gameObject);
                 }
-            }, Utils.Easing.Linear, lifeTime));
+            }, Utils.Easing.Linear, lifeTime);
         }
         #endregion
     }

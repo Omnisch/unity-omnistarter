@@ -1,3 +1,5 @@
+using Omnis.Utils;
+
 namespace Omnis.Gizmos
 {
     public partial class GizmoHandler
@@ -14,9 +16,9 @@ namespace Omnis.Gizmos
             else
             {
                 Agent = this;
-                StartCoroutine(Omnis.Utils.YieldHelper.DoWhen(
+                this.DoWhen(
                     () => gameObject.scene.isLoaded,
-                    () => DontDestroyOnLoad(gameObject)));
+                    () => DontDestroyOnLoad(gameObject));
                 return true;
             }
         }

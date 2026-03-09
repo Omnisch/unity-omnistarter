@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2025.07.10
+// version: 2026.03.09
 
+using Omnis.Utils;
 using System;
 using UnityEngine;
 
@@ -37,7 +38,7 @@ namespace Omnis
                 }
                 else if (value > 0f)
                 {
-                    jumpCoroutine = StartCoroutine(Utils.YieldHelper.Ease(jumpAction, Utils.Easing.OutExpo, jumpActionSpeed, true));
+                    jumpCoroutine = this.Ease(jumpAction, Easing.OutExpo, jumpActionSpeed, true);
                 }
             }
         }

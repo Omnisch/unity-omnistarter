@@ -1,3 +1,5 @@
+using Omnis.Utils;
+
     #ROOTNAMESPACEBEGIN#
 public partial class #PARTIALSCRIPTNAME#
 {
@@ -13,9 +15,9 @@ public partial class #PARTIALSCRIPTNAME#
         else
         {
             Instance = this;
-            StartCoroutine(Omnis.Utils.YieldHelper.DoWhen(
+            this.DoWhen(
                 () => gameObject.scene.isLoaded,
-                () => DontDestroyOnLoad(gameObject)));
+                () => DontDestroyOnLoad(gameObject));
             return true;
         }
     }

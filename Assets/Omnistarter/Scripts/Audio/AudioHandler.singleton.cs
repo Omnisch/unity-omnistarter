@@ -1,5 +1,7 @@
 // author: Omnistudio
-// version: 2025.03.30
+// version: 2026.03.09
+
+using Omnis.Utils;
 
 namespace Omnis.Audio
 {
@@ -17,9 +19,9 @@ namespace Omnis.Audio
             else
             {
                 Agent = this;
-                StartCoroutine(Utils.YieldHelper.DoWhen(
+                this.DoWhen(
                     () => gameObject.scene.isLoaded,
-                    () => DontDestroyOnLoad(gameObject)));
+                    () => DontDestroyOnLoad(gameObject));
                 return true;
             }
         }

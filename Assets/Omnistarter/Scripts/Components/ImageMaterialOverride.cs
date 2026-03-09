@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.12
+// version: 2026.03.09
 
 using Omnis.Utils;
 using System;
@@ -101,13 +101,13 @@ namespace Omnis
                 StopCoroutine(last);
             }
 
-            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
+            paramDict[nameOfParam] = this.Ease((value) => {
                 PrivateSet(nameOfParam, Mathf.Lerp(from, to, value));
 
                 if (value == 1f) {
                     callback?.Invoke();
                 }
-            }, Easing.Linear, lerpSpeed));
+            }, Easing.Linear, lerpSpeed);
         }
 
         public void LerpTo(string nameOfParam, Color to, Action callback = null)
@@ -117,13 +117,13 @@ namespace Omnis
                 StopCoroutine(last);
             }
 
-            paramDict[nameOfParam] = StartCoroutine(YieldHelper.Ease((value) => {
+            paramDict[nameOfParam] = this.Ease((value) => {
                 PrivateSet(nameOfParam, ColorHelper.Lerp(from, to, value));
 
                 if (value == 1f) {
                     callback?.Invoke();
                 }
-            }, Easing.Linear, lerpSpeed));
+            }, Easing.Linear, lerpSpeed);
         }
         #endregion
 

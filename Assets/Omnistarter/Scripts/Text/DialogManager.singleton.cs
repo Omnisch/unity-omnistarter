@@ -1,3 +1,5 @@
+using Omnis.Utils;
+
 namespace Omnis.Text
 {
     public partial class DialogManager
@@ -14,9 +16,9 @@ namespace Omnis.Text
             else
             {
                 Instance = this;
-                StartCoroutine(Omnis.Utils.YieldHelper.DoWhen(
+                this.DoWhen(
                     () => gameObject.scene.isLoaded,
-                    () => DontDestroyOnLoad(gameObject)));
+                    () => DontDestroyOnLoad(gameObject));
                 return true;
             }
         }

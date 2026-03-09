@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.30
+// version: 2026.03.09
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -56,7 +56,7 @@ namespace Omnis.Text
                             if (c.tagInfo.attrs.TryGetValue("time", out string o) && float.TryParse(o, out float wait))
                             {
                                 c.actor.pi.pause = true;
-                                c.actor.StartCoroutine(YieldHelper.DoAfterSeconds(wait, () => c.actor.pi.pause = false));
+                                c.actor.DoAfterSeconds(wait, () => c.actor.pi.pause = false);
                             }
                             else
                                 c.actor.pi.pause = true;

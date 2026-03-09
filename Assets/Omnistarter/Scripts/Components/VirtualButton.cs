@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.08
+// version: 2026.03.09
 
 using Omnis.Editor;
 using Omnis.Utils;
@@ -49,12 +49,12 @@ namespace Omnis
 
                     // Long press
                     if (longPress.needLongPress) {
-                        longPressCoroutine = StartCoroutine(LongPressHold());
+                        longPressCoroutine = LongPressHold();
                     }
 
                     // animation
                     if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = StartCoroutine(Zoom(anim.scale == 0f ? 1f : (1f / anim.scale)));
+                        ZoomCoroutine = Zoom(anim.scale == 0f ? 1f : (1f / anim.scale));
                     }
 
                 } else {
@@ -64,12 +64,12 @@ namespace Omnis
 
                         // animation
                         if (anim.animType == Animation.AnimType.Zooming) {
-                            ZoomCoroutine = StartCoroutine(Zoom(anim.scale));
+                            ZoomCoroutine = Zoom(anim.scale);
                         }
                     } else {
                         // animation
                         if (anim.animType == Animation.AnimType.Zooming) {
-                            ZoomCoroutine = StartCoroutine(Zoom(1f));
+                            ZoomCoroutine = Zoom(1f);
                         }
                     }
                 }
@@ -86,7 +86,7 @@ namespace Omnis
 
                     // animation
                     if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = StartCoroutine(Zoom(anim.scale));
+                        ZoomCoroutine = Zoom(anim.scale);
                     }
 
                 } else {
@@ -98,7 +98,7 @@ namespace Omnis
 
                     // animation
                     if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = StartCoroutine(Zoom(1f));
+                        ZoomCoroutine = Zoom(1f);
                     }
                 }
 
@@ -119,8 +119,8 @@ namespace Omnis
         }
 
 
-        private IEnumerator LongPressHold() {
-            yield return YieldHelper.Ease(
+        private Coroutine LongPressHold() {
+            return this.Ease(
                 (value) => {
                     longPressProgress = value;
                     longPress.progressCallback?.Invoke(value);
@@ -132,7 +132,7 @@ namespace Omnis
                 Easing.Linear,
                 longPress.pressTime);
         }
-        private IEnumerator Zoom(float scale) {
+        private Coroutine Zoom(float scale) {
             var oldLocalScale = transform.localScale;
             var newLocalScale = scale * originalLocalScale;
             Func<float, float> easingFunc = anim.easeType switch {
@@ -146,7 +146,7 @@ namespace Omnis
                 _ => 0.1f
             };
 
-            yield return YieldHelper.Ease(
+            return this.Ease(
                 (value) => {
                     transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
                 },

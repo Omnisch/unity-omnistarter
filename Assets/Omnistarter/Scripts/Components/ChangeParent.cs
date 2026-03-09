@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.12
+// version: 2026.03.09
 
 using Omnis.Utils;
 using UnityEngine;
@@ -32,7 +32,7 @@ namespace Omnis
             transform.GetPositionAndRotation(out var oldPosition, out var oldRotation);
             var oldScale = transform.lossyScale;
 
-            moveCoroutine = StartCoroutine(YieldHelper.Ease((value) => {
+            moveCoroutine = this.Ease((value) => {
                 transform.SetPositionAndRotation(
                     Vector3.Lerp(oldPosition, targets[targetIndex].position, value),
                     Quaternion.Lerp(oldRotation, targets[targetIndex].rotation, value));
@@ -45,7 +45,7 @@ namespace Omnis
                     transform.localScale = Vector3.one;
                     callback?.Invoke();
                 }
-            }, Easing.OutCubic, lerpTime, false));
+            }, Easing.OutCubic, lerpTime, false);
         }
     }
 }
