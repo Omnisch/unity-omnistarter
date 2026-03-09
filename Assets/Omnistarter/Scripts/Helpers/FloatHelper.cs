@@ -29,12 +29,22 @@ namespace Omnis.Utils
         #region Simple operations
         /// <summary>0.0001</summary>
         public static readonly float EpsilonLoose = 0.0001f;
+
+
         /// <summary>
         /// The loose version of Mathf.Approximately(), where Epsilon is 0.0001.
         /// </summary>
         public static bool ApproxLoose(this float value, float target) => Mathf.Abs(target - value) < EpsilonLoose;
+
+
         /// <returns>1 - value</returns>
         public static float Inv(this float value) => 1f - value;
+
+
+        /// <returns>Random.Range(value - halfRange, value + halfRange)</returns>
+        public static float Random(this float value, float halfRange) => UnityEngine.Random.Range(value - halfRange, value + halfRange);
+
+
         /// <summary>
         /// It's basically same with Mathf.Repeat(),
         /// except when <i>value</i> % <i>length</i> = 0, it returns <i>length</i> instead of 0.
@@ -45,10 +55,14 @@ namespace Omnis.Utils
             float commonRepeat = Mathf.Repeat(value, length);
             return commonRepeat == 0f ? length : commonRepeat;
         }
+
+
         /// <summary>
         /// A shorthand to System.Math.Round(value, digits).
         /// </summary>
         public static float Round(this float value, int digits) => (float)Math.Round(value, digits);
+
+
         /// <summary>
         /// If the value is greater than or equal to <i>par</i> it returns 1, else returns 0.
         /// </summary>
