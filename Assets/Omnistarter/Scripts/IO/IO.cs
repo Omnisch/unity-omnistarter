@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.03
+// version: 2026.03.05
 
 using OdinSerializer;
 using System.IO;
@@ -12,11 +12,26 @@ namespace Omnis
     /// </summary>
     public static class IO
     {
-        public static bool SaveBytesToFile(byte[] bytes, string path)
+        public static bool SaveToFile(object data, string path, bool backupOne = false) {
+            if (backupOne)
+                return SaveWithBackup(data, path);
+            else
+                return SaveWithoutBackup(data, path);
+        }
+        public static bool SaveToFile(object data, string dir, string fileName, bool backupOne = false) {
+            if (backupOne)
+                return SaveWithBackup(data, Path.Combine(dir, fileName));
+            else
+                return SaveWithoutBackup(data, Path.Combine(dir, fileName));
+        }
+        private static bool SaveWithoutBackup(object data, string path)
         {
-            if (bytes == null || bytes.Length == 0)
-            {
-                Debug.LogError("Null or empty byte data, saving aborted.");
+            if (data is not byte[] bytes) {
+                bytes = SerializationUtility.SerializeValue(data, DataFormat.JSON);
+            }
+
+            if (bytes == null || bytes.Length == 0) {
+                Debug.LogError("Null or empty bytes. Saving aborted.");
                 return false;
             }
 
@@ -39,39 +54,28 @@ namespace Omnis
                 return false;
             }
         }
-
-        public static bool SaveWithBackup(byte[] bytes, string dir, string assetName, string lastAssetName) {
-            EnsureDirectoryExists(dir);
-
-            string assetPath = Path.Combine(dir, assetName);
-            string lastPath = Path.Combine(dir, lastAssetName);
+        private static bool SaveWithBackup(object data, string path) {
+            string dir = Path.GetDirectoryName(path) ?? string.Empty;
+            string name = Path.GetFileNameWithoutExtension(path);
+            string ext = Path.GetExtension(path);
+            string prevPath = Path.Combine(dir, $"{name}-prev{ext}");
 
             try {
-                string tmpPath = assetPath + ".tmp";
-                File.WriteAllBytes(tmpPath, bytes);
+                string tmpPath = path + ".tmp";
+                SaveWithoutBackup(data, tmpPath);
 
-                if (File.Exists(assetPath)) {
-                    if (File.Exists(lastPath)) {
-                        File.Delete(lastPath);
+                if (File.Exists(path)) {
+                    if (File.Exists(prevPath)) {
+                        File.Delete(prevPath);
                     }
 
-                    File.Move(assetPath, lastPath);
+                    File.Move(path, prevPath);
                 }
 
-                if (File.Exists(assetPath)) {
-                    File.Delete(assetPath);
-                }
-
-                File.Move(tmpPath, assetPath);
-                Debug.Log($"Successfully wrote {bytes.Length} bytes to {assetPath}");
-
-#if UNITY_EDITOR
-                UnityEditor.AssetDatabase.Refresh();
-#endif
+                File.Move(tmpPath, path);
                 return true;
             }
-            catch (System.Exception e) {
-                Debug.LogError($"Failed to write bytes: {e.Message}");
+            catch {
                 return false;
             }
         }
@@ -88,11 +92,6 @@ namespace Omnis
 
 
 
-        public static void SaveToFile<T>(T dataToSave, string path)
-        {
-            byte[] bytes = SerializationUtility.SerializeValue(dataToSave, DataFormat.JSON);
-            File.WriteAllBytes(path, bytes);
-        }
         public static T LoadFromFile<T>(string path)
         {
             byte[] bytes = File.ReadAllBytes(path);
