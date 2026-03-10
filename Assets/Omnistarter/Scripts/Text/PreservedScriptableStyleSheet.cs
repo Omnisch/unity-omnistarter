@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.10
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -15,13 +15,13 @@ namespace Omnis.Text
         {
             #region Offset
             new(name: "elastic",
-                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.InBounce((c.time - c.index * 0.133f).PingPong(1f)).ono())),
+                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.BounceIn((c.time - c.index * 0.133f).PingPong(1f)).ono())),
             new(name: "float",
-                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f)).ono())),
+                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f)).ono())),
             new(name: "pacing",
                 render: (c) => {
-                    float x = c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum() - 0.25f).Repeat(1f));
-                    float y = c.actor.AnimFactor * Easing.RawSine((c.time - c.Spectrum()).Repeat(1f));
+                    float x = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum() - 0.25f).Repeat(1f));
+                    float y = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
             #endregion

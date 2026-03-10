@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.10
 
+using Omnis.Editor;
 using Omnis.Utils;
 using UnityEngine;
 
@@ -11,8 +12,10 @@ namespace Omnis
     {
         [SerializeField] private Transform[] targets;
         [SerializeField] private int targetIndex = 0;
-        [Space]
+        [Header("Animation")]
         public float lerpTime = 0.3f;
+        [ConditionalGroup]
+        public EasingSettings easing = new(Easing.EasingType.CubicOut);
 
         private Coroutine moveCoroutine = null;
 
@@ -51,7 +54,7 @@ namespace Omnis
                     transform.localScale = Vector3.one;
                     callback?.Invoke();
                 }
-            }, Easing.OutCubic, lerpTime, false);
+            }, easing.Evaluate, lerpTime, false);
         }
     }
 }

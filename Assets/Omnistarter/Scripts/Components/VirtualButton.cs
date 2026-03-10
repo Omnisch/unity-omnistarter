@@ -1,10 +1,9 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.10
 
 using Omnis.Editor;
 using Omnis.Utils;
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -21,8 +20,11 @@ namespace Omnis
         public UnityEvent exitCallback;
         [ConditionalGroup]
         public LongPress longPress;
+        [Header("Animation")]
+        public float animScale = 1.1f;
+        public float easingTime = 0.6f;
         [ConditionalGroup]
-        public Animation anim;
+        public EasingSettings easing = new(Easing.EasingType.ElasticOut);
 
         private bool canceled = false;
         private float longPressProgress = 0; // 0 ~ 1
@@ -53,9 +55,7 @@ namespace Omnis
                     }
 
                     // animation
-                    if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = Zoom(anim.scale == 0f ? 1f : (1f / anim.scale));
-                    }
+                    ZoomCoroutine = Zoom(animScale == 0f ? 1f : (1f / animScale));
 
                 } else {
                     if (!canceled) {
@@ -63,14 +63,7 @@ namespace Omnis
                         AbortLongPress();
 
                         // animation
-                        if (anim.animType == Animation.AnimType.Zooming) {
-                            ZoomCoroutine = Zoom(anim.scale);
-                        }
-                    } else {
-                        // animation
-                        if (anim.animType == Animation.AnimType.Zooming) {
-                            ZoomCoroutine = Zoom(1f);
-                        }
+                        ZoomCoroutine = Zoom(animScale);
                     }
                 }
             }
@@ -85,9 +78,7 @@ namespace Omnis
                     enterCallback?.Invoke();
 
                     // animation
-                    if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = Zoom(anim.scale);
-                    }
+                    ZoomCoroutine = Zoom(animScale);
 
                 } else {
                     exitCallback?.Invoke();
@@ -97,9 +88,7 @@ namespace Omnis
                     }
 
                     // animation
-                    if (anim.animType == Animation.AnimType.Zooming) {
-                        ZoomCoroutine = Zoom(1f);
-                    }
+                    ZoomCoroutine = Zoom(1f);
                 }
 
                 // Whether this is pointed or not, both should abort potential long press.
@@ -135,22 +124,14 @@ namespace Omnis
         private Coroutine Zoom(float scale) {
             var oldLocalScale = transform.localScale;
             var newLocalScale = scale * originalLocalScale;
-            Func<float, float> easingFunc = anim.easeType switch {
-                Animation.ZoomingEaseType.Bounce => Easing.OutBounce,
-                Animation.ZoomingEaseType.Elastic => Easing.OutElastic,
-                _ => Easing.OutQuart
-            };
-            float time = anim.easeType switch {
-                Animation.ZoomingEaseType.Bounce => 0.2f,
-                Animation.ZoomingEaseType.Elastic => 0.6f,
-                _ => 0.1f
-            };
+
+            if (oldLocalScale == newLocalScale) return null;
 
             return this.Ease(
                 (value) => {
                     transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
                 },
-                easingFunc, time);
+                easing.Evaluate, easingTime);
         }
 
         private void Start() {
@@ -171,19 +152,6 @@ namespace Omnis
             public UnityEvent longPressCallback;
             [ShowIf("needLongPress", true)]
             public UnityEvent notLongEnoughCallback;
-        }
-
-        [Serializable]
-        public class Animation
-        {
-            public AnimType animType = AnimType.None;
-            [ShowIf("animType", AnimType.Zooming)]
-            public float scale = 1.1f;
-            [ShowIf("animType", AnimType.Zooming)]
-            public ZoomingEaseType easeType = ZoomingEaseType.Elastic;
-
-            public enum AnimType { None, Zooming }
-            public enum ZoomingEaseType { Bounce, Elastic, Smoothstep }
         }
         #endregion
     }

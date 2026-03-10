@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2026.03.10
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,30 +26,25 @@ namespace Omnis
         #endregion
 
         #region Properties
-        public virtual bool Active
-        {
-            get => this.active;
-            protected set => this.active = value;
+        public virtual bool Active {
+            get => active;
+            protected set => active = value;
         }
-        public virtual bool LeftPressed
-        {
-            get => this.leftPressed;
-            protected set => this.leftPressed = value;
+        public virtual bool LeftPressed {
+            get => leftPressed;
+            protected set => leftPressed = value;
         }
-        public virtual bool RightPressed
-        {
-            get => this.rightPressed;
-            protected set => this.rightPressed = value;
+        public virtual bool RightPressed {
+            get => rightPressed;
+            protected set => rightPressed = value;
         }
-        public virtual bool MiddlePressed
-        {
-            get => this.middlePressed;
-            protected set => this.middlePressed = value;
+        public virtual bool MiddlePressed {
+            get => middlePressed;
+            protected set => middlePressed = value;
         }
-        public virtual bool Pointed
-        {
-            get => this.pointed;
-            protected set => this.pointed = value;
+        public virtual bool Pointed {
+            get => pointed;
+            protected set => pointed = value;
         }
         #endregion
 
@@ -58,15 +53,15 @@ namespace Omnis
         #endregion
 
         #region Messages
-        protected void InteractReceiver(List<Collider> siblings) { if (this.Active) OnInteracted(siblings); }
-        private void LeftPressReceiver()      { if (this.Active) this.LeftPressed = true; }
-        private void LeftReleaseReceiver()    { if (this.Active) this.LeftPressed = false; }
-        private void RightPressReceiver()     { if (this.Active) this.RightPressed = true; }
-        private void RightReleaseReceiver()   { if (this.Active) this.RightPressed = false; }
-        private void MiddlePressReceiver()    { if (this.Active) this.MiddlePressed = true; }
-        private void MiddleReleaseReceiver()  { if (this.Active) this.MiddlePressed = false; }
-        private void PointerEnterReceiver()   { if (this.Active) this.Pointed = true; }
-        private void PointerExitReceiver()    { if (this.Active) this.Pointed = false; }
+        protected void InteractReceiver(List<Collider> siblings) { if (Active) OnInteracted(siblings); }
+        private void LeftPressReceiver()      { if (Active) LeftPressed = true; }
+        private void LeftReleaseReceiver()    { if (Active) LeftPressed = false; }
+        private void RightPressReceiver()     { if (Active) RightPressed = true; }
+        private void RightReleaseReceiver()   { if (Active) RightPressed = false; }
+        private void MiddlePressReceiver()    { if (Active) MiddlePressed = true; }
+        private void MiddleReleaseReceiver()  { if (Active) MiddlePressed = false; }
+        private void PointerEnterReceiver()   { if (Active) Pointed = true; }
+        private void PointerExitReceiver()    { if (Active) Pointed = false; }
         #endregion
     }
 }

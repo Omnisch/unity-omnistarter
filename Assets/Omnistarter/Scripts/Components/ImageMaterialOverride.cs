@@ -1,6 +1,7 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.10
 
+using Omnis.Editor;
 using Omnis.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,10 @@ namespace Omnis
     {
         #region Serialized Fields
         [SerializeField] private Image imageToEdit;
-        [Range(0.1f, 10f)]
-        public float lerpSpeed = 1f;
+        [Header("Lerp")]
+        public float lerpTime = 1f;
+        [ConditionalGroup]
+        public EasingSettings easing = new(Easing.EasingType.Linear);
         #endregion
 
         #region Fields
@@ -107,7 +110,7 @@ namespace Omnis
                 if (value == 1f) {
                     callback?.Invoke();
                 }
-            }, Easing.Linear, lerpSpeed);
+            }, easing.Evaluate, lerpTime);
         }
 
         public void LerpTo(string nameOfParam, Color to, Action callback = null)
@@ -123,7 +126,7 @@ namespace Omnis
                 if (value == 1f) {
                     callback?.Invoke();
                 }
-            }, Easing.Linear, lerpSpeed);
+            }, easing.Evaluate, lerpTime);
         }
         #endregion
 
