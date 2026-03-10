@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Omnis
 {
+    [ExecuteAlways]
     public class ChangeParent : MonoBehaviour
     {
         [SerializeField] private Transform[] targets;
@@ -15,7 +16,11 @@ namespace Omnis
 
         private Coroutine moveCoroutine = null;
 
-        public void MoveToNextParent() => SetParent((targetIndex + 1) % targets.Length);
+        [ContextMenu("Move To Next Parent")]
+        public void MoveToNextParent() {
+            if (targets != null && targets.Length > 0)
+                SetParent((targetIndex + 1) % targets.Length);
+        }
         public void SetParent(int i) => SetParent(i, null);
         public void SetParent(int i, System.Action callback) {
             if (i < 0 || i >= targets.Length) {
