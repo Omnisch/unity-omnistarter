@@ -1,7 +1,8 @@
 // author: Omnistudio
-// version: 2025.09.03
+// version: 2026.03.11
 
 using Omnis.Utils;
+using OmnisEditor;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,29 +22,27 @@ namespace Omnis
 
 
         #region Fields
-        [SerializeField][Editor.InspectorReadOnly] private List<DesktopDraggable> draggables = new();
-        [SerializeField][Editor.InspectorReadOnly] private List<DesktopSlot> slots = new();
-        public List<DesktopDraggable> Draggables => this.draggables;
-        public List<DesktopSlot > Slots => this.slots;
+        [SerializeField][InspectorReadOnly] private List<DesktopDraggable> draggables = new();
+        [SerializeField][InspectorReadOnly] private List<DesktopSlot> slots = new();
+        public List<DesktopDraggable> Draggables => draggables;
+        public List<DesktopSlot> Slots => slots;
         private Plane plane;
         #endregion
 
 
         #region Methods
-        public RaycastResult MouseRaycast(bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
-        {
+        public RaycastResult MouseRaycast(bool doClamp = false, bool liftUp = false, float gridSnap = 0f) {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            return this.Raycast(ray, doClamp, liftUp, gridSnap);
+            return Raycast(ray, doClamp, liftUp, gridSnap);
         }
 
-        public RaycastResult Raycast(Ray ray, bool doClamp = false, bool liftUp = false, float gridSnap = 0f)
-        {
-            if (this.plane.Raycast(ray, out float dist)) {
+        public RaycastResult Raycast(Ray ray, bool doClamp = false, bool liftUp = false, float gridSnap = 0f) {
+            if (plane.Raycast(ray, out float dist)) {
                 Vector3 point = ray.GetPoint(dist);
 
                 bool clamped = false;
                 if (doClamp) {
-                    OrientedBox obb = OrientedBox.FromDiagonalAndRef(this.diagonalFrom.position, this.diagonalTo.position, this.vertexRef.position, this.inNormal);
+                    OrientedBox obb = OrientedBox.FromDiagonalAndRef(diagonalFrom.position, diagonalTo.position, vertexRef.position, inNormal);
                     var tmp = point;
                     point = obb.Clamp(point);
                     if (point != tmp) {
@@ -54,8 +53,8 @@ namespace Omnis
                 point = point.GridSnap(gridSnap);
 
                 if (liftUp) {
-                    Plane calcPlane = this.plane;
-                    calcPlane.Translate(-this.liftUpHeight * this.inNormal);
+                    Plane calcPlane = plane;
+                    calcPlane.Translate(-liftUpHeight * inNormal);
 
                     Ray rayRevert = new(point, (ray.origin - point).normalized);
                     if (calcPlane.Raycast(rayRevert, out float distLiftUp)) {
@@ -63,16 +62,13 @@ namespace Omnis
                     }
                 }
 
-                return new RaycastResult
-                {
+                return new RaycastResult {
                     hit = true,
                     point = point,
                     clamped = clamped
                 };
-            }
-            else {
-                return new RaycastResult
-                {
+            } else {
+                return new RaycastResult {
                     hit = false,
                     point = Vector3.zero,
                     clamped = false
@@ -80,27 +76,25 @@ namespace Omnis
             }
         }
 
-        public Vector3 AdsordToSurface(Vector3 position) => this.plane.ClosestPointOnPlane(position);
+        public Vector3 AdsordToSurface(Vector3 position) => plane.ClosestPointOnPlane(position);
 
-        public void MoveSelfWithAllDraggables(Vector3 delta)
-        {
-            foreach (var draggable in this.draggables)
-            {
+        public void MoveSelfWithAllDraggables(Vector3 delta) {
+            foreach (var draggable in draggables) {
                 if (draggable != null && draggable.transform.parent != this)
                     draggable.WorldPosition += delta;
             }
-            this.transform.position += delta;
+            transform.position += delta;
         }
-        public void MoveSelfWithAllDraggablesTo(Vector3 dest) => MoveSelfWithAllDraggables(dest - this.transform.position);
+        public void MoveSelfWithAllDraggablesTo(Vector3 dest) => MoveSelfWithAllDraggables(dest - transform.position);
         #endregion
 
 
         #region Unity Methods
-        private void Awake()
-        {
-            this.plane = new(this.inNormal, this.transform.position + this.localInPoint);
+        private void Awake() {
+            plane = new(inNormal, transform.position + localInPoint);
         }
         #endregion
+
 
         #region Structs
         public struct RaycastResult

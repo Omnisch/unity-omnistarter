@@ -1,10 +1,12 @@
 // author: Omnistudio
-// version: 2025.11.02
+// version: 2026.03.11
 
+using Omnis;
+using Omnis.Gizmos;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis.Editor
+namespace OmnisEditor
 {
     public static class CreateMenuItem
     {
@@ -52,7 +54,7 @@ namespace Omnis.Editor
         private static void CreateGizmoHandler(MenuCommand menuCommand)
         {
             GameObject go = new("Gizmo Handler");
-            go.AddComponent<Gizmos.GizmoHandler>();
+            go.AddComponent<GizmoHandler>();
             Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
             GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
             Selection.activeObject = go;

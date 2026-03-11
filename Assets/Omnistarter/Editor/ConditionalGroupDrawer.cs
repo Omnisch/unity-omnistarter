@@ -1,6 +1,6 @@
 // author: Omnistudio
-// version: 2025.11.18
-// drafted by GPT
+// version: 2026.03.11
+// drafted by ChatGPT
 
 using Omnis.Utils;
 using System;
@@ -9,7 +9,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis.Editor
+namespace OmnisEditor
 {
     [CustomPropertyDrawer(typeof(ConditionalGroupAttribute))]
     public class ConditionalGroupDrawer : PropertyDrawer

@@ -1,11 +1,12 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.03.11
 
+using Omnis;
 using Omnis.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis.Editor
+namespace OmnisEditor
 {
     [CustomPropertyDrawer(typeof(FloatRange))]
     public class FloatRangeDrawer : PropertyDrawer

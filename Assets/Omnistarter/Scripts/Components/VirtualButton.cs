@@ -1,8 +1,8 @@
 // author: Omnistudio
-// version: 2026.03.10
+// version: 2026.03.11
 
-using Omnis.Editor;
 using Omnis.Utils;
+using OmnisEditor;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -122,6 +122,8 @@ namespace Omnis
                 longPress.pressTime);
         }
         private Coroutine Zoom(float scale) {
+            if (!isActiveAndEnabled) return null;
+
             var oldLocalScale = transform.localScale;
             var newLocalScale = scale * originalLocalScale;
 

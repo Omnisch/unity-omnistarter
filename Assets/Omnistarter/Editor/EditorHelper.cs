@@ -1,17 +1,17 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.03.11
 
 using Omnis.Utils;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Omnis.Editor
+namespace OmnisEditor
 {
     /// <summary>
     /// Auxiliary functions of UnityEditor
     /// </summary>
-    public class EditorHelper : UnityEditor.Editor
+    public class EditorHelper : Editor
     {
         #region Inspector
         /// <summary>
