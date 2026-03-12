@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.11
+// version: 2026.03.12
 // drafted by ChatGPT
 
 using Omnis.Utils;
@@ -69,8 +69,8 @@ namespace OmnisEditor
             var hides = GetAttributes<HideIfAttribute>(fieldProp, groupRoot);
 
             // AND all ShowIf; NAND all HideIf
-            bool showOk = shows.All(a => CompareAgainst(groupRoot, a.OtherProperty, a.AnyEquals));
-            bool hideOk = hides.All(a => !CompareAgainst(groupRoot, a.OtherProperty, a.AnyEquals));
+            bool showOk = shows.All(a => CompareAgainst(groupRoot, a.otherProperty, a.anyEquals));
+            bool hideOk = hides.All(a => !CompareAgainst(groupRoot, a.otherProperty, a.anyEquals));
 
             return showOk && hideOk;
         }
@@ -78,7 +78,7 @@ namespace OmnisEditor
         private static bool IsDisabled(SerializedProperty fieldProp, SerializedProperty groupRoot) {
             var disables = GetAttributes<DisableIfAttribute>(fieldProp, groupRoot);
             // OR all DisableIf
-            return disables.Any(a => CompareAgainst(groupRoot, a.OtherProperty, a.AnyEquals));
+            return disables.Any(a => CompareAgainst(groupRoot, a.otherProperty, a.anyEquals));
         }
 
         private static bool CompareAgainst(SerializedProperty groupRoot, string otherPropName, object[] anyEquals) {
@@ -93,7 +93,7 @@ namespace OmnisEditor
             }
 
             // Compare depending on type
-            bool matched = false;
+            bool matched;
             switch (other.propertyType) {
                 case SerializedPropertyType.Boolean:
                     matched = anyEquals.Any(v => TypeHelper.ToBool(v) == other.boolValue);

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.25
+// version: 2026.03.12
 
 using System;
 using System.Collections.Generic;
@@ -14,49 +14,40 @@ namespace Omnis.Utils
     public static class StringHelper
     {
         #region Han Characters
-        public static readonly string[] hanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
-        public static readonly string[] hanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
-        private static readonly string[] unit = { "", "十", "百", "千", "万", "十", "百", "千", "亿" };
-        private static readonly string[] unitFormal = { "", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿" };
+        public static readonly string[] HanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
+        public static readonly string[] HanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
+        private static readonly string[] HanUnit = { "", "十", "百", "千", "万", "十", "百", "千", "亿" };
+        private static readonly string[] HanUnitFormal = { "", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿" };
 
-        public static string ParseToHanCardinal(this string numStr, bool useFormal = false)
-        {
+        public static string ParseToHanCardinal(this string numStr, bool useFormal = false) {
             // Not a number.
             if (!float.TryParse(numStr, out float num)) return "NAN";
 
             var splitted = num.ToString("F99").TrimEnd('0').Split('.');
             string integerPart = splitted[0];
 
-            var numbers = useFormal ? hanNumbersFormal : hanNumbers;
-            var units = useFormal ? unitFormal : unit;
+            var numbers = useFormal ? HanNumbersFormal : HanNumbers;
+            var units = useFormal ? HanUnitFormal : HanUnit;
             string integerStr = "";
 
-            if (integerPart == "0")
-            {
+            if (integerPart == "0") {
                 integerStr = numbers[0];
-            }
-            else
-            {
+            } else {
                 int length = integerPart.Length;
                 int midZero = 0;
 
-                for (int i = 0; i < length; i++)
-                {
+                for (int i = 0; i < length; i++) {
                     int digit = integerPart[i] - '0';
                     int unitIndex = (length - 2 - i) % 8 + 1;
 
-                    if (digit == 0)
-                    {
+                    if (digit == 0) {
                         midZero++;
                         if (unitIndex % 8 == 0)
                             integerStr += units[unitIndex];
                         else if (midZero < 4 && unitIndex % 4 == 0)
                             integerStr += units[unitIndex];
-                    }
-                    else
-                    {
-                        if (midZero > 0)
-                        {
+                    } else {
+                        if (midZero > 0) {
                             integerStr += numbers[0];
                             midZero = 0;
                         }
@@ -66,22 +57,19 @@ namespace Omnis.Utils
             }
 
             if (!useFormal)
-            {
                 if (integerStr.StartsWith("一十"))
                     integerStr = integerStr[1..];
-            }
 
             string decimalStr = splitted[1].ParseToHanIndividual(useFormal);
 
             return decimalStr == "" ? integerStr : integerStr + "点" + decimalStr;
         }
-        public static string ParseToHanIndividual(this string numStr, bool useFormal = false)
-        {
+        
+        public static string ParseToHanIndividual(this string numStr, bool useFormal = false) {
             string result = "";
-            var numbers = useFormal ? hanNumbersFormal : hanNumbers;
+            var numbers = useFormal ? HanNumbersFormal : HanNumbers;
 
-            foreach (char digit in numStr)
-            {
+            foreach (char digit in numStr) {
                 if (digit >= '0' && digit <= '9')
                     result += numbers[digit - '0'];
                 else
@@ -124,9 +112,7 @@ namespace Omnis.Utils
                 }
             }
 
-            for (int i = 0; i < line.Length; i++) {
-                char c = line[i];
-
+            foreach (char c in line) {
                 if (escaping) {
                     escaping = false;
 
@@ -196,9 +182,9 @@ namespace Omnis.Utils
         #endregion
 
         #region Extensions
-        public static string TrimStart(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
+        public static string TrimStart(this string str, string trimString, StringComparison cmp = StringComparison.Ordinal)
             => str != null && trimString != null && str.StartsWith(trimString, cmp) ? str[trimString.Length..] : str;
-        public static string TrimEnd(this string str, string trimString, System.StringComparison cmp = System.StringComparison.Ordinal)
+        public static string TrimEnd(this string str, string trimString, StringComparison cmp = StringComparison.Ordinal)
             => str != null && trimString != null && str.EndsWith(trimString, cmp) ? str[..^trimString.Length] : str;
 
 

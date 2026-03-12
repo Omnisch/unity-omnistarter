@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.29
+// version: 2026.03.12
 
 using System;
 using System.Collections;
@@ -26,7 +26,7 @@ namespace Omnis.Audio
         }
 
         public static AudioClip Record(MonoBehaviour mono, int lengthSec, int sampleRate = 16000) {
-            AudioClip clip = Start(lengthSec, sampleRate);
+            var clip = Start(lengthSec, sampleRate);
 
             if (clip == null) {
                 return null;

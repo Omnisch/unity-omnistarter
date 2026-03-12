@@ -26,8 +26,8 @@ namespace Omnis
         [ConditionalGroup]
         public EasingSettings easing = new(Easing.EasingType.ElasticOut);
 
-        private bool canceled = false;
-        private float longPressProgress = 0; // 0 ~ 1
+        private bool canceled;
+        private float longPressProgress; // 0 ~ 1
         private Coroutine longPressCoroutine;
         private Coroutine zoomCoroutine;
         private Coroutine ZoomCoroutine {
@@ -55,7 +55,7 @@ namespace Omnis
                     }
 
                     // animation
-                    ZoomCoroutine = Zoom(animScale == 0f ? 1f : (1f / animScale));
+                    ZoomCoroutine = Zoom(animScale == 0f ? 1f : 1f / animScale);
 
                 } else {
                     if (!canceled) {
@@ -101,7 +101,7 @@ namespace Omnis
                 if (longPressCoroutine != null) {
                     StopCoroutine(longPressCoroutine);
                 }
-                if (longPressProgress > 0f && longPressProgress < 1f) {
+                if (longPressProgress is > 0f and < 1f) {
                     longPress.notLongEnoughCallback?.Invoke();
                 }
             }
@@ -110,7 +110,7 @@ namespace Omnis
 
         private Coroutine LongPressHold() {
             return this.Ease(
-                (value) => {
+                value => {
                     longPressProgress = value;
                     longPress.progressCallback?.Invoke(value);
                 },
@@ -130,7 +130,7 @@ namespace Omnis
             if (oldLocalScale == newLocalScale) return null;
 
             return this.Ease(
-                (value) => {
+                value => {
                     transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
                 },
                 easing.Evaluate, easingTime);

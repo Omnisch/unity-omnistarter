@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.10
+// version: 2026.03.12
 
 using System;
 using UnityEngine;
@@ -49,43 +49,49 @@ namespace Omnis.Utils
         public static float CircOut(float x) => Mathf.Sqrt(1f - (x - 1f) * (x - 1f));
 
 
-        public static float BackIn(float x)
-        {
+        public static float BackIn(float x) {
             const float c1 = 1.70158f, c3 = 2.70158f;
             return c3 * x * x * x - c1 * x * x;
         }
-        public static float BackOut(float x)
-        {
+        
+        public static float BackOut(float x) {
             const float c1 = 1.70158f, c3 = 2.70158f;
             return 1f + c3 * (x - 1f) * (x - 1f) * (x - 1f) + c1 * (x - 1f) * (x - 1f);
         }
 
 
-        public static float ElasticIn(float x)
-        {
+        public static float ElasticIn(float x) {
             const float c4 = 2f * Mathf.PI / 3f;
-            return x == 0f ? 0f : (x == 1f ? 1f : -Mathf.Pow(2f, 10f * (x - 1f)) * Mathf.Sin((10f * x - 10.75f) * c4));
+            return x switch {
+                0f => 0f,
+                1f => 1f,
+                _ => -Mathf.Pow(2f, 10f * (x - 1f)) * Mathf.Sin((10f * x - 10.75f) * c4)
+            };
         }
-        public static float ElasticOut(float x)
-        {
+        
+        public static float ElasticOut(float x) {
             const float c4 = 2f * Mathf.PI / 3f;
-            return x == 0f ? 0f : (x == 1f ? 1f : Mathf.Pow(2f, -10f * x) * Mathf.Sin((10f * x - 0.75f) * c4) + 1f);
+            return x switch {
+                0f => 0f,
+                1f => 1f,
+                _ => Mathf.Pow(2f, -10f * x) * Mathf.Sin((10f * x - 0.75f) * c4) + 1f
+            };
         }
 
 
-        public static float BounceIn(float x)
-        {
+        public static float BounceIn(float x) {
             return 1f - BounceOut(1f - x);
         }
-        public static float BounceOut(float x)
-        {
+        
+        public static float BounceOut(float x) {
             const float n1 = 7.5625f;
             const float d1 = 2.75f;
-
-            if (x < 1f / d1) return n1 * x * x;
-            else if (x < 2f / d1) return n1 * (x -= 1.5f / d1) * x + 0.75f;
-            else if (x < 2.5f / d1) return n1 * (x -= 2.25f / d1) * x + 0.9375f;
-            else return n1 * (x -= 2.625f / d1) * x + 0.984375f;
+            return x switch {
+                < 1f / d1 => n1 * x * x,
+                < 2f / d1 => n1 * (x -= 1.5f / d1) * x + 0.75f,
+                < 2.5f / d1 => n1 * (x -= 2.25f / d1) * x + 0.9375f,
+                _ => n1 * (x -= 2.625f / d1) * x + 0.984375f
+            };
         }
 
 

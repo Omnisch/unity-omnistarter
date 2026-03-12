@@ -1,4 +1,5 @@
 using Omnis.Utils;
+using UnityEditor;
 
     #ROOTNAMESPACEBEGIN#
 public partial class #PARTIALSCRIPTNAME#
@@ -26,6 +27,20 @@ public partial class #PARTIALSCRIPTNAME#
     {
         if (!EnsureSingleton())
             return;
+    }
+}
+
+
+[CustomEditor(typeof(#PARTIALSCRIPTNAME#))]
+public class #PARTIALSCRIPTNAME#SingletonEditor : Editor
+{
+    public override void OnInspectorGUI() {
+        EditorGUILayout.HelpBox(
+            "This is a singleton that can be accessed by Instance. " +
+            "But it also prevents other instances from creating, even over scenes.", MessageType.Info);
+        EditorGUILayout.Space();
+
+        DrawDefaultInspector();
     }
 }
 #ROOTNAMESPACEEND#

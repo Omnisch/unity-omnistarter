@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.05
+// version: 2026.03.12
 
 using Newtonsoft.Json;
 using System;
@@ -78,8 +78,8 @@ namespace Omnis.Utils
         }
 
         #region Full Shorthands
-        public async static Task<byte[]> GetAsync(string url, string auth, Action<string, LogLevel> upstreamLog = null) => await GetAsync(url, auth, null, upstreamLog);
-        public async static Task<byte[]> GetAsync(
+        public static async Task<byte[]> GetAsync(string url, string auth, Action<string, LogLevel> upstreamLog = null) => await GetAsync(url, auth, null, upstreamLog);
+        public static async Task<byte[]> GetAsync(
                 string url,
                 string auth,
                 List<KeyValuePair<string, string>> moreHeaders,
@@ -93,8 +93,8 @@ namespace Omnis.Utils
         }
 
 
-        public async static Task<byte[]> PostJsonAsync(string url, string auth, object body, Action<string, LogLevel> upstreamLog = null) => await PostJsonAsync(url, auth, body, null, upstreamLog);
-        public async static Task<byte[]> PostJsonAsync(
+        public static async Task<byte[]> PostJsonAsync(string url, string auth, object body, Action<string, LogLevel> upstreamLog = null) => await PostJsonAsync(url, auth, body, null, upstreamLog);
+        public static async Task<byte[]> PostJsonAsync(
             string url,
             string auth,
             object body,

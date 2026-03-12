@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.05
+// version: 2026.03.12
 
 using OdinSerializer;
 using System.IO;
@@ -13,16 +13,14 @@ namespace Omnis
     public static class IO
     {
         public static bool SaveToFile(object data, string path, bool backupOne = false) {
-            if (backupOne)
-                return SaveWithBackup(data, path);
-            else
-                return SaveWithoutBackup(data, path);
+            return backupOne
+                ? SaveWithBackup(data, path)
+                : SaveWithoutBackup(data, path);
         }
         public static bool SaveToFile(object data, string dir, string fileName, bool backupOne = false) {
-            if (backupOne)
-                return SaveWithBackup(data, Path.Combine(dir, fileName));
-            else
-                return SaveWithoutBackup(data, Path.Combine(dir, fileName));
+            return backupOne
+                ? SaveWithBackup(data, Path.Combine(dir, fileName))
+                : SaveWithoutBackup(data, Path.Combine(dir, fileName));
         }
         private static bool SaveWithoutBackup(object data, string path)
         {

@@ -6,15 +6,12 @@ namespace Omnis
     {
         public static InputHandler Instance { get; private set; }
 
-        private bool EnsureSingleton()
-        {
-            if (Instance != null && Instance != this)
-            {
+        private bool EnsureSingleton() {
+            if (Instance != null && Instance != this) {
                 Destroy(gameObject);
                 return false;
             }
-            else
-            {
+            else {
                 Instance = this;
                 this.DoWhen(
                     () => gameObject.scene.isLoaded,

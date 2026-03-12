@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.11
+// version: 2026.03.12
 
 using System;
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace OmnisEditor
     /// <summary>
     /// Put this on a serializable field (struct/class) to let ConditionalGroupDrawer render its children.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class ConditionalGroupAttribute : PropertyAttribute { }
 
     /// <summary>
@@ -24,11 +24,11 @@ namespace OmnisEditor
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ShowIfAttribute : PropertyAttribute
     {
-        public readonly string OtherProperty;
-        public readonly object[] AnyEquals;  // enum literals allowed
+        public readonly string otherProperty;
+        public readonly object[] anyEquals;  // enum literals allowed
         public ShowIfAttribute(string otherProperty, params object[] anyEquals) {
-            OtherProperty = otherProperty;
-            AnyEquals = anyEquals ?? Array.Empty<object>();
+            this.otherProperty = otherProperty;
+            this.anyEquals = anyEquals ?? Array.Empty<object>();
         }
     }
 
@@ -39,11 +39,11 @@ namespace OmnisEditor
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class HideIfAttribute : PropertyAttribute
     {
-        public readonly string OtherProperty;
-        public readonly object[] AnyEquals;
+        public readonly string otherProperty;
+        public readonly object[] anyEquals;
         public HideIfAttribute(string otherProperty, params object[] anyEquals) {
-            OtherProperty = otherProperty;
-            AnyEquals = anyEquals ?? Array.Empty<object>();
+            this.otherProperty = otherProperty;
+            this.anyEquals = anyEquals ?? Array.Empty<object>();
         }
     }
 
@@ -54,11 +54,11 @@ namespace OmnisEditor
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class DisableIfAttribute : PropertyAttribute
     {
-        public readonly string OtherProperty;
-        public readonly object[] AnyEquals;
+        public readonly string otherProperty;
+        public readonly object[] anyEquals;
         public DisableIfAttribute(string otherProperty, params object[] anyEquals) {
-            OtherProperty = otherProperty;
-            AnyEquals = anyEquals ?? Array.Empty<object>();
+            this.otherProperty = otherProperty;
+            this.anyEquals = anyEquals ?? Array.Empty<object>();
         }
     }
 }

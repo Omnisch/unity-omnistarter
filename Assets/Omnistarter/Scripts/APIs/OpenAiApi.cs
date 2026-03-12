@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.21
+// version: 2026.03.12
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,7 +12,7 @@ namespace Omnis.API
 {
     public static class OpenAiApi
     {
-        private static readonly string BaseUrl = "https://api.openai.com/v1/responses";
+        private const string BaseUrl = "https://api.openai.com/v1/responses";
 
         /// <returns>response.output[0].content[0].text</returns>
         public static async Task<string> TextGeneration(string apiKey, string model, string userPrompt, string sysPrompt = null, object textFormat = null, Action<string, LogLevel> upstreamLog = null) {

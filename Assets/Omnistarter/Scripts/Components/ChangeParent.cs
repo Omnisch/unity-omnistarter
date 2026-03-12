@@ -12,19 +12,19 @@ namespace Omnis
     {
         [SerializeField] private Transform[] targets;
         [SerializeField] private int targetIndex = 0;
-        [Header("Animation")]
-        public float lerpTime = 0.3f;
-        [ConditionalGroup]
-        public EasingSettings easing = new(Easing.EasingType.CubicOut);
+        [Header("Animation")] public float lerpTime = 0.3f;
+        [ConditionalGroup] public EasingSettings easing = new(Easing.EasingType.CubicOut);
 
-        private Coroutine moveCoroutine = null;
+        private Coroutine moveCoroutine;
 
         [ContextMenu("Move To Next Parent")]
         public void MoveToNextParent() {
             if (targets != null && targets.Length > 0)
                 SetParent((targetIndex + 1) % targets.Length);
         }
+
         public void SetParent(int i) => SetParent(i, null);
+
         public void SetParent(int i, System.Action callback) {
             if (i < 0 || i >= targets.Length) {
                 Debug.LogWarning("Manual-set index out of bounds.");
@@ -54,7 +54,7 @@ namespace Omnis
                     transform.localScale = Vector3.one;
                     callback?.Invoke();
                 }
-            }, easing.Evaluate, lerpTime, false);
+            }, easing.Evaluate, lerpTime);
         }
     }
 }

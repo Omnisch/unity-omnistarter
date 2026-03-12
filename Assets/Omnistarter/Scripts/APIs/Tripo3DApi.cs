@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.26
+// version: 2026.03.12
 
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
@@ -13,7 +13,7 @@ namespace Omnis.API
 {
     public static class Tripo3DApi
     {
-        private static readonly string BaseUrl = "https://api.tripo3d.ai/v2/openapi";
+        private const string BaseUrl = "https://api.tripo3d.ai/v2/openapi";
         public static readonly string ModelFormat = "glb"; // (glb, fbx)
 
 
@@ -35,17 +35,17 @@ namespace Omnis.API
             if (request.result != UnityWebRequest.Result.Success) {
                 LogHelper.LogError($"HTTP Error: {request.responseCode} - {request.error}", upstreamLog);
                 return null;
-            } else {
-                LogHelper.LogInfo($"HTTP Success: {request.downloadHandler.text}", upstreamLog);
-                var dataRaw = request.downloadHandler.data;
-                var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-                return data.SelectToken("data.image_token").Value<string>();
             }
+            
+            LogHelper.LogInfo($"HTTP Success: {request.downloadHandler.text}", upstreamLog);
+            var dataRaw = request.downloadHandler.data;
+            var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
+            return data.SelectToken("data.image_token")?.Value<string>();
         }
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateTextToImageTask(string api_key, string prompt, Action<string, LogLevel> upstreamLog = null) {
+        public static async Task<string> CreateTextToImageTask(string api_key, string prompt, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "generate_image",
                 prompt
@@ -53,18 +53,18 @@ namespace Omnis.API
 
             var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-            return data.SelectToken("data.task_id").Value<string>();
+            return data.SelectToken("data.task_id")?.Value<string>();
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToImageTaskFromToken(string api_key, string file_token, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
+        public static async Task<string> CreateImageToImageTaskFromToken(string api_key, string file_token, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
             => await CreateImageToImageTask(api_key, file_token, null, prompt, t_pose, upstreamLog);
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToImageTaskFromUrl(string api_key, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
+        public static async Task<string> CreateImageToImageTaskFromUrl(string api_key, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null)
             => await CreateImageToImageTask(api_key, null, url, prompt, t_pose, upstreamLog);
 
-        private async static Task<string> CreateImageToImageTask(string api_key, string file_token, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null) {
+        private static async Task<string> CreateImageToImageTask(string api_key, string file_token, string url, string prompt, bool t_pose, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "generate_image",
                 //model_version = "gemini_2.5_flash_image_preview",
@@ -79,18 +79,18 @@ namespace Omnis.API
 
             var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-            return data.SelectToken("data.task_id").Value<string>();
+            return data.SelectToken("data.task_id")?.Value<string>();
         }
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token, Action<string, LogLevel> upstreamLog = null)
+        public static async Task<string> CreateImageToModelTaskFromToken(string api_key, string file_token, Action<string, LogLevel> upstreamLog = null)
             => await CreateImageToModelTask(api_key, file_token, null, upstreamLog);
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateImageToModelTaskFromUrl(string api_key, string url, Action<string, LogLevel> upstreamLog = null)
+        public static async Task<string> CreateImageToModelTaskFromUrl(string api_key, string url, Action<string, LogLevel> upstreamLog = null)
             => await CreateImageToModelTask(api_key, null, url, upstreamLog);
 
-        private async static Task<string> CreateImageToModelTask(string api_key, string file_token, string url, Action<string, LogLevel> upstreamLog = null) {
+        private static async Task<string> CreateImageToModelTask(string api_key, string file_token, string url, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "image_to_model",
                 model_version = "v3.0-20250812",
@@ -104,12 +104,12 @@ namespace Omnis.API
 
             var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-            return data.SelectToken("data.task_id").Value<string>();
+            return data.SelectToken("data.task_id")?.Value<string>();
         }
 
 
         /// <returns>data.task_id</returns>
-        public async static Task<string> CreateAnimateRigTask(string api_key, string task_id, Action<string, LogLevel> upstreamLog = null) {
+        public static async Task<string> CreateAnimateRigTask(string api_key, string task_id, Action<string, LogLevel> upstreamLog = null) {
             var requestData = new {
                 type = "animate_rig",
                 original_model_task_id = task_id,
@@ -118,7 +118,7 @@ namespace Omnis.API
 
             var dataRaw = await HttpHelper.PostJsonAsync($"{BaseUrl}/task", $"Bearer {api_key}", requestData, upstreamLog);
             var data = JObject.Parse(Encoding.UTF8.GetString(dataRaw));
-            return data.SelectToken("data.task_id").Value<string>();
+            return data.SelectToken("data.task_id")?.Value<string>();
         }
 
 
@@ -136,7 +136,7 @@ namespace Omnis.API
                 if (downloadData != null) {
                     string downloadText = Encoding.UTF8.GetString(downloadData);
                     var statusResponse = JObject.Parse(downloadText);
-                    if (statusResponse?["data"] != null) {
+                    if (statusResponse["data"] != null) {
                         var data = statusResponse["data"];
                         var currentStatus = data?.Value<string>("status");
                         var progress = data?.Value<float>("progress");
@@ -144,19 +144,21 @@ namespace Omnis.API
                         percentageCallback?.Invoke((progress ?? 0f) / 100f);
                         LogHelper.LogInfo($"Task status: {currentStatus} | progress: {progress}%", upstreamLog);
 
-                        if (currentStatus.ToLower() == "success") {
+                        if (currentStatus?.ToLower() == "success") {
                             try {
                                 outputUrl =
-                                    data?.SelectToken("output.pbr_model") != null ? data.SelectToken("output.pbr_model").Value<string>() :
-                                    data?.SelectToken("output.model") != null ? data.SelectToken("output.model").Value<string>() :
-                                    data?.SelectToken("output.generated_image").Value<string>();
+                                    data?.SelectToken("output.pbr_model") != null ? data.SelectToken("output.pbr_model")?.Value<string>() :
+                                    data?.SelectToken("output.model") != null ? data.SelectToken("output.model")?.Value<string>() :
+                                    data?.SelectToken("output.generated_image")?.Value<string>();
                                 LogHelper.LogInfo($"Task completed, result URL: {outputUrl}", upstreamLog);
                             }
                             catch {
                                 LogHelper.LogError("Task completed but the result is empty.", upstreamLog);
                             }
                             break;
-                        } else if (currentStatus.ToLower() == "failed") {
+                        }
+                        
+                        if (currentStatus?.ToLower() == "failed") {
                             LogHelper.LogError($"Task failed: {statusResponse?.Value<string>("code")}", upstreamLog);
                             break;
                         }
