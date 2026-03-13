@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.11
+// version: 2026.03.13
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -80,10 +80,10 @@ namespace Omnis
                     instancedMat.SetTexture(nameOfParam, tex);
                     break;
                 case Vector2 v2:
-                    instancedMat.SetVector(nameOfParam, (Vector4)v2);
+                    instancedMat.SetVector(nameOfParam, v2);
                     break;
                 case Vector3 v3:
-                    instancedMat.SetVector(nameOfParam, (Vector4)v3);
+                    instancedMat.SetVector(nameOfParam, v3);
                     break;
                 case Vector4 v4:
                     instancedMat.SetVector(nameOfParam, v4);
@@ -104,13 +104,11 @@ namespace Omnis
                 StopCoroutine(last);
             }
 
-            paramDict[nameOfParam] = this.Ease((value) => {
-                PrivateSet(nameOfParam, Mathf.Lerp(from, to, value));
-
-                if (value == 1f) {
-                    callback?.Invoke();
-                }
-            }, easing.Evaluate, lerpTime);
+            paramDict[nameOfParam] = this.Ease(
+                value => PrivateSet(nameOfParam, Mathf.Lerp(from, to, value)),
+                () => callback?.Invoke(),
+                easing.Evaluate, lerpTime
+            );
         }
 
         public void LerpTo(string nameOfParam, Color to, Action callback = null)
@@ -120,13 +118,11 @@ namespace Omnis
                 StopCoroutine(last);
             }
 
-            paramDict[nameOfParam] = this.Ease((value) => {
-                PrivateSet(nameOfParam, ColorHelper.Lerp(from, to, value));
-
-                if (value == 1f) {
-                    callback?.Invoke();
-                }
-            }, easing.Evaluate, lerpTime);
+            paramDict[nameOfParam] = this.Ease(
+                value => PrivateSet(nameOfParam, ColorHelper.Lerp(from, to, value)),
+                () => callback?.Invoke(),
+                easing.Evaluate, lerpTime
+            );
         }
         #endregion
 
@@ -134,7 +130,7 @@ namespace Omnis
         #region Unity Messages
         private void Awake() {
             Debug.Assert(imageToEdit != null);
-            paramDict = new();
+            paramDict = new Dictionary<string, Coroutine>();
             EnsureMaterialInstance();
         }
 

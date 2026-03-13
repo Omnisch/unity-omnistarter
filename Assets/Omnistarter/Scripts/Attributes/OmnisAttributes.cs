@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.03.13
 
 using System;
 using UnityEngine;
@@ -34,7 +34,7 @@ namespace OmnisEditor
 
     /// <summary>
     /// Hide this field if the sibling property equals to one of the given values.<br/>
-    /// AND when multiple attributes applyed.
+    /// AND when multiple attributes applied.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class HideIfAttribute : PropertyAttribute
@@ -49,7 +49,7 @@ namespace OmnisEditor
 
     /// <summary>
     /// Disable this field if the sibling property equals to one of the given values.<br/>
-    /// OR when multiple attributes applyed.
+    /// OR when multiple attributes applied.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class DisableIfAttribute : PropertyAttribute

@@ -5,8 +5,8 @@ using System.Reflection;
 
 /// <summary>
 /// Debug Extension
-/// 	- Static class that extends Unity's debugging functionallity.
-/// 	- Attempts to mimic Unity's existing debugging behaviour for ease-of-use.
+/// 	- Static class that extends Unity's debugging functionality.
+/// 	- Attempts to mimic Unity's existing debugging behavior for ease-of-use.
 /// 	- Includes gizmo drawing methods for less memory-intensive debug visualization.
 /// </summary>
 

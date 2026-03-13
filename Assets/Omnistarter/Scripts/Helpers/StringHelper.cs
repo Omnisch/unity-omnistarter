@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.03.13
 
 using System;
 using System.Collections.Generic;
@@ -23,8 +23,8 @@ namespace Omnis.Utils
             // Not a number.
             if (!float.TryParse(numStr, out float num)) return "NAN";
 
-            var splitted = num.ToString("F99").TrimEnd('0').Split('.');
-            string integerPart = splitted[0];
+            var split = num.ToString("F99").TrimEnd('0').Split('.');
+            string integerPart = split[0];
 
             var numbers = useFormal ? HanNumbersFormal : HanNumbers;
             var units = useFormal ? HanUnitFormal : HanUnit;
@@ -60,7 +60,7 @@ namespace Omnis.Utils
                 if (integerStr.StartsWith("一十"))
                     integerStr = integerStr[1..];
 
-            string decimalStr = splitted[1].ParseToHanIndividual(useFormal);
+            string decimalStr = split[1].ParseToHanIndividual(useFormal);
 
             return decimalStr == "" ? integerStr : integerStr + "点" + decimalStr;
         }
@@ -136,7 +136,7 @@ namespace Omnis.Utils
                     continue;
                 }
 
-                if (supportEscapes && c == '\\') {
+                if (supportEscapes && c is '\\') {
                     escaping = true;
                     continue;
                 }
@@ -152,7 +152,7 @@ namespace Omnis.Utils
                 }
 
                 // Not in quotes
-                if (c == '"' || c == '\'') {
+                if (c is '"' or '\'') {
                     inQuotes = true;
                     quoteChar = c;
                     continue;

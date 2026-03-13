@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.11
+// version: 2026.03.13
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -119,7 +119,8 @@ namespace Omnis
                     longPressProgress = 0f;
                 },
                 Easing.Linear,
-                longPress.pressTime);
+                longPress.pressTime
+            );
         }
         private Coroutine Zoom(float scale) {
             if (!isActiveAndEnabled) return null;
@@ -133,7 +134,8 @@ namespace Omnis
                 value => {
                     transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
                 },
-                easing.Evaluate, easingTime);
+                easing.Evaluate, easingTime
+            );
         }
 
         private void Start() {

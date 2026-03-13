@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.03.13
 
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
@@ -159,7 +159,7 @@ namespace Omnis.API
                         }
                         
                         if (currentStatus?.ToLower() == "failed") {
-                            LogHelper.LogError($"Task failed: {statusResponse?.Value<string>("code")}", upstreamLog);
+                            LogHelper.LogError($"Task failed: {statusResponse.Value<string>("code")}", upstreamLog);
                             break;
                         }
                     } else {

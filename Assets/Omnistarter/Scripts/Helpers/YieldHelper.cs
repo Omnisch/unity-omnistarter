@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.13
 
 using System;
 using System.Collections;
@@ -174,7 +174,7 @@ namespace Omnis.Utils
             final?.Invoke();
         }
 
-        /// <inheritdoc cref="GiveDeltaTime(Action{float}, Action, float, int, bool)"/>
+        /// <inheritdoc cref="EGiveDeltaTime(Action{float}, Action, float, int, bool)"/>
         public static Coroutine GiveDeltaTime(this MonoBehaviour mono, Action<float> action, Action final = null, float time = 1f, int frameInterval = 1, bool fixedUpdate = false)
             => mono.StartCoroutine(EGiveDeltaTime(action, final, time, frameInterval, fixedUpdate));
         #endregion

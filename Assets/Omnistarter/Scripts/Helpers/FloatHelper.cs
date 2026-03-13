@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.13
 
 using System;
 using UnityEngine;
@@ -28,7 +28,7 @@ namespace Omnis.Utils
 
         #region Simple operations
         /// <summary>0.0001</summary>
-        public static readonly float EpsilonLoose = 0.0001f;
+        public const float EpsilonLoose = 0.0001f;
 
 
         /// <summary>

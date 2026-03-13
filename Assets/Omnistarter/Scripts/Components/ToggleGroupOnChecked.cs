@@ -1,5 +1,5 @@
 // author: ChatGPT
-// version: 2026.02.25
+// version: 2026.03.13
 
 using System;
 using System.Collections.Generic;
@@ -18,26 +18,26 @@ namespace Omnis
         [Serializable] public class ToggleEvent : UnityEvent<Toggle> { }
 
         [Header("Raised when a toggle becomes ON")]
-        public IntEvent OnCheckedId = new();
-        public StringEvent OnCheckedName = new();
-        public ToggleEvent OnCheckedToggle = new();
+        public IntEvent onCheckedId = new();
+        public StringEvent onCheckedName = new();
+        public ToggleEvent onCheckedToggle = new();
 
         [Tooltip("If true, fires once at Start for the initially ON toggle (if any).")]
-        public bool FireInitial = true;
+        public bool fireInitial = true;
 
-        private ToggleGroup _group;
-        private readonly List<Toggle> _toggles = new();
+        private ToggleGroup group;
+        private readonly List<Toggle> toggles = new();
 
         private void Awake() {
-            _group = GetComponent<ToggleGroup>();
+            group = GetComponent<ToggleGroup>();
 
             // Collect toggles under this object (you can switch to true if nested).
-            GetComponentsInChildren(false, _toggles);
+            GetComponentsInChildren(false, toggles);
 
             // Ensure they belong to this group and register callbacks.
-            foreach (var t in _toggles) {
+            foreach (var t in toggles) {
                 if (t == null) continue;
-                t.group = _group;
+                t.group = group;
 
                 // Capture local variable to avoid closure pitfalls.
                 var toggle = t;
@@ -46,25 +46,25 @@ namespace Omnis
                     if (!isOn) return; // only care when turned ON
 
                     int id = toggle.transform.GetSiblingIndex();
-                    OnCheckedId.Invoke(id);
-                    string name = toggle.gameObject.name;
-                    OnCheckedName.Invoke(name);
-                    OnCheckedToggle.Invoke(toggle);
+                    onCheckedId.Invoke(id);
+                    string n = toggle.gameObject.name;
+                    onCheckedName.Invoke(n);
+                    onCheckedToggle.Invoke(toggle);
                 });
             }
         }
 
         private void Start() {
-            if (!FireInitial) return;
+            if (!fireInitial) return;
 
             // If one is already ON, emit it once.
-            foreach (var t in _toggles) {
+            foreach (var t in toggles) {
                 if (t != null && t.isOn) {
                     int id = t.transform.GetSiblingIndex();
-                    OnCheckedId.Invoke(id);
-                    string name = t.gameObject.name;
-                    OnCheckedName.Invoke(name);
-                    OnCheckedToggle.Invoke(t);
+                    onCheckedId.Invoke(id);
+                    string n = t.gameObject.name;
+                    onCheckedName.Invoke(n);
+                    onCheckedToggle.Invoke(t);
                     break;
                 }
             }

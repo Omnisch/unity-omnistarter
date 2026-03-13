@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.02
+// version: 2026.03.13
 
 using System;
 using UnityEngine;
@@ -9,7 +9,7 @@ namespace Omnis.Utils
     public static class TypeHelper
     {
         public static bool IsIntegerLike(object v) =>
-            v is sbyte || v is byte || v is short || v is ushort || v is int || v is uint || v is long || v is ulong;
+            v is sbyte or byte or short or ushort or int or uint or long or ulong;
 
         public static bool ToBool(object v) {
             if (v is bool b) return b;

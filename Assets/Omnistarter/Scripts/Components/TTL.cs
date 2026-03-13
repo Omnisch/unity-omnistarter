@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.09
+// version: 2026.03.13
 
 using Omnis.Utils;
 using UnityEngine;
@@ -26,13 +26,14 @@ namespace Omnis
 
         #region Unity methods
         private void Start() {
-            this.Ease((value) => {
-                OnLifeSpan?.Invoke(value);
-                if (value == 1f) {
+            this.Ease(
+                value => OnLifeSpan?.Invoke(value),
+                () => {
                     goodbyeCallback?.Invoke();
                     Destroy(gameObject);
-                }
-            }, Utils.Easing.Linear, lifeTime);
+                },
+                Easing.Linear, lifeTime
+            );
         }
         #endregion
     }

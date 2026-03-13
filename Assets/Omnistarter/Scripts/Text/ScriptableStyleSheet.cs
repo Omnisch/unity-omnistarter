@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.30
+// version: 2026.03.13
 
 using System;
 using System.Collections.Generic;
@@ -28,12 +28,12 @@ namespace Omnis.Text
             /// The function to render texts.<br/>
             /// CharInfo: The character to be rendered.
             /// </summary>
-            public Action<CharInfo> render;
+            public Action<CharInfo> Render;
 
             public ScriptableRichTextTag(string name, Action<CharInfo> render)
             {
                 this.name = name;
-                this.render = render;
+                Render = render;
             }
         }
     }

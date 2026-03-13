@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.03.13
 
 using System;
 using UnityEngine;
@@ -37,8 +37,8 @@ namespace Omnis.Utils
         public static float QuintOut(float x) => 1f - (1f - x) * (1f - x) * (1f - x) * (1f - x) * (1f - x);
 
 
-        public static float ExpoIn(float x) => x == 0f ? 0f : Mathf.Pow(2f, 10f * (x - 1f));
-        public static float ExpoOut(float x) => x == 1f ? 1f : 1f - Mathf.Pow(2f, -10f * x);
+        public static float ExpoIn(float x) => x <= 0f ? 0f : Mathf.Pow(2f, 10f * (x - 1f));
+        public static float ExpoOut(float x) => x >= 1f ? 1f : 1f - Mathf.Pow(2f, -10f * x);
 
 
         /// <remarks>
@@ -95,8 +95,8 @@ namespace Omnis.Utils
         }
 
 
-        public static float Smoothstep(float x) => Mathf.SmoothStep(0f, 1f, x);
-        public static float Smootherstep(float x) => x <= 0f ? 0f : (x >= 1f ? 1f : x * x * x * (6f * x * x - 15f * x + 10f));
+        public static float SmoothStep(float x) => Mathf.SmoothStep(0f, 1f, x);
+        public static float SmootherStep(float x) => x <= 0f ? 0f : (x >= 1f ? 1f : x * x * x * (6f * x * x - 15f * x + 10f));
 
 
 
@@ -111,7 +111,7 @@ namespace Omnis.Utils
             BackIn, BackOut,
             ElasticIn, ElasticOut,
             BounceIn, BounceOut,
-            Smoothstep, Smootherstep
+            SmoothStep, SmootherStep
         }
         public static Func<float, float> Select(EasingType type)
             => type switch {
@@ -138,8 +138,8 @@ namespace Omnis.Utils
                 EasingType.ElasticOut => ElasticOut,
                 EasingType.BounceIn => BounceIn,
                 EasingType.BounceOut => BounceOut,
-                EasingType.Smoothstep => Smoothstep,
-                EasingType.Smootherstep => Smootherstep,
+                EasingType.SmoothStep => SmoothStep,
+                EasingType.SmootherStep => SmootherStep,
                 _ => Linear
             };
     }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.11
+// version: 2026.03.13
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -11,7 +11,7 @@ namespace Omnis
     public class ChangeParent : MonoBehaviour
     {
         [SerializeField] private Transform[] targets;
-        [SerializeField] private int targetIndex = 0;
+        [SerializeField] private int targetIndex;
         [Header("Animation")] public float lerpTime = 0.3f;
         [ConditionalGroup] public EasingSettings easing = new(Easing.EasingType.CubicOut);
 
@@ -19,7 +19,7 @@ namespace Omnis
 
         [ContextMenu("Move To Next Parent")]
         public void MoveToNextParent() {
-            if (targets != null && targets.Length > 0)
+            if (targets is { Length: > 0 })
                 SetParent((targetIndex + 1) % targets.Length);
         }
 
@@ -41,20 +41,22 @@ namespace Omnis
             transform.GetPositionAndRotation(out var oldPosition, out var oldRotation);
             var oldScale = transform.lossyScale;
 
-            moveCoroutine = this.Ease((value) => {
-                transform.SetPositionAndRotation(
-                    Vector3.Lerp(oldPosition, targets[targetIndex].position, value),
-                    Quaternion.Lerp(oldRotation, targets[targetIndex].rotation, value));
-                VectorHelper.SetGlobalScale(transform, Vector3.Lerp(oldScale, targets[targetIndex].lossyScale, value));
-
-                if (value == 1f) {
+            moveCoroutine = this.Ease(
+                value => {
+                    transform.SetPositionAndRotation(
+                        Vector3.Lerp(oldPosition, targets[targetIndex].position, value),
+                        Quaternion.Lerp(oldRotation, targets[targetIndex].rotation, value));
+                    VectorHelper.SetGlobalScale(transform, Vector3.Lerp(oldScale, targets[targetIndex].lossyScale, value));
+                },
+                () => {
                     moveCoroutine = null;
                     transform.SetParent(targets[targetIndex]);
                     transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
                     transform.localScale = Vector3.one;
                     callback?.Invoke();
-                }
-            }, easing.Evaluate, lerpTime);
+                },
+                easing.Evaluate, lerpTime
+            );
         }
     }
 }

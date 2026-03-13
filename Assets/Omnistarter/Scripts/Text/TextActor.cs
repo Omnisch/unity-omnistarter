@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.30
+// version: 2026.03.13
 
 using System.Collections;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace Omnis.Text
         public string actorId;
         [SerializeField] private string staticHead;
         public static readonly float DefaultPrintSpeed = 20f;
-        public bool allowEarlyNext = false;
+        public bool allowEarlyNext;
         [Header("Animation Scale")]
         [SerializeField][Range(-1, 1)] private float animScale = 1f;
         [SerializeField] private bool isWorldPos;
@@ -90,14 +90,14 @@ namespace Omnis.Text
 
                 // Perform rich text effects.
                 foreach (var tagInfo in tagInfoList) {
-                    // If all the finish-able tags are finished, it also count as ready.
+                    // If all the finish-able tags are finished, it also counts as ready.
                     Ready &= tagInfo.finished ?? true;
 
                     if (tagInfo.finished ?? false) continue;
 
-                    var tag = DialogManager.Instance.StyleSheet.Find((tag) => tag.name == tagInfo.name);
+                    var richTag = DialogManager.Instance.StyleSheet.Find(t => t.name == tagInfo.name);
                     for (int i = tagInfo.startIndex; i < tagInfo.endIndex; i++) {
-                        tag?.render(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
+                        richTag?.Render(new CharInfo(this, tagInfo, i, Time.time, Input.mousePosition));
                     }
                 }
 
@@ -120,8 +120,8 @@ namespace Omnis.Text
         }
 
 
-        private static readonly Regex openTag = new(@"<(?<name>\w+)(?<attrs>[^>]*?)>", RegexOptions.Compiled);
-        private static readonly Regex closeTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
+        private static readonly Regex OpenTag = new(@"<(?<name>\w+)(?<attrs>[^>]*?)>", RegexOptions.Compiled);
+        private static readonly Regex CloseTag = new(@"</(?<name>\w+)\s*>", RegexOptions.Compiled);
         private static List<TagInfo> ParseRichText(string src, out string srcVisible) {
             var result = new List<TagInfo>();
             var tmpList = new List<TagInfo>();
@@ -129,7 +129,7 @@ namespace Omnis.Text
 
             int visibleIndex = 0;
             for (int i = 0; i < src.Length;) {
-                var mClose = closeTag.Match(src, i);
+                var mClose = CloseTag.Match(src, i);
                 if (mClose.Success && mClose.Index == i) {
                     string n = mClose.Groups["name"].Value;
                     var open = tmpList.Find((tag) => tag.name == n);
@@ -151,7 +151,7 @@ namespace Omnis.Text
                     }
                 }
 
-                var mOpen = openTag.Match(src, i);
+                var mOpen = OpenTag.Match(src, i);
                 if (mOpen.Success && mOpen.Index == i) {
                     string n = mOpen.Groups["name"].Value;
 
