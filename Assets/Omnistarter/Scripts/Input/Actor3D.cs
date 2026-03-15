@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.10
+// version: 2026.03.15
 
 using Omnis.Utils;
 using System;
@@ -38,7 +38,7 @@ namespace Omnis
                 }
                 else if (value > 0f)
                 {
-                    jumpCoroutine = this.Ease(jumpAction, Easing.ExpoOut, jumpActionSpeed, true);
+                    jumpCoroutine = this.Ease(Easing.ExpoOut, jumpAction, null, jumpActionSpeed, true);
                 }
             }
         }

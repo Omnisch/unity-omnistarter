@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.15
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -112,9 +112,10 @@ namespace Omnis
             }
 
             paramDict[nameOfParam] = this.Ease(
+                easing.Evaluate,
                 value => PrivateSet(nameOfParam, Mathf.Lerp(from, to, value)),
                 () => callback?.Invoke(),
-                easing.Evaluate, lerpTime
+                lerpTime
             );
         }
 
@@ -126,9 +127,10 @@ namespace Omnis
             }
 
             paramDict[nameOfParam] = this.Ease(
+                easing.Evaluate,
                 value => PrivateSet(nameOfParam, ColorHelper.Lerp(from, to, value)),
                 () => callback?.Invoke(),
-                easing.Evaluate, lerpTime
+                lerpTime
             );
         }
         #endregion

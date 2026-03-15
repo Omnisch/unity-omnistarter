@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.15
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -42,6 +42,7 @@ namespace Omnis
             var oldScale = transform.lossyScale;
 
             moveCoroutine = this.Ease(
+                easing.Evaluate,
                 value => {
                     transform.SetPositionAndRotation(
                         Vector3.Lerp(oldPosition, targets[targetIndex].position, value),
@@ -55,7 +56,7 @@ namespace Omnis
                     transform.localScale = Vector3.one;
                     callback?.Invoke();
                 },
-                easing.Evaluate, lerpTime
+                lerpTime
             );
         }
     }

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.15
 
 using System;
 using System.Collections;
@@ -10,55 +10,53 @@ namespace Omnis.Utils
     public static class YieldHelper
     {
         #region Accumulations
-        /// <summary>It takes <i>time</i> seconds to ease from 0 to 1, where <i>easingFunc</i> determines the curve.</summary>
-        public static Coroutine Ease(this MonoBehaviour mono, Action<float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, null, easingFunc, time, 1f, false, false, fixedUpdate);
+        
+        /// <summary>It takes time seconds to ease from 0 to 1.</summary>
+        /// <param name="easingFunc">It determines the curve.</param>
+        /// <param name="action">The first value is the current lerp.<br/>The second value (if set) is the delta.</param>
+        /// <param name="final">The callback when finished.</param>
+        /// <param name="time">The duration time in seconds.</param>
+        /// <param name="fixedUpdate">If it yields WaitForFixedUpdate() or null.</param>
+        public static IEnumerator EEase(Func<float, float> easingFunc,
+                                        Action<float> action, Action final = null,
+                                        float time = 1f, bool fixedUpdate = false)
+            => EEaseRepeat(easingFunc, action, final, time, 1f, false, false, fixedUpdate);
+        
+        
+        /// <inheritdoc cref="EEase(Func{float, float}, Action{float}, Action, float, bool)"/>
+        public static IEnumerator EEase(Func<float, float> easingFunc,
+                                        Action<float, float> action, Action final = null,
+                                        float time = 1f, bool fixedUpdate = false)
+            => EEaseRepeat(easingFunc, action, final, time, 1f, false, false, fixedUpdate);
+        
+
+        /// <inheritdoc cref="EEase(Func{float, float}, Action{float}, Action, float, bool)"/>
+        public static Coroutine Ease(this MonoBehaviour mono, Func<float, float> easingFunc,
+                                     Action<float> action, Action final = null,
+                                     float time = 1f, bool fixedUpdate = false)
+            => mono.StartCoroutine(EEase(easingFunc, action, final, time, fixedUpdate));
 
 
-        /// <inheritdoc cref="Ease(MonoBehaviour, Action{float}, Func{float, float}, float, bool)"/>
-        /// <param name="action">Action&lt;value, delta&gt;: The second param is delta value of easingFunc.</param>
-        public static Coroutine Ease(this MonoBehaviour mono, Action<float, float> action, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, null, easingFunc, time, 1f, false, false, fixedUpdate);
+        /// <inheritdoc cref="EEase(Func{float, float}, Action{float}, Action, float, bool)"/>
+        public static Coroutine Ease(this MonoBehaviour mono, Func<float, float> easingFunc,
+                                     Action<float, float> action, Action final = null,
+                                     float time = 1f, bool fixedUpdate = false)
+            => mono.StartCoroutine(EEase(easingFunc, action, final, time, fixedUpdate));
 
 
-        /// <inheritdoc cref="Ease(MonoBehaviour, Action{float}, Func{float, float}, float, bool)"/>
-        public static Coroutine Ease(this MonoBehaviour mono, Action<float> action, Action final, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, final, easingFunc, time, 1f, false, false, fixedUpdate);
-
-
-        /// <inheritdoc cref="Ease(MonoBehaviour, Action{float}, Func{float, float}, float, bool)"/>
-        /// <param name="action">Action&lt;value, delta&gt;: The second param is delta value of easingFunc.</param>
-        public static Coroutine Ease(this MonoBehaviour mono, Action<float, float> action, Action final, Func<float, float> easingFunc, float time = 1f, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, final, easingFunc, time, 1f, false, false, fixedUpdate);
-
-
-        /// <inheritdoc cref="EEaseRepeat(Action{float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
-        public static Coroutine EaseRepeat(this MonoBehaviour mono, Action<float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, null, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate);
-
-
-        /// <inheritdoc cref="EEaseRepeat(Action{float, float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
-        public static Coroutine EaseRepeat(this MonoBehaviour mono, Action<float, float> action, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-            => mono.EaseRepeat(action, null, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate);
-
-
-        /// <inheritdoc cref="EEaseRepeat(Action{float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
-        public static Coroutine EaseRepeat(this MonoBehaviour mono, Action<float> action, Action final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-            => mono.StartCoroutine(EEaseRepeat(action, final, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate));
-
-
-        /// <inheritdoc cref="EEaseRepeat(Action{float, float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
-        public static Coroutine EaseRepeat(this MonoBehaviour mono, Action<float, float> action, Action final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-            => mono.StartCoroutine(EEaseRepeat(action, final, easingFunc, time, cycleCount, pingPong, dampened, fixedUpdate));
-
-
-
-        /// <summary>It takes <i>time</i> seconds to ease from 0 to 1, repeat <i>cycleCount</i> times.</summary>
+        /// <summary>It takes time seconds to ease from 0 to 1, repeat cycleCount times.</summary>
+        /// <param name="easingFunc">It determines the curve.</param>
+        /// <param name="action">The first value is the current lerp.<br/>The second value (if set) is the delta.</param>
+        /// <param name="final">The callback when finished.</param>
+        /// <param name="time">The duration time in seconds.</param>
         /// <param name="cycleCount">If less than 1, it won't stop.</param>
         /// <param name="pingPong">If true, it will use Mathf.PingPong() rather than Mathf.Repeat().</param>
-        /// <param name="dampened">If true, it applys linear decay to the scale.</param>
-        public static IEnumerator EEaseRepeat(Action<float> action, Action final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-        {
+        /// <param name="dampened">If true, it applies linear decay to the scale.</param>
+        /// <param name="fixedUpdate">If it yields WaitForFixedUpdate() or null.</param>
+        public static IEnumerator EEaseRepeat(Func<float, float> easingFunc,
+                                              Action<float> action, Action final = null,
+                                              float time = 1f, float cycleCount = 3f,
+                                              bool pingPong = false, bool dampened = false, bool fixedUpdate = false) {
             if (action == null) yield break;
 
             time = Mathf.Max(time, float.Epsilon);
@@ -78,10 +76,11 @@ namespace Omnis.Utils
         }
 
 
-        /// <inheritdoc cref="EEaseRepeat(Action{float}, Action, Func{float, float}, float, float, bool, bool, bool)"/>
-        /// <param name="action">Action&lt;value, delta&gt;: The second param is delta value of easingFunc.</param>
-        public static IEnumerator EEaseRepeat(Action<float, float> action, Action final, Func<float, float> easingFunc, float time = 1f, float cycleCount = 3f, bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
-        {
+        /// <inheritdoc cref="EEaseRepeat(Func{float, float}, Action{float}, Action, float, float, bool, bool, bool)"/>
+        public static IEnumerator EEaseRepeat(Func<float, float> easingFunc,
+                                              Action<float, float> action, Action final = null,
+                                              float time = 1f, float cycleCount = 3f,
+                                              bool pingPong = false, bool dampened = false, bool fixedUpdate = false) {
             if (action == null) yield break;
 
             time = Mathf.Max(time, float.Epsilon);
@@ -101,6 +100,23 @@ namespace Omnis.Utils
             action.Invoke(easingFunc(pingPong ? cycleCount.PingPong(1f) : cycleCount.RepeatCeil(1f)), 1f - lastValue);
             final?.Invoke();
         }
+
+
+        /// <inheritdoc cref="EEaseRepeat(Func{float, float}, Action{float}, Action, float, float, bool, bool, bool)"/>
+        public static Coroutine EaseRepeat(this MonoBehaviour mono, Func<float, float> easingFunc,
+                                           Action<float> action, Action final = null,
+                                           float time = 1f, float cycleCount = 3f,
+                                           bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+            => mono.StartCoroutine(EEaseRepeat(easingFunc, action, final, time, cycleCount, pingPong, dampened, fixedUpdate));
+
+
+        /// <inheritdoc cref="EEaseRepeat(Func{float, float}, Action{float}, Action, float, float, bool, bool, bool)"/>
+        public static Coroutine EaseRepeat(this MonoBehaviour mono, Func<float, float> easingFunc,
+                                           Action<float, float> action, Action final = null,
+                                           float time = 1f, float cycleCount = 3f,
+                                           bool pingPong = false, bool dampened = false, bool fixedUpdate = false)
+            => mono.StartCoroutine(EEaseRepeat(easingFunc, action, final, time, cycleCount, pingPong, dampened, fixedUpdate));
+
 
 
         /// <summary>It performs Mathf.SmoothDamp().</summary>
@@ -124,12 +140,14 @@ namespace Omnis.Utils
         /// <summary>It performs Mathf.SmoothDamp().</summary>
         public static Coroutine SmoothDamp(this MonoBehaviour mono, Action<float> action, float time = 1f, bool fixedUpdate = false)
             => mono.StartCoroutine(ESmoothDamp(action, time, fixedUpdate));
+        
         #endregion
 
 
 
 
-        #region Delta time
+        #region Delta Time
+        
         /// <summary>
         /// It gives the delta time through <i>frameInterval</i> frames back to <i>action</i>.<br/>
         /// NOTE: Floating-point errors may occur.
@@ -177,12 +195,13 @@ namespace Omnis.Utils
         /// <inheritdoc cref="EGiveDeltaTime(Action{float}, Action, float, int, bool)"/>
         public static Coroutine GiveDeltaTime(this MonoBehaviour mono, Action<float> action, Action final = null, float time = 1f, int frameInterval = 1, bool fixedUpdate = false)
             => mono.StartCoroutine(EGiveDeltaTime(action, final, time, frameInterval, fixedUpdate));
+        
         #endregion
 
 
 
-
         #region Sequences
+        
         /// <summary>It sequentially invokes <i>actions</i> for <i>i</i> times, waiting <i>interval</i> seconds in between.</summary>
         /// <param name="i">If less than 1, it won't stop.</param>
         /// <param name="interval">If <i>interval</i> &lt; 0, it invokes <i>action</i> every frame.</param>
@@ -263,6 +282,7 @@ namespace Omnis.Utils
         /// <inheritdoc cref="EDoAfterSeconds(float, Action)"/>
         public static Coroutine DoAfterSeconds(this MonoBehaviour mono, float waitSeconds, Action action)
             => mono.StartCoroutine(EDoAfterSeconds(waitSeconds, action));
+        
         #endregion
     }
 }

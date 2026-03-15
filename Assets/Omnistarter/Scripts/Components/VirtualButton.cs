@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.15
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -110,6 +110,7 @@ namespace Omnis
 
         private Coroutine LongPressHold() {
             return this.Ease(
+                Easing.Linear,
                 value => {
                     longPressProgress = value;
                     longPress.progressCallback?.Invoke(value);
@@ -118,7 +119,6 @@ namespace Omnis
                     longPress.longPressCallback?.Invoke();
                     longPressProgress = 0f;
                 },
-                Easing.Linear,
                 longPress.pressTime
             );
         }
@@ -131,10 +131,11 @@ namespace Omnis
             if (oldLocalScale == newLocalScale) return null;
 
             return this.Ease(
+                easing.Evaluate,
                 value => {
                     transform.localScale = Vector3.Lerp(oldLocalScale, newLocalScale, value);
-                },
-                easing.Evaluate, easingTime
+                }, null,
+                easingTime
             );
         }
 
