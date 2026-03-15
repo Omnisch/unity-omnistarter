@@ -13,20 +13,17 @@ namespace Omnis.Audio
     public sealed class MusicPlayer : MonoBehaviour
     {
         [Header("Scene References")]
-        [SerializeField]
-        private AudioMixerGroup musicMixerGroup;
+        [SerializeField] private AudioMixerGroup musicMixerGroup;
+        [SerializeField] private Transform laneARoot;
+        [SerializeField] private Transform laneBRoot;
 
         [Header("Scheduling")]
-        [SerializeField, Min(0.02f)]
-        private double scheduleLeadTime = 0.10;
-
+        [SerializeField, Min(0.02f)] private double scheduleLeadTime = 0.10;
         [SerializeField, Min(0f)] private float defaultFadeSeconds = 1f;
 
         public MusicCue CurrentCue => active.cue;
         public int CurrentVariantIndex => active.currentVariantIndex;
 
-        private Transform laneARoot;
-        private Transform laneBRoot;
         private Lane laneA;
         private Lane laneB;
         private Lane active;

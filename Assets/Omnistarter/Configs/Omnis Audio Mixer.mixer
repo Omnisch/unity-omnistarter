@@ -114,7 +114,10 @@ AudioMixerSnapshotController:
   m_Name: Paused
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 6cf81fcc8b22dee41a3a7c27c4109d5f
-  m_FloatValues: {}
+  m_FloatValues:
+    2e923cd59fbc9cb42bc58ef5ddb2bbcf: -24
+    8d69e876007d08f4b972c9adeab6977e: -24
+    c998549c815c1334e9cfd8ffa0a7e297: -24
   m_TransitionOverrides: {}
 --- !u!243 &-3426661186348914487
 AudioMixerGroupController:
@@ -219,7 +222,17 @@ AudioMixerController:
   m_SuspendThreshold: -80
   m_EnableSuspend: 1
   m_UpdateMode: 0
-  m_ExposedParameters: []
+  m_ExposedParameters:
+  - guid: 4ef9619db64be8f458b9323c759c816b
+    name: AmbienceUserVolume
+  - guid: 6369fe330ab609a48abb8643c0df784d
+    name: MasterUserVolume
+  - guid: 4f03d742df5906a4d9cd67f252520779
+    name: MusicUserVolume
+  - guid: fe6af57e9b8d9d445a0c743894985644
+    name: SfxUserVolume
+  - guid: 79abe6e8dea307843a5ef39f1c8d9cc0
+    name: UiUserVolume
   m_AudioMixerGroupViews:
   - guids:
     - 5ee516893b96c9f4c914b62224243db5
