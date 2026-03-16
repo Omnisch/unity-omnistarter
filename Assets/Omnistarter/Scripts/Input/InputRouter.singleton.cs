@@ -2,9 +2,9 @@ using Omnis.Utils;
 
 namespace Omnis
 {
-    public partial class InputHandler
+    public partial class InputRouter
     {
-        public static InputHandler Instance { get; private set; }
+        public static InputRouter Instance { get; private set; }
 
         private bool EnsureSingleton() {
             if (Instance != null && Instance != this) {

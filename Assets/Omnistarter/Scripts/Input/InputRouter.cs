@@ -13,7 +13,7 @@ namespace Omnis
     /// Hooked with .inputactions in the new Input System.
     /// </summary>
     [RequireComponent(typeof(PlayerInput))]
-    public partial class InputHandler : MonoBehaviour
+    public partial class InputRouter : MonoBehaviour
     {
         #region Serialized Fields
         [SerializeField] protected UnityEvent debugLogic;
@@ -27,11 +27,12 @@ namespace Omnis
         #region Fields
         protected PlayerInput playerInput;
         private List<Collider> hits = new();
+        private readonly RaycastHit[] rawHits = new RaycastHit[256];
         /// <summary>
         /// Used to handle LeftPressed-then-PointerOutOfBounds situations, in ReleaseLeftOOBs().
         /// </summary>
         private List<Collider> hitsLeftTrack = new();
-        private List<GameObject> listeners = new();
+        private readonly List<GameObject> listeners = new();
         #endregion
 
         #region Properties
@@ -42,19 +43,21 @@ namespace Omnis
                 pointerPosition = value;
 
                 Ray r = Camera.main.ScreenPointToRay(value);
-                var rawHits = Physics.RaycastAll(r);
-                System.Array.Sort(rawHits, (a, b) => a.distance.CompareTo(b.distance));
-                List<Collider> newHits = rawHits.Select(hit => hit.collider).ToList();
-                foreach (var hit in hits.Except(newHits).ToList())
-                    if (hit) {
-                        hit.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
-                        if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
-                    }
-                foreach (var hit in newHits.Except(hits).ToList())
-                    if (hit) {
-                        hit.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
-                        if (hit.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
-                    }
+                int hitCount = Physics.RaycastNonAlloc(r, rawHits);
+                
+                System.Array.Sort(rawHits[..hitCount], (a, b) => a.distance.CompareTo(b.distance));
+                var newHits = rawHits[..hitCount].Select(h => h.collider).ToList();
+                
+                foreach (var col in hits.Except(newHits).Where(c => c != null)) {
+                    col.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
+                    if (col.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
+                }
+                
+                foreach (var col in newHits.Except(hits).Where(c => c != null)) {
+                    col.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
+                    if (col.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
+                }
+                
                 hits = newHits;
             }
         }

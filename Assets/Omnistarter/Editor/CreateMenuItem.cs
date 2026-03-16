@@ -44,7 +44,7 @@ namespace OmnisEditor
         private static void CreateInputHandler(MenuCommand menuCommand)
         {
             GameObject go = new("Input Handler");
-            go.AddComponent<InputHandler>();
+            go.AddComponent<InputRouter>();
             Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
             GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
             Selection.activeObject = go;

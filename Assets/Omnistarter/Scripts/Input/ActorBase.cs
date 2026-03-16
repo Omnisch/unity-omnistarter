@@ -14,7 +14,7 @@ namespace Omnis
         #endregion
 
         #region Fields
-        private InputHandler handler;
+        private InputRouter router;
         private float jumpAxis;
         private float horizontalAxis;
         private float verticalAxis;
@@ -61,15 +61,15 @@ namespace Omnis
         #region Unity methods
         protected virtual void Start()
         {
-            handler = FindFirstObjectByType<InputHandler>();
-            if (handler)
-                handler.AddListener(gameObject);
+            router = FindFirstObjectByType<InputRouter>();
+            if (router)
+                router.AddListener(gameObject);
             else
                 Destroy(gameObject);
         }
         protected virtual void OnDestroy()
         {
-            if (handler) handler.RemoveListener(gameObject);
+            if (router) router.RemoveListener(gameObject);
         }
         #endregion
 

@@ -59,7 +59,7 @@ MonoBehaviour:
   musicVolume: 1
   sfxVolume: 1
   uiVolume: 1
-  overrideInstance: 1
+  overrideInstance: 0
 --- !u!1 &2751627444395859074
 GameObject:
   m_ObjectHideFlags: 0
