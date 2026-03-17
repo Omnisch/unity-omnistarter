@@ -1,11 +1,12 @@
 // author: Omnistudio
-// version: 2026.03.05
+// version: 2026.03.18
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Omnis.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace Omnis.API
     {
         public const string ChatUrl  = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
         public const string ImageUrl = "https://ark.cn-beijing.volces.com/api/v3/images/generations";
-        public const string TTSUrl   = "https://openspeech.bytedance.com/api/v1/tts";
+        public const string TTSUrl   = "https://openspeech.bytedance.com/api/v3/tts/unidirectional";
         public const string ASRUrl   = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash";
 
 
@@ -187,30 +188,39 @@ namespace Omnis.API
 
         #region Voice
         /// <returns>response.data</returns>
-        public static async Task<string> VoiceSynthesis(string appid, string token, string prompt, string voice_type, Action<string, LogLevel> upstreamLog = null) {
+        public static async Task<byte[]> VoiceSynthesis(string appid, string token, string text, string speaker, Action<string, LogLevel> upstreamLog = null) {
+            var header = new List<KeyValuePair<string, string>> {
+                new("X-Api-App-Key", appid),
+                new("X-Api-Access-Key", token),
+                new("X-Api-Resource-Id", "seed-tts-2.0"),
+                new("X-Api-Request-Id", Guid.NewGuid().ToString())
+            };
             var request = new {
-                app = new {
-                    appid,
-                    token,
-                    cluster = "volcano_tts",
-                },
                 user = new {
                     uid = Application.buildGUID
                 },
-                audio = new {
-                    voice_type,
-                },
-                request = new {
-                    reqid = Guid.NewGuid().ToString(),
-                    text = prompt,
-                    operation = "query"
+                req_params = new {
+                    text,
+                    speaker,
+                    audio_params = new {
+                        format = "pcm",
+                        sample_rate = 24000,
+                    }
                 }
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, $"Bearer;{token}", requestString, upstreamLog);
-            var response = JObject.Parse(Encoding.UTF8.GetString(responseRaw));
-            LogHelper.LogInfo($"[{response["code"]}] {response["message"]}", upstreamLog);
-            return response.Value<string>("data");
+            var responseRaw = await HttpHelper.PostJsonAsync(TTSUrl, "", requestString, header, upstreamLog);
+
+            var dataCombined = new List<byte[]>();
+            
+            foreach (byte[] responseRawChunk in SplitJsonObjects(responseRaw)) {
+                var responseChunked = JObject.Parse(Encoding.UTF8.GetString(responseRawChunk));
+                var dataChunked = responseChunked.Value<string>("data");
+                if (dataChunked != null)
+                    dataCombined.Add(Convert.FromBase64String(dataChunked));
+            }
+
+            return Merge(dataCombined);
         }
 
         public static async Task<string> AutoSpeechRecognition(string appid, string token, string url, string data, string format, Action<string, LogLevel> upstreamLog = null) {
@@ -245,57 +255,115 @@ namespace Omnis.API
             return response["result"]?.Value<string>("text");
         }
 
-        //object VoiceSynthRequest {
-        //    object app;
-        //        string appid;
-        //        string token;
-        //        string cluster;
-        //    object user;
-        //        string uid;
-        //    object audio;
-        //        string voice_type;
-        //    object request;
-        //        string reqid;
-        //        string text;
-        //        string operation;
-        //}
+        #region Chunked
 
-        //object VoiceSynthResponse {
-        //    string reqid;
-        //    int code;
-        //    string message;
-        //    int sequence;
-        //    string data;
-        //    object addition;
-        //        string duration;
-        //        string frontend;
-        //}
+        /// <summary>
+        /// Split a UTF-8 JSON object stream like:
+        /// { ... }\n{ ... }\n{ ... }
+        /// into individual object byte arrays.
+        /// 
+        /// It only splits top-level JSON objects and does not parse fields.
+        /// </summary>
+        public static IEnumerable<byte[]> SplitJsonObjects(byte[] bytes) {
+            if (bytes == null || bytes.Length == 0)
+                yield break;
 
-        //object ASRRequest {
-        //    object audio;
-        //        string url;       # *
-        //        string data;
-        //        string language;
-        //        string format;    # * raw / wav / mp3 / ogg
-        //        string codec;     # raw / opus
-        //        int rate;         # 16000 (recommended)
-        //    object request;
-        //        string model_name;    # * Must be set to "bigmodel" for now.
-        //        bool enable_itn;      # ITN will make the result more readable.
-        //        bool enable_punc;
-        //        bool enable_ddc;
-        //        object corpus;
-        //            string boosting_table_name;
-        //            string correct_table_name;
-        //            string context;
-        //}
+            int start = -1;
+            int braceDepth = 0;
+            bool inString = false;
+            bool isEscaping = false;
 
-        //object ASRResponse {
-        //    object audio_info;
-        //        int duration;
-        //    object result;
-        //        string text;
-        //}
+            for (int i = 0; i < bytes.Length; i++) {
+                byte b = bytes[i];
+
+                if (start < 0) {
+                    if (IsWhitespace(b))
+                        continue;
+
+                    if (b == (byte)'{') {
+                        start = i;
+                        braceDepth = 1;
+                        inString = false;
+                        isEscaping = false;
+                    }
+
+                    continue;
+                }
+
+                if (inString) {
+                    if (isEscaping) {
+                        isEscaping = false;
+                        continue;
+                    }
+
+                    if (b == (byte)'\\') {
+                        isEscaping = true;
+                        continue;
+                    }
+
+                    if (b == (byte)'"') {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (b == (byte)'"') {
+                    inString = true;
+                    continue;
+                }
+
+                if (b == (byte)'{') {
+                    braceDepth++;
+                    continue;
+                }
+
+                if (b == (byte)'}') {
+                    braceDepth--;
+
+                    if (braceDepth == 0) {
+                        int length = i - start + 1;
+                        var chunk = new byte[length];
+                        Buffer.BlockCopy(bytes, start, chunk, 0, length);
+                        yield return chunk;
+
+                        start = -1;
+                    }
+                }
+            }
+
+            if (start >= 0) {
+                throw new FormatException("Incomplete JSON object stream: last object was not closed.");
+            }
+        }
+
+        private static bool IsWhitespace(byte b) {
+            return b is (byte)' '
+                     or (byte)'\t'
+                     or (byte)'\r'
+                     or (byte)'\n';
+        }
+
+        private static byte[] Merge(List<byte[]> chunks)
+        {
+            if (chunks == null || chunks.Count == 0)
+                return Array.Empty<byte>();
+
+            int totalLength = chunks.Where(chunk => chunk != null).Sum(chunk => chunk.Length);
+
+            byte[] result = new byte[totalLength];
+            int offset = 0;
+
+            foreach (byte[] chunk in chunks.Where(chunk => chunk != null && chunk.Length != 0)) {
+                Buffer.BlockCopy(chunk, 0, result, offset, chunk.Length);
+                offset += chunk.Length;
+            }
+
+            return result;
+        }
+
+        #endregion
+        
         #endregion
     }
 }

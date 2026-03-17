@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.18
 
 using System;
 using UnityEngine;
@@ -23,6 +23,10 @@ namespace Omnis.Utils
         #region Audio (Written by ChatGPT)
         public static AudioClip MakeAudioClipFromBase64(string dataStr, int frequency, int channel = 1) {
             byte[] dataBytes = Convert.FromBase64String(dataStr);
+            return MakeAudioClipFromBase64(dataBytes, frequency, channel);
+        }
+
+        public static AudioClip MakeAudioClipFromBase64(byte[] dataBytes, int frequency, int channel = 1) {
             float[] dataFloats = new float[dataBytes.Length / 2];
             for (int i = 0; i < dataFloats.Length; i++) {
                 short sample = BitConverter.ToInt16(dataBytes, i * 2);
