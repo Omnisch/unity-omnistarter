@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.02.05
+// version: 2026.03.18
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace Omnis
     /// Hooked with .inputactions in the new Input System.
     /// </summary>
     [RequireComponent(typeof(PlayerInput))]
-    public partial class InputRouter : MonoBehaviour
+    public class InputRouter : MonoBehaviour
     {
         #region Serialized Fields
         [SerializeField] protected UnityEvent debugLogic;
@@ -42,6 +42,8 @@ namespace Omnis
             private set {
                 pointerPosition = value;
 
+                if (Camera.main == null) return;
+                
                 Ray r = Camera.main.ScreenPointToRay(value);
                 int hitCount = Physics.RaycastNonAlloc(r, rawHits);
                 
@@ -109,9 +111,6 @@ namespace Omnis
 
         #region Unity Methods
         protected virtual void Awake() {
-            if (!EnsureSingleton())
-                return;
-
             playerInput = GetComponent<PlayerInput>();
 
             foreach (var map in playerInput.actions.actionMaps)
@@ -120,14 +119,14 @@ namespace Omnis
         protected virtual void OnEnable() {
             if (playerInput)
                 playerInput.enabled = true;
-            if (Instance == null || Instance == this)
-                Cursor.visible = true;
+            
+            Cursor.visible = true;
         }
         protected virtual void OnDisable() {
             if (playerInput)
                 playerInput.enabled = false;
-            if (Instance == this)
-                Cursor.visible = false;
+            
+            Cursor.visible = false;
         }
         #endregion
 

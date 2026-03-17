@@ -1,5 +1,5 @@
 // author: ChatGPT
-// version: 2026.03.16
+// version: 2026.03.18
 
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace Omnis.Audio
         Sequential
     }
     
-    [CreateAssetMenu(menuName = "Omnis/Audio/Audio Cue", order = 240)]
+    [CreateAssetMenu(menuName = "Omnis/Audio/Audio Cue (240)", order = 240)]
     public sealed class AudioCue : ScriptableObject
     {
         public AudioBus bus = AudioBus.Sfx;

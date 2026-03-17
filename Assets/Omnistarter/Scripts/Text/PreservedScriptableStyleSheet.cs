@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.16
+// version: 2026.03.18
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Omnis.Text
 {
-    [CreateAssetMenu(menuName = "Omnis/Preserved Style Sheet", order = 246)]
+    [CreateAssetMenu(menuName = "Omnis/Presets/Preserved Style Sheet", order = 245)]
     public class PreservedScriptableStyleSheet : ScriptableStyleSheet
     {
         public override List<ScriptableRichTextTag> Tags => this.tags;

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.03.18
 
 using Omnis.Text.Conditions;
 using System.Collections.Generic;
@@ -15,6 +15,9 @@ namespace Omnis.Text
 
 
         #region Fields
+
+        public static DialogManager Instance;
+        
         private readonly Dictionary<string, TextActor> actors = new();
         private Dictionary<string, List<EntryBranch>> dialogScript;
         private EntryBranch currBranch;
@@ -23,6 +26,7 @@ namespace Omnis.Text
 
         public DialogCommands commands;
         public Blackboard blackboard;
+        
         #endregion
 
 
@@ -95,8 +99,7 @@ namespace Omnis.Text
 
         #region Unity Methods
         protected virtual void Awake() {
-            if (!EnsureSingleton())
-                return;
+            Instance = this;
 
             commands = new();
 

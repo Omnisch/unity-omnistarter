@@ -1,12 +1,12 @@
 // author: Omnistudio
-// version: 2026.03.16
+// version: 2026.03.18
 
 using UnityEngine;
 using UnityEngine.Audio;
 
 namespace Omnis.Audio
 {
-    public sealed partial class AudioManager : MonoBehaviour
+    public sealed class AudioManager : MonoBehaviour
     {
         [Header("Subsystems")]
         [SerializeField] private MusicPlayer musicPlayer;
@@ -34,19 +34,23 @@ namespace Omnis.Audio
         public float SfxVolume => sfxVolume;
         public float UiVolume => uiVolume;
 
+        public static AudioManager Instance;
+
         private const string MasterVolumeKey = "Audio.MasterVolume";
         private const string MusicVolumeKey = "Audio.MusicVolume";
         private const string SfxVolumeKey = "Audio.SfxVolume";
         private const string UiVolumeKey = "Audio.UiVolume";
 
         private void Awake() {
-            if (!EnsureSingleton()) {
-                return;
-            }
+            Instance = this;
 
             LoadVolumes();
             ApplyAllVolumes();
             ApplyDefaultSnapshotImmediate();
+        }
+
+        private void OnDestroy() {
+            Instance = null;
         }
 
 

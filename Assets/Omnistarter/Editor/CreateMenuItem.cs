@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.16
+// version: 2026.03.18
 
 using Omnis;
 using Omnis.Audio;
@@ -72,7 +72,7 @@ namespace OmnisEditor
             => Selection.GetFiltered<AudioClip>(SelectionMode.Assets).Length > 0;
         
         
-        [MenuItem("Assets/Create/Omnis/Class Editor", false, 244)]
+        [MenuItem("Assets/Create/Omnis/Class Editor (250)", false, 250)]
         private static void CreateClassEditor() {
             string templatePath = "Assets/Omnistarter/Editor/ClassEditorTemplate.cs.txt";
             string selectedObjectName = EditorHelper.ExtractAssetMainNameFromObject(Selection.activeObject);
@@ -84,7 +84,7 @@ namespace OmnisEditor
             => Selection.activeObject != null && AssetDatabase.GetAssetPath(Selection.activeObject).EndsWith(".cs");
 
 
-        [MenuItem("Assets/Create/Omnis/Singleton", false, 245)]
+        [MenuItem("Assets/Create/Omnis/Singleton", false, 251)]
         private static void CreateSingletonInstance() {
             string templatePath = "Assets/Omnistarter/Editor/SingletonTemplate.cs.txt";
             string selectedObjectName = EditorHelper.ExtractAssetMainNameFromObject(Selection.activeObject);

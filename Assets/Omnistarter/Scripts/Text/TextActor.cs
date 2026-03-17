@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.18
 
 using System.Collections;
 using System.Collections.Generic;
@@ -214,12 +214,16 @@ namespace Omnis.Text
         private void Start() {
             tmpro = GetComponent<TMP_Text>();
             Line = tmpro.text;
-            DialogManager.Instance.AddActor(this);
+
+            if (DialogManager.Instance != null) {
+                DialogManager.Instance.AddActor(this);
+            }
         }
 
         private void OnDestroy() {
-            if (DialogManager.Instance != null)
+            if (DialogManager.Instance != null) {
                 DialogManager.Instance.RemoveActor(this);
+            }
         }
         #endregion
 
