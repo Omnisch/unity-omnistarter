@@ -29,7 +29,6 @@ namespace Omnis.SceneManagement
             curtain = Instantiate(curtainPrefab);
             DontDestroyOnLoad(curtain);
 
-            curtain.GetComponent<Canvas>().worldCamera = Camera.main;
             yield return YieldHelper.EEase(
                 easing.Evaluate,
                 value => {
@@ -43,7 +42,6 @@ namespace Omnis.SceneManagement
                 yield break;
             }
             
-            curtain.GetComponent<Canvas>().worldCamera = Camera.main;
             yield return YieldHelper.EEase(
                 easing.Evaluate,
                 value => {

@@ -8,7 +8,7 @@ namespace Omnis
 {
     /// <summary>
     /// PointerReceiver will send messages to all Omnis.PointerBase on self GameObject.<br/>
-    /// Needs an Omnis.InputHandler in the scene.
+    /// Needs an Omnis.InputRouter in the scene.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     [DisallowMultipleComponent]

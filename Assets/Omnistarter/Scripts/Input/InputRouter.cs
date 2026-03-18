@@ -47,7 +47,7 @@ namespace Omnis
                 Ray r = Camera.main.ScreenPointToRay(value);
                 int hitCount = Physics.RaycastNonAlloc(r, rawHits);
                 
-                System.Array.Sort(rawHits[..hitCount], (a, b) => a.distance.CompareTo(b.distance));
+                System.Array.Sort(rawHits, 0, hitCount, new RaycastHitDistanceComparer());
                 var newHits = rawHits[..hitCount].Select(h => h.collider).ToList();
                 
                 foreach (var col in hits.Except(newHits).Where(c => c != null)) {
@@ -63,6 +63,13 @@ namespace Omnis
                 hits = newHits;
             }
         }
+        private sealed class RaycastHitDistanceComparer : IComparer<RaycastHit>
+        {
+            public int Compare(RaycastHit a, RaycastHit b) {
+                return a.distance.CompareTo(b.distance);
+            }
+        }
+        
         public Vector2 PointerDelta { get; private set; }
 
         protected Texture2D CursorIcon {
