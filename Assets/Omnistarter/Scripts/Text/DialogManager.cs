@@ -64,12 +64,11 @@ namespace Omnis.Text
         #region Methods
         public bool TryEnter(string entryName) {
             entryName = entryName.ToLowerInvariant();
-            if (!dialogScript.ContainsKey(entryName)) {
+            if (!dialogScript.TryGetValue(entryName, out var entry)) {
                 Debug.LogWarning($"No entry named {entryName}.");
                 return false;
             }
 
-            var entry = dialogScript[entryName];
             foreach (var branch in entry) {
                 if (branch.cond == null || branch.cond.Evaluate(blackboard)) {
                     currBranch = branch;
@@ -82,8 +81,7 @@ namespace Omnis.Text
         }
 
         public void NextLine() {
-            if (currBranch != null)
-                CurrLineIndex++;
+            CurrLineIndex++;
         }
 
         private void FinishEntry() {

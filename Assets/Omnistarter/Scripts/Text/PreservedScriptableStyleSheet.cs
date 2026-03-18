@@ -15,11 +15,11 @@ namespace Omnis.Text
         {
             #region Offset
             new(name: "elastic",
-                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.BounceIn((c.time - c.index * 0.133f).PingPong(1f)).ono())),
+                render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.BounceIn((c.time - c.index * 0.133f).PingPong(1f)).ono())),
             new(name: "float",
-                render: (c) => c.SimpleEditVertices(c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f)).ono())),
+                render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f)).ono())),
             new(name: "pacing",
-                render: (c) => {
+                render: c => {
                     float x = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum() - 0.25f).Repeat(1f));
                     float y = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
@@ -28,14 +28,14 @@ namespace Omnis.Text
 
             #region Emphasis
             new(name: "hili",
-                render: (c) => c.SimpleEditColor(ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, c.Spectrum()))),
+                render: c => c.SimpleEditColor(ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, c.Spectrum()))),
             new(name: "rgb",
-                render: (c) => c.SimpleEditColor(Color.HSVToRGB((c.time - c.Spectrum()).Repeat(1f), 1f, 1f))),
+                render: c => c.SimpleEditColor(Color.HSVToRGB((c.time - c.Spectrum()).Repeat(1f), 1f, 1f))),
             #endregion
 
             #region Print
             new(name: "break",
-                render: (c) => {
+                render: c => {
                     if (c.actor.pi.past >= c.tagInfo.endIndex)
                     {
                         c.tagInfo.finished = true;
@@ -64,12 +64,12 @@ namespace Omnis.Text
                     }
                 }),
             new(name: "reveal",
-                render: (c) => {
+                render: c => {
                     PrintingPresets(c);
                     c.SimpleEditAlpha(Mathf.Clamp01(c.actor.pi.past - c.index));
                 }),
             new(name: "print",
-                render: (c) => {
+                render: c => {
                     PrintingPresets(c);
                     c.SimpleEditAlpha(Mathf.Clamp01((int)c.actor.pi.past - c.index));
                 }),
@@ -77,7 +77,7 @@ namespace Omnis.Text
 
             #region Interact
             new(name: "pushingui",
-                render: (c) => {
+                render: c => {
                     var charInfo = c.actor.TMPro.textInfo.characterInfo[c.index];
                     if (!charInfo.isVisible) return;
                     int matIndex = charInfo.materialReferenceIndex;
@@ -120,8 +120,8 @@ namespace Omnis.Text
             else if (c.actor.pi.past > c.tagInfo.startIndex) {
                 if (c.actor.Next) {
                     c.actor.Next = false;
-                    // Only skip when allowing early next.
-                    if (c.actor.allowEarlyNext) {
+                    // Only skip when there is no "no-skip" attribute.
+                    if (!c.tagInfo.attrs.ContainsKey("no-skip")) {
                         c.actor.pi.past = c.tagInfo.endIndex;
                     }
                 }

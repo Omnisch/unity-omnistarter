@@ -18,7 +18,6 @@ namespace Omnis.Text
         public string actorId;
         [SerializeField] private string staticHead;
         public static readonly float DefaultPrintSpeed = 20f;
-        public bool allowEarlyNext;
         [Header("Animation Scale")]
         [SerializeField][Range(-1, 1)] private float animScale = 1f;
         [SerializeField] private bool isWorldPos;
