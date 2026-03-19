@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.03.18
 
 using Newtonsoft.Json;
 using System;
@@ -102,8 +102,8 @@ namespace Omnis.Utils
             Action<string, LogLevel> upstreamLog = null) {
             UnityWebRequest request;
 
-            if (body.GetType() == typeof(string))
-                request = MakePostJsonByString(url, auth, (string)body, moreHeaders);
+            if (body is string bs)
+                request = MakePostJsonByString(url, auth, bs, moreHeaders);
             else
                 request = MakePostJsonFromStruct(url, auth, body, moreHeaders);
 

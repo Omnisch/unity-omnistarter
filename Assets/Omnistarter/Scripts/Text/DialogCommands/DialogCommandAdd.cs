@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.03.18
 
 using Omnis.Text.Conditions;
 using System;
@@ -10,6 +10,8 @@ namespace Omnis.Text
 {
     public class DialogCommandAdd : IDialogCommand
     {
+        public string Keyword => "add";
+        
         private static readonly double DefaultValue = 0;
 
         /// <summary>

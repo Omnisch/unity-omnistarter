@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.01.02
+// version: 2026.03.18
 
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +7,8 @@ using System.Collections.Generic;
 namespace Omnis.Text
 {
     public interface IDialogCommand {
+        string Keyword { get; }
+        
         IEnumerator Execute(string[] args, DialogManager ctx);
     }
 

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.03.19
 
 using Omnis.Text.Conditions;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Omnis.Text
     public partial class DialogManager : MonoBehaviour
     {
         #region Serialized Fields
-        [SerializeField] private ScriptableStyleSheet styleSheet;
+        [SerializeField] protected ScriptableStyleSheet styleSheet;
         #endregion
 
 
@@ -19,10 +19,10 @@ namespace Omnis.Text
         public static DialogManager Instance;
         
         private readonly Dictionary<string, TextActor> actors = new();
-        private Dictionary<string, List<EntryBranch>> dialogScript;
-        private EntryBranch currBranch;
-        private int currLineIndex;
-        private TextActor currActor;
+        protected Dictionary<string, List<EntryBranch>> dialogScript;
+        protected EntryBranch currBranch;
+        protected int currLineIndex;
+        protected TextActor currActor;
 
         public DialogCommands commands;
         public Blackboard blackboard;
@@ -32,7 +32,7 @@ namespace Omnis.Text
 
         #region Properties
         public ScriptableStyleSheet StyleSheet => styleSheet;
-        protected int CurrLineIndex {
+        protected virtual int CurrLineIndex {
             get => currLineIndex;
             set {
                 if (currBranch == null) {
@@ -62,7 +62,7 @@ namespace Omnis.Text
 
 
         #region Methods
-        public bool TryEnter(string entryName) {
+        public virtual bool TryEnter(string entryName) {
             entryName = entryName.ToLowerInvariant();
             if (!dialogScript.TryGetValue(entryName, out var entry)) {
                 Debug.LogWarning($"No entry named {entryName}.");
@@ -80,11 +80,11 @@ namespace Omnis.Text
             return false;
         }
 
-        public void NextLine() {
+        public virtual void NextLine() {
             CurrLineIndex++;
         }
 
-        private void FinishEntry() {
+        protected virtual void FinishEntry() {
             if (currBranch.nextEntry != null)
                 TryEnter(currBranch.nextEntry);
         }
@@ -104,6 +104,13 @@ namespace Omnis.Text
             // register any new commands at here
             commands.Register("add", new DialogCommandAdd());
             commands.Register("set", new DialogCommandSet());
+            
+            // or you can add components to this dialog manager
+            var loadedCommands = GetComponents<IDialogCommand>();
+
+            foreach (var cmd in loadedCommands) {
+                commands.Register(cmd.Keyword, cmd);
+            }
         }
         #endregion
     }
