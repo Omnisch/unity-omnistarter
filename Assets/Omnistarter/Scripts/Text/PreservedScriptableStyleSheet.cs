@@ -14,26 +14,51 @@ namespace Omnis.Text
         protected readonly List<ScriptableRichTextTag> tags = new()
         {
             #region Offset
+            // <elastic> </elastic>
             new(name: "elastic",
                 render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.BounceIn((c.time - c.index * 0.133f).PingPong(1f)).ono())),
+            // <float> </float>
             new(name: "float",
                 render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f)).ono())),
+            // <pacing> </pacing>
             new(name: "pacing",
                 render: c => {
                     float x = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum() - 0.25f).Repeat(1f));
                     float y = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
+            // <noise (speed=float)> </noise>
+            // speed=4 can be panic enough
+            new (name: "noise",
+                render: c => {
+                    const float a = 1f;
+                    float f = c.time;
+                    
+                    if (c.tagInfo.attrs.TryGetValue("speed", out string o) && float.TryParse(o, out float speed)) {
+                        f *= speed;
+                        f *= speed;
+                    }
+                    float x = c.actor.AnimFactor * Mathf.PerlinNoise(f, c.index);
+                    float y = c.actor.AnimFactor * Mathf.PerlinNoise(f + a, c.index);
+                    
+                    c.SimpleEditVertices(new Vector3(x, y, 0f));
+                }),
             #endregion
 
             #region Emphasis
+            // <hili> </hili>
             new(name: "hili",
+                render: c => c.SimpleEditColor(ColorHelper.gold)),
+            // <colorful> </colorful>
+            new(name: "colorful",
                 render: c => c.SimpleEditColor(ColorHelper.Lerp(ColorHelper.skyBlue, ColorHelper.gold, c.Spectrum()))),
+            // <rgb> </rgb>
             new(name: "rgb",
                 render: c => c.SimpleEditColor(Color.HSVToRGB((c.time - c.Spectrum()).Repeat(1f), 1f, 1f))),
             #endregion
 
             #region Print
+            // <break (time=float) />
             new(name: "break",
                 render: c => {
                     if (c.actor.pi.past >= c.tagInfo.endIndex)
@@ -63,11 +88,13 @@ namespace Omnis.Text
                         }
                     }
                 }),
+            // <reveal (speed=float) (no-skip)> </reveal>
             new(name: "reveal",
                 render: c => {
                     PrintingPresets(c);
                     c.SimpleEditAlpha(Mathf.Clamp01(c.actor.pi.past - c.index));
                 }),
+            // <print (speed=float) (no-skip)> </print>
             new(name: "print",
                 render: c => {
                     PrintingPresets(c);
@@ -76,7 +103,8 @@ namespace Omnis.Text
             #endregion
 
             #region Interact
-            new(name: "pushingui",
+            // <pushing> </pushing>
+            new(name: "pushing",
                 render: c => {
                     var charInfo = c.actor.TMPro.textInfo.characterInfo[c.index];
                     if (!charInfo.isVisible) return;

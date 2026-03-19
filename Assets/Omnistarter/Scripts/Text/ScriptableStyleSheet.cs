@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.03.19
 
 using System;
 using System.Collections.Generic;
@@ -23,12 +23,12 @@ namespace Omnis.Text
             /// The reference used in tags, e.g. &lt;name&gt;&lt;/name&gt; or &lt;name /&gt;<br/>
             /// It should not be the same with tags preserved by Unity.
             /// </summary>
-            public string name;
+            public readonly string name;
             /// <summary>
             /// The function to render texts.<br/>
             /// CharInfo: The character to be rendered.
             /// </summary>
-            public Action<CharInfo> Render;
+            public readonly Action<CharInfo> Render;
 
             public ScriptableRichTextTag(string name, Action<CharInfo> render)
             {
@@ -78,6 +78,7 @@ namespace Omnis.Text
 
     public static class CharInfoExtensions
     {
+        /// <summary>Lerp from 0 at startIndex, to 1 at endIndex.</summary>
         public static float Spectrum(this CharInfo c)
             => c.tagInfo.endIndex <= c.tagInfo.startIndex + 1 ? 0f : (c.index - c.tagInfo.startIndex) / (float)(c.tagInfo.endIndex - c.tagInfo.startIndex - 1);
         public static CharInfo SimpleEditVertices(this CharInfo c, Vector3 value)
