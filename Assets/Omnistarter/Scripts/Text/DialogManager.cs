@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.19
+// version: 2026.03.21
 
 using Omnis.Text.Conditions;
 using System.Collections.Generic;
@@ -21,8 +21,8 @@ namespace Omnis.Text
         private readonly Dictionary<string, TextActor> actors = new();
         protected Dictionary<string, List<EntryBranch>> dialogScript;
         protected EntryBranch currBranch;
-        protected int currLineIndex;
         protected TextActor currActor;
+        private int currLineIndex;
 
         public DialogCommands commands;
         public Blackboard blackboard;
@@ -32,12 +32,20 @@ namespace Omnis.Text
 
         #region Properties
         public ScriptableStyleSheet StyleSheet => styleSheet;
-        protected virtual int CurrLineIndex {
+        public virtual int CurrLineIndex {
             get => currLineIndex;
-            set {
+            protected set {
                 if (currBranch == null) {
                     currLineIndex = -1;
                 } else {
+                    // interrupt old commands
+                    var oldLine = currBranch.actorLines[currLineIndex];
+                    foreach (var cmd in oldLine.cmds) {
+                        if (commands.TryGet(cmd.keyword, out var exe)) {
+                            exe.OnInterrupted(this);
+                        }
+                    }
+                    
                     if (value >= currBranch.actorLines.Count) {
                         FinishEntry();
                     } else {
@@ -47,10 +55,10 @@ namespace Omnis.Text
                             actor.Line = actorLine.text;
                             currActor = actor;
                         }
-                        // execute commands
+                        // execute new commands
                         foreach (var cmd in actorLine.cmds) {
                             if (commands.TryGet(cmd.keyword, out var exe)) {
-                                StartCoroutine(exe.Execute(cmd.args, this));
+                                exe.OnExecute(cmd.args, this);
                             }
                         }
                     }

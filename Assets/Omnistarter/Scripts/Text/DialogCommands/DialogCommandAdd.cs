@@ -1,9 +1,8 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.03.21
 
 using Omnis.Text.Conditions;
 using System;
-using System.Collections;
 using System.Globalization;
 
 namespace Omnis.Text
@@ -17,7 +16,7 @@ namespace Omnis.Text
         /// <summary>
         /// /add &lt;flag&gt; &lt;delta_value&gt;
         /// </summary>
-        public IEnumerator Execute(string[] args, DialogManager ctx) {
+        public void OnExecute(string[] args, DialogManager ctx) {
             if (args.Length < 3) {
                 throw new ArgumentException("Too few arguments, needs to be exactly two arguments: flag name, delta value (number).");
             } else if (args.Length > 3) {
@@ -38,7 +37,8 @@ namespace Omnis.Text
             }
 
             ctx.blackboard[args[1]] = Value.From(flagValue.Number + delta);
-            yield break;
         }
+
+        public void OnInterrupted(DialogManager ctx) { }
     }
 }

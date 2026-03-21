@@ -1,7 +1,6 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.03.21
 
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Omnis.Text
@@ -9,7 +8,9 @@ namespace Omnis.Text
     public interface IDialogCommand {
         string Keyword { get; }
         
-        IEnumerator Execute(string[] args, DialogManager ctx);
+        void OnExecute(string[] args, DialogManager ctx);
+
+        void OnInterrupted(DialogManager ctx);
     }
 
     public sealed class DialogCommands {
