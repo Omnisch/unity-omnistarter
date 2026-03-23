@@ -36,6 +36,8 @@ namespace Omnis
         #endregion
 
         #region Properties
+        public static InputRouter Instance { get; private set; }
+        
         private Vector2 pointerPosition;
         public Vector2 PointerPosition {
             get => pointerPosition;
@@ -118,6 +120,8 @@ namespace Omnis
 
         #region Unity Methods
         protected virtual void Awake() {
+            Instance = this;
+            
             playerInput = GetComponent<PlayerInput>();
 
             foreach (var map in playerInput.actions.actionMaps)

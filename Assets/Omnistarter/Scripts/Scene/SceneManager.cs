@@ -13,20 +13,39 @@ namespace Omnis.SceneManagement
         [SerializeField] private string startSceneName;
         [SerializeField] private SceneTransitionBase transition;
         [SerializeField] private float redundantLoadTime = 0.1f;
-        
+
+        public static SceneManager Instance { get; private set; }
+
         private string oldSceneName;
         private bool isLoading;
         
         public void LoadSceneByName(string sceneName) {
             if (isLoading)
                 return;
-            StartCoroutine(LoadSceneAsync(sceneName));
+            StartCoroutine(LoadSceneAsync(sceneName, -1));
         }
 
-        private IEnumerator LoadSceneAsync(string sceneName) {
+        public void LoadSceneByIndex(int sceneIndex) {
+            if (isLoading)
+                return;
+            StartCoroutine(LoadSceneAsync(null, sceneIndex));
+        }
+
+        public void LoadNextScene() {
+            if (isLoading)
+                return;
+
+            int currSceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+            int totalSceneCount = UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings;
+            StartCoroutine(LoadSceneAsync(null,  (currSceneIndex + 1) % totalSceneCount));
+        }
+
+        private IEnumerator LoadSceneAsync(string sceneName, int sceneIndex) {
             isLoading = true;
 
-            var loadOp = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            var loadOp = string.IsNullOrEmpty(sceneName)
+                ? UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneIndex, LoadSceneMode.Additive)
+                : UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
             if (loadOp == null) {
                 isLoading = false;
                 yield break;
@@ -50,17 +69,18 @@ namespace Omnis.SceneManagement
             loadOp.allowSceneActivation = true;
 
             yield return loadOp;
+            yield return new WaitForSecondsRealtime(redundantLoadTime);
 
-            var newScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
+            var newScene = string.IsNullOrEmpty(sceneName)
+                ? UnityEngine.SceneManagement.SceneManager.GetSceneByBuildIndex(sceneIndex)
+                : UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
             if (newScene.IsValid() && newScene.isLoaded) {
                 UnityEngine.SceneManagement.SceneManager.SetActiveScene(newScene);
             }
 
-            yield return new WaitForSecondsRealtime(redundantLoadTime);
-
             yield return transition.TransitionIn(sceneName);
             
-            oldSceneName = sceneName;
+            oldSceneName = newScene.name;
             isLoading = false;
         }
 
@@ -71,7 +91,11 @@ namespace Omnis.SceneManagement
             var mainCamera = FindObjectsByType<Camera>(FindObjectsSortMode.None).First(cam => cam.CompareTag("MainCamera"));
             mainCamera.tag = "Untagged";
         }
-        
+
+
+        private void Awake() {
+            Instance = this;
+        }
 
         private void Start() {
             if (string.IsNullOrEmpty(startSceneName))
