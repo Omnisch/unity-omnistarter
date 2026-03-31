@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.03.21
 
 using Omnis.Utils;
 using System.Collections.Generic;
@@ -17,25 +17,31 @@ namespace Omnis.Text
             // <elastic> </elastic>
             new(name: "elastic",
                 render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.BounceIn((c.time - c.index * 0.133f).PingPong(1f)).ono())),
-            // <float> </float>
-            new(name: "float",
-                render: c => c.SimpleEditVertices(c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f)).ono())),
+            // <floating (offset=0.1)> </floating>
+            new(name: "floating",
+                render: c => {
+                    float offset = 0.1f;
+                    if (c.tagInfo.attrs.TryGetValue("offset", out string o)) {
+                        float.TryParse(o, out offset);
+                    }
+                    c.SimpleEditVertices(
+                        c.actor.AnimFactor * Easing.SineRaw((c.time - c.index * offset).Repeat(1f)).ono());
+                }),
             // <pacing> </pacing>
             new(name: "pacing",
                 render: c => {
-                    float x = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum() - 0.25f).Repeat(1f));
-                    float y = c.actor.AnimFactor * Easing.SineRaw((c.time - c.Spectrum()).Repeat(1f));
+                    float x = c.actor.AnimFactor * Easing.SineRaw((c.time - c.index * 0.1f - 0.25f).Repeat(1f));
+                    float y = c.actor.AnimFactor * Easing.SineRaw((c.time - c.index * 0.1f).Repeat(1f));
                     c.SimpleEditVertices(new Vector3(x, y, 0f));
                 }),
-            // <noise (speed=float)> </noise>
-            // speed=4 can be panic enough
+            // <noise (speed=1)> </noise>
+            // speed=10 can be panic enough
             new (name: "noise",
                 render: c => {
                     const float a = 1f;
                     float f = c.time;
                     
                     if (c.tagInfo.attrs.TryGetValue("speed", out string o) && float.TryParse(o, out float speed)) {
-                        f *= speed;
                         f *= speed;
                     }
                     float x = c.actor.AnimFactor * Mathf.PerlinNoise(f, c.index);
