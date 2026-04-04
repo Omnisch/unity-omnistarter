@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.12
+// version: 2026.04.04
 
 using OdinSerializer;
 using System.IO;
@@ -12,20 +12,20 @@ namespace Omnis
     /// </summary>
     public static class IO
     {
-        public static bool SaveToFile(object data, string path, bool backupOne = false) {
+        public static bool SaveToFile(object data, string path, bool backupOne = false, bool useBinary = false) {
             return backupOne
-                ? SaveWithBackup(data, path)
-                : SaveWithoutBackup(data, path);
+                ? SaveWithBackup(data, path, useBinary)
+                : SaveWithoutBackup(data, path, useBinary);
         }
-        public static bool SaveToFile(object data, string dir, string fileName, bool backupOne = false) {
+        public static bool SaveToFile(object data, string dir, string fileName, bool backupOne = false, bool useBinary = false) {
             return backupOne
-                ? SaveWithBackup(data, Path.Combine(dir, fileName))
-                : SaveWithoutBackup(data, Path.Combine(dir, fileName));
+                ? SaveWithBackup(data, Path.Combine(dir, fileName), useBinary)
+                : SaveWithoutBackup(data, Path.Combine(dir, fileName), useBinary);
         }
-        private static bool SaveWithoutBackup(object data, string path)
+        private static bool SaveWithoutBackup(object data, string path, bool useBinary)
         {
             if (data is not byte[] bytes) {
-                bytes = SerializationUtility.SerializeValue(data, DataFormat.JSON);
+                bytes = SerializationUtility.SerializeValue(data, useBinary ? DataFormat.Binary : DataFormat.JSON);
             }
 
             if (bytes == null || bytes.Length == 0) {
@@ -52,7 +52,7 @@ namespace Omnis
                 return false;
             }
         }
-        private static bool SaveWithBackup(object data, string path) {
+        private static bool SaveWithBackup(object data, string path, bool useBinary) {
             string dir = Path.GetDirectoryName(path) ?? string.Empty;
             string name = Path.GetFileNameWithoutExtension(path);
             string ext = Path.GetExtension(path);
@@ -60,7 +60,7 @@ namespace Omnis
 
             try {
                 string tmpPath = path + ".tmp";
-                SaveWithoutBackup(data, tmpPath);
+                SaveWithoutBackup(data, tmpPath, useBinary);
 
                 if (File.Exists(path)) {
                     if (File.Exists(prevPath)) {
@@ -90,10 +90,10 @@ namespace Omnis
 
 
 
-        public static T LoadFromFile<T>(string path)
+        public static T LoadFromFile<T>(string path, bool useBinary = false)
         {
             byte[] bytes = File.ReadAllBytes(path);
-            return SerializationUtility.DeserializeValue<T>(bytes, DataFormat.JSON);
+            return SerializationUtility.DeserializeValue<T>(bytes, useBinary ? DataFormat.Binary : DataFormat.JSON);
         }
     }
 }
