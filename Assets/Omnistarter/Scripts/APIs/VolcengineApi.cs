@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.04.10
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Omnis.API
 {
@@ -196,9 +195,6 @@ namespace Omnis.API
                 new("X-Api-Request-Id", Guid.NewGuid().ToString())
             };
             var request = new {
-                user = new {
-                    uid = Application.buildGUID
-                },
                 req_params = new {
                     text,
                     speaker,
