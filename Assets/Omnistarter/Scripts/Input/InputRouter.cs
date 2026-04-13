@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.04.13
 
 using System.Collections.Generic;
 using System.Linq;
@@ -53,12 +53,12 @@ namespace Omnis
                 var newHits = rawHits[..hitCount].Select(h => h.collider).ToList();
                 
                 foreach (var col in hits.Except(newHits).Where(c => c != null)) {
-                    col.SendMessage("OnPointerExit", options: SendMessageOptions.DontRequireReceiver);
+                    col.SendMessage("OnPointerExitRaw", options: SendMessageOptions.DontRequireReceiver);
                     if (col.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
                 }
                 
                 foreach (var col in newHits.Except(hits).Where(c => c != null)) {
-                    col.SendMessage("OnPointerEnter", options: SendMessageOptions.DontRequireReceiver);
+                    col.SendMessage("OnPointerEnterRaw", options: SendMessageOptions.DontRequireReceiver);
                     if (col.TryGetComponent<PointerReceiver>(out var pr) && pr.opaque) break;
                 }
                 
@@ -91,7 +91,7 @@ namespace Omnis
 
             foreach (var hit in hits) {
                 if (hit && hit.TryGetComponent<PointerReceiver>(out var pr)) {
-                    hit.SendMessage("OnInteract", hits, SendMessageOptions.DontRequireReceiver);
+                    hit.SendMessage("OnInteractRaw", hits, SendMessageOptions.DontRequireReceiver);
                     hit.SendMessage(methodName, value, SendMessageOptions.DontRequireReceiver);
                     // if opaque, ignore colliders behind it.
                     if (pr.opaque) break;
@@ -143,20 +143,20 @@ namespace Omnis
 
         #region Messages
         protected virtual void OnLeftPress() {
-            ForwardMessageToHits("OnLeftPress");
+            ForwardMessageToHits("OnLeftPressRaw");
             hitsLeftTrack = hits;
             CursorIcon = iconCursorPressed;
         }
         protected virtual void OnLeftRelease() {
-            ForwardMessageToHits("OnLeftRelease");
+            ForwardMessageToHits("OnLeftReleaseRaw");
             ReleaseLeftOOBs();
             CursorIcon = iconCursor;
         }
-        protected virtual void OnRightPress() => ForwardMessageToHits("OnRightPress");
-        protected virtual void OnRightRelease() => ForwardMessageToHits("OnRightRelease");
-        protected virtual void OnMiddlePress() => ForwardMessageToHits("OnMiddlePress");
-        protected virtual void OnMiddleRelease() => ForwardMessageToHits("OnMiddleRelease");
-        protected virtual void OnScroll(InputValue value) => ForwardMessageToHits("OnScroll", value.Get<float>());
+        protected virtual void OnRightPress() => ForwardMessageToHits("OnRightPressRaw");
+        protected virtual void OnRightRelease() => ForwardMessageToHits("OnRightReleaseRaw");
+        protected virtual void OnMiddlePress() => ForwardMessageToHits("OnMiddlePressRaw");
+        protected virtual void OnMiddleRelease() => ForwardMessageToHits("OnMiddleReleaseRaw");
+        protected virtual void OnScroll(InputValue value) => ForwardMessageToHits("OnScrollRaw", value.Get<float>());
         protected virtual void OnPointer(InputValue value) => PointerPosition = value.Get<Vector2>();
         protected virtual void OnPointerDelta(InputValue value) => PointerDelta = value.Get<Vector2>();
 
@@ -167,8 +167,8 @@ namespace Omnis
         protected virtual void OnUndo() => ForwardMessageToListeners("OnUndo");
         protected virtual void OnRetry() => ForwardMessageToListeners("OnRetry");
 
-        protected virtual void OnSave() => ForwardMessageToHits("OnSave");
-        protected virtual void OnLoad() => ForwardMessageToHits("OnLoad");
+        protected virtual void OnSave() => ForwardMessageToListeners("OnSave");
+        protected virtual void OnLoad() => ForwardMessageToListeners("OnLoad");
         protected virtual void OnDebugTest() => debugLogic?.Invoke();
         protected virtual void OnQuitGame() {
 #if UNITY_EDITOR

@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.10
+// version: 2026.04.13
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -53,15 +53,15 @@ namespace Omnis
         #endregion
 
         #region Messages
-        protected void InteractReceiver(List<Collider> siblings) { if (Active) OnInteracted(siblings); }
-        private void LeftPressReceiver()      { if (Active) LeftPressed = true; }
-        private void LeftReleaseReceiver()    { if (Active) LeftPressed = false; }
-        private void RightPressReceiver()     { if (Active) RightPressed = true; }
-        private void RightReleaseReceiver()   { if (Active) RightPressed = false; }
-        private void MiddlePressReceiver()    { if (Active) MiddlePressed = true; }
-        private void MiddleReleaseReceiver()  { if (Active) MiddlePressed = false; }
-        private void PointerEnterReceiver()   { if (Active) Pointed = true; }
-        private void PointerExitReceiver()    { if (Active) Pointed = false; }
+        protected void OnInteract(List<Collider> siblings) { if (Active) OnInteracted(siblings); }
+        private void OnLeftPress()      { if (Active) LeftPressed = true; }
+        private void OnLeftRelease()    { if (Active) LeftPressed = false; }
+        private void OnRightPress()     { if (Active) RightPressed = true; }
+        private void OnRightRelease()   { if (Active) RightPressed = false; }
+        private void OnMiddlePress()    { if (Active) MiddlePressed = true; }
+        private void OnMiddleRelease()  { if (Active) MiddlePressed = false; }
+        private void OnPointerEnter()   { if (Active) Pointed = true; }
+        private void OnPointerExit()    { if (Active) Pointed = false; }
         #endregion
     }
 }
