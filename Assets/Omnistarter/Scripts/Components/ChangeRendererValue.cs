@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.15
+// version: 2026.04.13
 
 using Omnis.Utils;
 using OmnisEditor;
@@ -60,9 +60,7 @@ namespace Omnis
             throw new NotSupportedException($"MaterialPropertyBlock does not support type: {typeof(T).FullName} (param: {nameOfParam})");
         }
         public void Set<T>(string nameOfParam, T value) {
-            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
-                StopCoroutine(last);
-            }
+            StopLerp(nameOfParam);
 
             PrivateSet(nameOfParam, value);
             paramDict[nameOfParam] = null;
@@ -107,9 +105,7 @@ namespace Omnis
         public void LerpTo(string nameOfParam, float to, Action callback = null)
             => LerpTo(nameOfParam, Get<float>(nameOfParam), to, callback);
         public void LerpTo(string nameOfParam, float from, float to, Action callback = null) {
-            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
-                StopCoroutine(last);
-            }
+            StopLerp(nameOfParam);
 
             paramDict[nameOfParam] = this.Ease(
                 easing.Evaluate,
@@ -122,9 +118,7 @@ namespace Omnis
         public void LerpTo(string nameOfParam, Color to, Action callback = null)
             => LerpTo(nameOfParam, Get<Color>(nameOfParam), to, callback);
         public void LerpTo(string nameOfParam, Color from, Color to, Action callback = null) {
-            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
-                StopCoroutine(last);
-            }
+            StopLerp(nameOfParam);
 
             paramDict[nameOfParam] = this.Ease(
                 easing.Evaluate,
@@ -132,6 +126,12 @@ namespace Omnis
                 () => callback?.Invoke(),
                 lerpTime
             );
+        }
+
+        public void StopLerp(string nameOfParam) {
+            if (paramDict.TryGetValue(nameOfParam, out var last) && last != null) {
+                StopCoroutine(last);
+            }
         }
         #endregion
 
