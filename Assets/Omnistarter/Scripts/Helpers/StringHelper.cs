@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.13
+// version: 2026.04.16
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ namespace Omnis.Utils
     public static class StringHelper
     {
         #region Han Characters
+
         public static readonly string[] HanNumbers = { "零", "一", "二", "三", "四", "五", "六", "七", "八", "九" };
         public static readonly string[] HanNumbersFormal = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖" };
         private static readonly string[] HanUnit = { "", "十", "百", "千", "万", "十", "百", "千", "亿" };
@@ -32,7 +33,8 @@ namespace Omnis.Utils
 
             if (integerPart == "0") {
                 integerStr = numbers[0];
-            } else {
+            }
+            else {
                 int length = integerPart.Length;
                 int midZero = 0;
 
@@ -46,11 +48,13 @@ namespace Omnis.Utils
                             integerStr += units[unitIndex];
                         else if (midZero < 4 && unitIndex % 4 == 0)
                             integerStr += units[unitIndex];
-                    } else {
+                    }
+                    else {
                         if (midZero > 0) {
                             integerStr += numbers[0];
                             midZero = 0;
                         }
+
                         integerStr += numbers[digit] + units[unitIndex];
                     }
                 }
@@ -64,7 +68,7 @@ namespace Omnis.Utils
 
             return decimalStr == "" ? integerStr : integerStr + "点" + decimalStr;
         }
-        
+
         public static string ParseToHanIndividual(this string numStr, bool useFormal = false) {
             string result = "";
             var numbers = useFormal ? HanNumbersFormal : HanNumbers;
@@ -78,6 +82,31 @@ namespace Omnis.Utils
 
             return result;
         }
+
+        public static bool IsAllChinese(this string s) {
+            if (string.IsNullOrEmpty(s))
+                return false;
+
+            foreach (char c in s) {
+                if (c < 0x4E00 || c > 0x9FFF)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool ContainsChinese(this string s) {
+            if (string.IsNullOrEmpty(s))
+                return false;
+
+            foreach (char c in s) {
+                if (c >= 0x4E00 && c <= 0x9FFF)
+                    return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region Natural Order
