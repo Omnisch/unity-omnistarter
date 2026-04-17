@@ -90,9 +90,13 @@ namespace Omnis
 
 
 
+        /// <summary>
+        /// Warning: Don't use this to load bytes, use File.ReadAllBytes instead.
+        /// </summary>
         public static T LoadFromFile<T>(string path, bool useBinary = false)
         {
             byte[] bytes = File.ReadAllBytes(path);
+
             return SerializationUtility.DeserializeValue<T>(bytes, useBinary ? DataFormat.Binary : DataFormat.JSON);
         }
     }
