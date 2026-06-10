@@ -36,6 +36,7 @@ public partial class #PARTIALSCRIPTNAME#
 }
 
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(#PARTIALSCRIPTNAME#))]
 public class #PARTIALSCRIPTNAME#SingletonEditor : Editor
 {
@@ -58,4 +59,5 @@ public class #PARTIALSCRIPTNAME#SingletonEditor : Editor
         DrawDefaultInspector();
     }
 }
+#endif
 #ROOTNAMESPACEEND#
