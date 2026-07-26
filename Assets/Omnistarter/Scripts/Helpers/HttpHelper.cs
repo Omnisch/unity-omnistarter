@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.03.18
+// version: 2026.07.23
 
 using Newtonsoft.Json;
 using System;
@@ -15,9 +15,9 @@ namespace Omnis.Utils
     {
         #region Make Request
         public static UnityWebRequest MakeGet(
-                string url,
-                string auth,
-                List<KeyValuePair<string, string>> moreHeaders = null)
+            string url,
+            string auth,
+            List<KeyValuePair<string, string>> moreHeaders = null)
         {
             var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET) {
                 downloadHandler = new DownloadHandlerBuffer()
@@ -32,10 +32,10 @@ namespace Omnis.Utils
         }
 
         public static UnityWebRequest MakePostJsonByString(
-                string url,
-                string auth,
-                string jsonBody = "{}",
-                List<KeyValuePair<string, string>> moreHeaders = null)
+            string url,
+            string auth,
+            string jsonBody = "{}",
+            List<KeyValuePair<string, string>> moreHeaders = null)
         {
             jsonBody = JsonPruneHelperLight.RemoveEmptyFields(jsonBody);
             Debug.Log($"POST data: {jsonBody}");
@@ -46,7 +46,7 @@ namespace Omnis.Utils
             };
             request.SetRequestHeader("Authorization", auth);
             request.SetRequestHeader("Content-Type", "application/json");
-
+            
             if (moreHeaders != null)
                 foreach (var header in moreHeaders)
                     request.SetRequestHeader(header.Key, header.Value);
@@ -55,10 +55,10 @@ namespace Omnis.Utils
         }
 
         public static UnityWebRequest MakePostJsonFromStruct(
-                string url,
-                string auth,
-                object body = null,
-                List<KeyValuePair<string, string>> moreHeaders = null)
+            string url,
+            string auth,
+            object body = null,
+            List<KeyValuePair<string, string>> moreHeaders = null)
             => MakePostJsonByString(url, auth, JsonConvert.SerializeObject(body), moreHeaders);
         #endregion
 
@@ -70,9 +70,9 @@ namespace Omnis.Utils
 
         public static byte[] GetResultData(UnityWebRequest request, Action<string, LogLevel> upstreamLog = null) {
             if (request.result == UnityWebRequest.Result.Success) {
-                LogHelper.LogInfo($"HTTP Success: {request.downloadHandler.text}", upstreamLog);
+                LogHelper.LogInfo($"HTTP {request.responseCode}: {request.downloadHandler.text}", upstreamLog);
             } else {
-                LogHelper.LogError($"HTTP Error: {request.responseCode} - {request.error}", upstreamLog);
+                LogHelper.LogError($"{request.error}: {request.downloadHandler.text}", upstreamLog);
             }
             return request.downloadHandler.data;
         }
@@ -80,10 +80,10 @@ namespace Omnis.Utils
         #region Full Shorthands
         public static async Task<byte[]> GetAsync(string url, string auth, Action<string, LogLevel> upstreamLog = null) => await GetAsync(url, auth, null, upstreamLog);
         public static async Task<byte[]> GetAsync(
-                string url,
-                string auth,
-                List<KeyValuePair<string, string>> moreHeaders,
-                Action<string, LogLevel> upstreamLog = null)
+            string url,
+            string auth,
+            List<KeyValuePair<string, string>> moreHeaders,
+            Action<string, LogLevel> upstreamLog = null)
         {
             UnityWebRequest request = MakeGet(url, auth, moreHeaders);
             LogHelper.LogInfo($"Waiting response from {url} ...", upstreamLog);
