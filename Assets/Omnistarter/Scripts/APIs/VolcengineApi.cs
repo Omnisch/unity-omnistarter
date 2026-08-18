@@ -1,5 +1,5 @@
 // author: Omnistudio
-// version: 2026.04.10
+// version: 2026.08.18
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -69,6 +69,8 @@ namespace Omnis.API
         }
 
         public enum ChatModel {
+            doubao_seed_2_1_pro,
+            doubao_seed_2_1_turbo,
             doubao_seed_2_0_pro,
             doubao_seed_2_0_lite,
             doubao_seed_2_0_mini,
@@ -87,6 +89,8 @@ namespace Omnis.API
         }
         public static string GetModelID(ChatModel m) {
             return m switch {
+                ChatModel.doubao_seed_2_1_pro       => "doubao-seed-2-1-pro-260628",
+                ChatModel.doubao_seed_2_1_turbo     => "doubao-seed-2-1-turbo-260628",
                 ChatModel.doubao_seed_2_0_pro       => "doubao-seed-2-0-pro-260215",
                 ChatModel.doubao_seed_2_0_lite      => "doubao-seed-2-0-lite-260215",
                 ChatModel.doubao_seed_2_0_mini      => "doubao-seed-2-0-mini-260215",
@@ -102,9 +106,10 @@ namespace Omnis.API
                 ChatModel.doubao_seed_1_6_flash     => "doubao-seed-1-6-flash-250828",
                 ChatModel.doubao_seed_1_6_vision    => "doubao-seed-1-6-vision-250815",
                 ChatModel.deepseek_r1               => "deepseek-r1-250528",
-                _ => "doubao-seed-1-8-251228"
+                _ => GetDefaultModelID()
             };
         }
+        public static string GetDefaultModelID() => "doubao-seed-2-0-lite-260215";
 
         [Serializable]
         public struct ChatResponseDataItem {
@@ -146,26 +151,26 @@ namespace Omnis.API
             string prompt,
             object image = null,
             string size = "2K",
-            string sequential_image_generation = "disabled",
             string response_format = "b64_json") {
             return new {
                 model = GetModelID(model),
                 prompt,
                 image,
                 size,
-                sequential_image_generation,
                 response_format,
                 watermark = false
             };
         }
 
         public enum ImageModel {
+            doubao_seedream_5_0_pro,
             doubao_seedream_5_0,
             doubao_seedream_4_5,
             doubao_seedream_4_0,
         }
         public static string GetModelID(ImageModel m) {
             return m switch {
+                ImageModel.doubao_seedream_5_0_pro => "doubao-seedream-5-0-pro-260628",
                 ImageModel.doubao_seedream_5_0 => "doubao-seedream-5-0-260128",
                 ImageModel.doubao_seedream_4_5 => "doubao-seedream-4-5-251128",
                 ImageModel.doubao_seedream_4_0 => "doubao-seedream-4-0-250828",
